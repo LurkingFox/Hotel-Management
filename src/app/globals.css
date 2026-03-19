@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --theme-ink: #11202f;
+  --theme-ink-soft: #21384f;
+  --theme-parchment: #f7f1e8;
+  --theme-parchment-deep: #efe4d4;
+  --theme-terracotta: #bb6d4a;
+  --theme-brass: #a97c50;
+}
+
+html {
+  background: var(--theme-parchment);
+}
+
+body {
+  @apply bg-parchment text-ink antialiased;
+}
+
+body {
+  background: var(--theme-parchment);
+}
+
+a {
+  @apply text-inherit no-underline;
+}
+
+::selection {
+  background: rgba(187, 109, 74, 0.28);
+}
