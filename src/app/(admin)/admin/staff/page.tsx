@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation'
 
 import { AdminStaffClient } from '@/app/(admin)/admin/staff/admin-staff-client'
+import { applyShiftHistoryFilters, buildShiftHistoryQueryString, getMatchingShiftStaffIds, parseShiftStatus, type ShiftHistoryFilters } from '@/lib/admin-history/staff'
+import { getPage, getSingleParam, isDateInput } from '@/lib/admin-history/shared'
 import type { StaffRole } from '@/lib/staff-roles'
 import { createAuthenticatedServerSupabaseClient } from '@/lib/supabase/server'
 import type { Database } from '@/lib/supabase/types'
@@ -30,111 +32,8 @@ type StaffHistorySearchParams = {
   shiftStatus?: string | string[]
   shiftTo?: string | string[]
 }
-type ShiftHistoryFilters = {
-  fromDate: string
-  query: string
-  status: 'all' | 'closed' | 'open'
-  toDate: string
-}
 
 const PAGE_SIZE = 8
-const VALID_SHIFT_STATUS = new Set(['all', 'open', 'closed'])
-
-function getSingleParam(value: string | string[] | undefined) {
-  return Array.isArray(value) ? value[0] ?? '' : value ?? ''
-}
-
-function getPage(value: string | string[] | undefined) {
-  const page = Number.parseInt(getSingleParam(value), 10)
-  return Number.isFinite(page) && page > 0 ? page : 1
-}
-
-function isDateInput(value: string) {
-  return /^\d{4}-\d{2}-\d{2}$/.test(value)
-}
-
-function toStartOfDayIso(value: string) {
-  return `${value}T00:00:00.000Z`
-}
-
-function toExclusiveEndOfDayIso(value: string) {
-  const date = new Date(`${value}T00:00:00.000Z`)
-  date.setUTCDate(date.getUTCDate() + 1)
-  return date.toISOString()
-}
-
-function buildShiftHistoryQueryString(filters: ShiftHistoryFilters, page: number) {
-  const params = new URLSearchParams()
-
-  if (filters.query) {
-    params.set('shiftQuery', filters.query)
-  }
-
-  if (filters.status !== 'all') {
-    params.set('shiftStatus', filters.status)
-  }
-
-  if (filters.fromDate) {
-    params.set('shiftFrom', filters.fromDate)
-  }
-
-  if (filters.toDate) {
-    params.set('shiftTo', filters.toDate)
-  }
-
-  if (page > 1) {
-    params.set('shiftPage', String(page))
-  }
-
-  return params.toString()
-}
-
-async function getMatchingStaffIds(
-  supabase: Awaited<ReturnType<typeof createAuthenticatedServerSupabaseClient>>['supabase'],
-  query: string
-) {
-  if (!query) {
-    return [] as string[]
-  }
-
-  const { data, error } = await supabase
-    .from('staff')
-    .select('id')
-    .or(`name.ilike.%${query}%,role.ilike.%${query}%`)
-    .limit(40)
-
-  if (error) {
-    throw new Error(error.message)
-  }
-
-  return (data ?? []).map((member) => member.id)
-}
-
-function applyShiftHistoryFilters(query: any, filters: ShiftHistoryFilters, staffIds: string[]) {
-  let nextQuery = query
-
-  if (filters.fromDate) {
-    nextQuery = nextQuery.gte('started_at', toStartOfDayIso(filters.fromDate))
-  }
-
-  if (filters.toDate) {
-    nextQuery = nextQuery.lt('started_at', toExclusiveEndOfDayIso(filters.toDate))
-  }
-
-  if (filters.status === 'open') {
-    nextQuery = nextQuery.is('ended_at', null)
-  }
-
-  if (filters.status === 'closed') {
-    nextQuery = nextQuery.not('ended_at', 'is', null)
-  }
-
-  if (filters.query) {
-    nextQuery = nextQuery.in('staff_id', staffIds.length > 0 ? staffIds : ['00000000-0000-0000-0000-000000000000'])
-  }
-
-  return nextQuery
-}
 
 export default async function AdminStaffPage({ searchParams }: { searchParams?: StaffHistorySearchParams }) {
   const { supabase, user, session } = await createAuthenticatedServerSupabaseClient()
@@ -173,7 +72,7 @@ export default async function AdminStaffPage({ searchParams }: { searchParams?: 
   const toDate = getSingleParam(searchParams?.shiftTo)
   const requestedPage = getPage(searchParams?.shiftPage)
   const statusParam = getSingleParam(searchParams?.shiftStatus)
-  const status: 'all' | 'closed' | 'open' = VALID_SHIFT_STATUS.has(statusParam) ? (statusParam as 'all' | 'closed' | 'open') : 'all'
+  const status: 'all' | 'closed' | 'open' = parseShiftStatus(statusParam)
 
   const historyFilters: ShiftHistoryFilters = {
     fromDate: isDateInput(fromDate) ? fromDate : '',
@@ -182,7 +81,7 @@ export default async function AdminStaffPage({ searchParams }: { searchParams?: 
     toDate: isDateInput(toDate) ? toDate : ''
   }
 
-  const staffIds = await getMatchingStaffIds(supabase, historyFilters.query)
+  const staffIds = await getMatchingShiftStaffIds(supabase, historyFilters.query)
   const rangeFrom = (requestedPage - 1) * PAGE_SIZE
   const rangeTo = rangeFrom + PAGE_SIZE - 1
 

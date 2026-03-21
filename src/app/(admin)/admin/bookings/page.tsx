@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 
 import { AdminBookingsClient } from '@/app/(admin)/admin/bookings/admin-bookings-client'
+import { getBookingAccessPresentation } from '@/lib/access-provider/config'
 import { createAuthenticatedServerSupabaseClient } from '@/lib/supabase/server'
 import type { Database } from '@/lib/supabase/types'
 
@@ -31,5 +32,11 @@ export default async function AdminBookingsPage() {
     throw new Error(bookingsError.message)
   }
 
-  return <AdminBookingsClient bookings={(bookings ?? []) as BookingWithRoom[]} rooms={(rooms ?? []) as RoomRow[]} />
+  return (
+    <AdminBookingsClient
+      accessPresentation={getBookingAccessPresentation()}
+      bookings={(bookings ?? []) as BookingWithRoom[]}
+      rooms={(rooms ?? []) as RoomRow[]}
+    />
+  )
 }

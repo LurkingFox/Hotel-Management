@@ -1,12 +1,13 @@
 import { redirect } from 'next/navigation'
 
 import { AdminAccessLogClient } from '@/app/(admin)/admin/access-log/admin-access-log-client'
+import { applyAccessFilters, buildAccessLogQueryString, getMatchingAccessRoomIds, parseAccessResult, type AccessLogFilters, type AccessResult } from '@/lib/admin-history/access-log'
+import { getPage, getSingleParam, isDateInput } from '@/lib/admin-history/shared'
 import { createAuthenticatedServerSupabaseClient } from '@/lib/supabase/server'
 import type { Database } from '@/lib/supabase/types'
 
 type RoomRow = Database['public']['Tables']['rooms']['Row']
 type AccessLogRow = Database['public']['Tables']['access_log']['Row']
-type AccessResult = Database['public']['Enums']['access_result']
 
 type AccessLogWithRoom = AccessLogRow & {
   rooms: Pick<RoomRow, 'id' | 'number' | 'status' | 'type'> | null
@@ -20,113 +21,7 @@ type AccessLogSearchParams = {
   to?: string | string[]
 }
 
-type QueryFilters = {
-  fromDate: string
-  query: string
-  result: 'all' | AccessResult
-  toDate: string
-}
-
 const PAGE_SIZE = 12
-const VALID_RESULTS = new Set<AccessResult>(['granted', 'denied', 'expired'])
-
-function getSingleParam(value: string | string[] | undefined) {
-  return Array.isArray(value) ? value[0] ?? '' : value ?? ''
-}
-
-function getPage(value: string | string[] | undefined) {
-  const page = Number.parseInt(getSingleParam(value), 10)
-  return Number.isFinite(page) && page > 0 ? page : 1
-}
-
-function isDateInput(value: string) {
-  return /^\d{4}-\d{2}-\d{2}$/.test(value)
-}
-
-function toStartOfDayIso(value: string) {
-  return `${value}T00:00:00.000Z`
-}
-
-function toExclusiveEndOfDayIso(value: string) {
-  const date = new Date(`${value}T00:00:00.000Z`)
-  date.setUTCDate(date.getUTCDate() + 1)
-  return date.toISOString()
-}
-
-function buildAccessLogQueryString(filters: QueryFilters, page: number) {
-  const params = new URLSearchParams()
-
-  if (filters.query) {
-    params.set('query', filters.query)
-  }
-
-  if (filters.result !== 'all') {
-    params.set('result', filters.result)
-  }
-
-  if (filters.fromDate) {
-    params.set('from', filters.fromDate)
-  }
-
-  if (filters.toDate) {
-    params.set('to', filters.toDate)
-  }
-
-  if (page > 1) {
-    params.set('page', String(page))
-  }
-
-  return params.toString()
-}
-
-async function getMatchingRoomIds(supabase: Awaited<ReturnType<typeof createAuthenticatedServerSupabaseClient>>['supabase'], query: string) {
-  if (!query) {
-    return [] as string[]
-  }
-
-  const { data, error } = await supabase.from('rooms').select('id').ilike('number', `%${query}%`).limit(20)
-
-  if (error) {
-    throw new Error(error.message)
-  }
-
-  return (data ?? []).map((room) => room.id)
-}
-
-function applyAccessFilters(query: any, filters: QueryFilters, roomIds: string[], includeResultFilter: boolean) {
-  let nextQuery = query
-
-  if (filters.fromDate) {
-    nextQuery = nextQuery.gte('accessed_at', toStartOfDayIso(filters.fromDate))
-  }
-
-  if (filters.toDate) {
-    nextQuery = nextQuery.lt('accessed_at', toExclusiveEndOfDayIso(filters.toDate))
-  }
-
-  if (includeResultFilter && filters.result !== 'all') {
-    nextQuery = nextQuery.eq('result', filters.result)
-  }
-
-  if (filters.query) {
-    const escapedQuery = filters.query.replace(/[,%()]/g, ' ').trim()
-    const orParts = [
-      `card_uid.ilike.%${escapedQuery}%`,
-      `guest_name.ilike.%${escapedQuery}%`,
-      `issued_by.ilike.%${escapedQuery}%`,
-      `note.ilike.%${escapedQuery}%`,
-      `result.ilike.%${escapedQuery}%`
-    ]
-
-    if (roomIds.length > 0) {
-      orParts.push(`room_id.in.(${roomIds.join(',')})`)
-    }
-
-    nextQuery = nextQuery.or(orParts.join(','))
-  }
-
-  return nextQuery
-}
 
 export default async function AdminAccessLogPage({ searchParams }: { searchParams?: AccessLogSearchParams }) {
   const { supabase, user } = await createAuthenticatedServerSupabaseClient()
@@ -140,16 +35,16 @@ export default async function AdminAccessLogPage({ searchParams }: { searchParam
   const toDate = getSingleParam(searchParams?.to)
   const resultParam = getSingleParam(searchParams?.result)
   const page = getPage(searchParams?.page)
-  const resultFilter: 'all' | AccessResult = VALID_RESULTS.has(resultParam as AccessResult) ? (resultParam as AccessResult) : 'all'
+  const resultFilter: 'all' | AccessResult = parseAccessResult(resultParam)
 
-  const filters: QueryFilters = {
+  const filters: AccessLogFilters = {
     fromDate: isDateInput(fromDate) ? fromDate : '',
     query,
     result: resultFilter,
     toDate: isDateInput(toDate) ? toDate : ''
   }
 
-  const roomIds = await getMatchingRoomIds(supabase, filters.query)
+  const roomIds = await getMatchingAccessRoomIds(supabase, filters.query)
   const rangeFrom = (page - 1) * PAGE_SIZE
   const rangeTo = rangeFrom + PAGE_SIZE - 1
 

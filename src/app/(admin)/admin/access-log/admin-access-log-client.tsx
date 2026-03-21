@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 
+import { triggerHistoryExport } from '@/lib/admin-history/client'
 import type { Database } from '@/lib/supabase/types'
 
 type RoomRow = Database['public']['Tables']['rooms']['Row']
@@ -185,6 +186,15 @@ export function AdminAccessLogClient({ currentPage, events, filters, latestDenie
     navigate({ from: range.from, page: '1', to: range.to })
   }
 
+  function handleExport() {
+    triggerHistoryExport('access-log', {
+      from: filters.fromDate || undefined,
+      query: filters.query || undefined,
+      result: filters.result === 'all' ? undefined : filters.result,
+      to: filters.toDate || undefined
+    })
+  }
+
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,_#11202f_0%,_#11202f_24%,_#f7f1e8_24%,_#f7f1e8_100%)] px-6 py-10 text-ink md:px-10">
       <div className="mx-auto max-w-7xl space-y-6">
@@ -288,7 +298,12 @@ export function AdminAccessLogClient({ currentPage, events, filters, latestDenie
 
             <div className="mt-4 flex flex-col gap-3 rounded-[1.5rem] bg-[#fcfaf6] px-4 py-4 text-sm text-ink/65 lg:flex-row lg:items-center lg:justify-between">
               <span>Showing {events.length} of {totalCount} matching events</span>
-              <span>{visibleRangeLabel}</span>
+              <div className="flex flex-wrap items-center gap-3">
+                <span>{visibleRangeLabel}</span>
+                <button className="rounded-full border border-ink/12 px-4 py-2 font-semibold text-ink transition hover:bg-parchment" onClick={handleExport} type="button">
+                  Export CSV
+                </button>
+              </div>
             </div>
 
             <div className="mt-6 grid gap-4">

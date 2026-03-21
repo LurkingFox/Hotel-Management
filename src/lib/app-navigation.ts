@@ -25,7 +25,7 @@ const adminSections: AppNavSection[] = [
       { href: '/admin/keycards', label: 'Keycards', description: 'Room keys, master keys, and validity control.' },
       { href: '/admin/staff', label: 'Staff', description: 'Roster, shifts, and access-linked identities.' },
       { href: '/admin/access-log', label: 'Access log', description: 'Granted, denied, and expired entry history.' },
-      { href: '/admin/settings', label: 'Settings', description: 'Hotel identity, logo, and contact details.' }
+      { href: '/admin/settings', label: 'Settings', description: 'Hotel identity, logo, and Seam room-device mappings.' }
     ]
   },
   {

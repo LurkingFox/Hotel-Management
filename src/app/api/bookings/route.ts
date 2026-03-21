@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+import { createBookingAccessService } from '@/lib/access-provider/booking-service'
+import type { BookingAccessOperationResult } from '@/lib/access-provider/types'
 import { createAuthenticatedServerSupabaseClient, type AuthenticatedUser } from '@/lib/supabase/server'
 import type { Database } from '@/lib/supabase/types'
 
@@ -35,6 +37,21 @@ type UpdateBookingBody = {
   cancelNote?: string
 }
 
+type BookingMutationResponse = {
+  access?: {
+    code: string | null
+    label: string
+    note: string | null
+    provider: string
+  }
+  booking?: Database['public']['Tables']['bookings']['Row'] & {
+    rooms: Pick<Database['public']['Tables']['rooms']['Row'], 'number' | 'rate_ghs' | 'type'> | null
+  }
+  message?: string
+  provider?: string
+  success?: boolean
+}
+
 function getActorName(user: AuthenticatedUser) {
   const metadataName = user?.user_metadata?.name
   if (typeof metadataName === 'string' && metadataName.length > 0) {
@@ -53,13 +70,36 @@ function requiresReference(method: PayMethod): boolean {
   return method === 'momo' || method === 'bank_transfer' || method === 'cheque'
 }
 
-function normalizeCardUid(value: string): string {
-  return value.trim().toUpperCase()
-}
-
 function getErrorResponse(error: unknown) {
   const message = error instanceof Error ? error.message : 'Unexpected server error.'
   return NextResponse.json({ error: message }, { status: 500 })
+}
+
+function getCredentialIssuedMessage(guestName: string, access: BookingAccessOperationResult) {
+  if (access.provider === 'seam') {
+    return access.credentialCode
+      ? `Access code ${access.credentialCode} issued for ${guestName}.`
+      : `Access code issued for ${guestName}.`
+  }
+
+  return `Keycard issued for ${guestName}.`
+}
+
+function getCredentialExtendedMessage(guestName: string, access: BookingAccessOperationResult) {
+  return access.provider === 'seam' ? `Access code updated for ${guestName}.` : `Stay extended for ${guestName}.`
+}
+
+function getCredentialRevokedMessage(guestName: string, access: BookingAccessOperationResult) {
+  return access.provider === 'seam' ? `Access code revoked for ${guestName}.` : `Keycards revoked for ${guestName}.`
+}
+
+function buildAccessPayload(access: BookingAccessOperationResult) {
+  return {
+    code: access.credentialCode,
+    label: access.credentialLabel,
+    note: access.note,
+    provider: access.provider
+  }
 }
 
 async function getBookingWithRoom(
@@ -113,6 +153,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const { supabase, user } = await createAuthenticatedServerSupabaseClient()
+    const accessService = createBookingAccessService(supabase)
 
     if (!user) {
       return NextResponse.json({ error: 'Authentication required.' }, { status: 401 })
@@ -127,9 +168,8 @@ export async function POST(request: NextRequest) {
 
     const nights = getNightCount(body.checkIn, body.checkOutExpected)
     const bookingStatus = body.status ?? 'reserved'
-    const normalizedCardUid = body.cardUid ? normalizeCardUid(body.cardUid) : undefined
 
-    if (bookingStatus === 'active' && !normalizedCardUid) {
+    if (bookingStatus === 'active' && accessService.provider === 'local_rfid' && !body.cardUid?.trim()) {
       return NextResponse.json({ error: 'cardUid is required for a walk-in check-in.' }, { status: 400 })
     }
 
@@ -190,24 +230,15 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: roomUpdateError.message }, { status: 500 })
       }
 
-      const { data: keycard, error: keycardError } = await supabase
-        .from('keycards')
-        .insert({
-          booking_id: booking.id,
-          card_uid: normalizedCardUid!,
-          room_id: body.roomId,
-          issued_to: body.guestName,
-          issued_by: actor,
-          valid_from: body.checkIn,
-          valid_until: body.checkOutExpected,
-          status: 'active'
-        })
-        .select('*')
-        .single()
-
-      if (keycardError) {
-        return NextResponse.json({ error: keycardError.message }, { status: 500 })
-      }
+      const accessOperation = await accessService.issueBookingAccess({
+        bookingId: booking.id,
+        issuedBy: actor,
+        issuedTo: body.guestName,
+        manualCredential: body.cardUid ?? null,
+        roomId: body.roomId,
+        validFrom: body.checkIn,
+        validUntil: body.checkOutExpected
+      })
 
       await createNotification(supabase, {
         type: 'walk_in_checked_in',
@@ -218,11 +249,28 @@ export async function POST(request: NextRequest) {
 
       await createNotification(supabase, {
         type: 'keycard_issued',
-        message: `Keycard issued for ${body.guestName}.`,
+        message: getCredentialIssuedMessage(body.guestName, accessOperation),
         triggered_by: actor,
         booking_id: booking.id,
-        keycard_id: keycard.id
+        keycard_id: accessOperation.localRecordId
       })
+
+      const { data: persistedBooking, error: persistedBookingError } = await getBookingWithRoom(supabase, booking.id)
+
+      if (persistedBookingError || !persistedBooking) {
+        return NextResponse.json(
+          { error: persistedBookingError?.message ?? 'Booking was created but could not be reloaded.' },
+          { status: 500 }
+        )
+      }
+
+      const payload: BookingMutationResponse = {
+        access: buildAccessPayload(accessOperation),
+        booking: persistedBooking,
+        message: getCredentialIssuedMessage(body.guestName, accessOperation)
+      }
+
+      return NextResponse.json(payload, { status: 201 })
     }
 
     if (bookingStatus === 'reserved') {
@@ -252,7 +300,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    return NextResponse.json(persistedBooking, { status: 201 })
+    return NextResponse.json({ booking: persistedBooking } satisfies BookingMutationResponse, { status: 201 })
   } catch (error) {
     return getErrorResponse(error)
   }
@@ -261,6 +309,7 @@ export async function POST(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const { supabase, user } = await createAuthenticatedServerSupabaseClient()
+    const accessService = createBookingAccessService(supabase)
 
     if (!user) {
       return NextResponse.json({ error: 'Authentication required.' }, { status: 401 })
@@ -284,9 +333,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (body.action === 'check_in') {
-      const normalizedCardUid = body.cardUid ? normalizeCardUid(body.cardUid) : undefined
-
-      if (!normalizedCardUid) {
+      if (accessService.provider === 'local_rfid' && !body.cardUid?.trim()) {
         return NextResponse.json({ error: 'cardUid is required to check in.' }, { status: 400 })
       }
 
@@ -310,24 +357,15 @@ export async function PATCH(request: NextRequest) {
         }
       }
 
-      const { data: keycard, error: keycardError } = await supabase
-        .from('keycards')
-        .insert({
-          booking_id: booking.id,
-          card_uid: normalizedCardUid,
-          room_id: booking.room_id,
-          issued_to: body.issuedTo ?? booking.guest_name,
-          issued_by: actor,
-          valid_from: booking.check_in,
-          valid_until: booking.check_out_expected,
-          status: 'active'
-        })
-        .select('*')
-        .single()
-
-      if (keycardError) {
-        return NextResponse.json({ error: keycardError.message }, { status: 500 })
-      }
+      const accessOperation = await accessService.issueBookingAccess({
+        bookingId: booking.id,
+        issuedBy: actor,
+        issuedTo: body.issuedTo ?? booking.guest_name,
+        manualCredential: body.cardUid ?? null,
+        roomId: booking.room_id,
+        validFrom: booking.check_in,
+        validUntil: booking.check_out_expected
+      })
 
       await createNotification(supabase, {
         type: 'booking_checked_in',
@@ -338,13 +376,18 @@ export async function PATCH(request: NextRequest) {
 
       await createNotification(supabase, {
         type: 'keycard_issued',
-        message: `Keycard issued for ${booking.guest_name}.`,
+        message: getCredentialIssuedMessage(booking.guest_name, accessOperation),
         triggered_by: actor,
         booking_id: booking.id,
-        keycard_id: keycard.id
+        keycard_id: accessOperation.localRecordId
       })
 
-      return NextResponse.json({ success: true })
+      return NextResponse.json({
+        access: buildAccessPayload(accessOperation),
+        message: getCredentialIssuedMessage(booking.guest_name, accessOperation),
+        provider: accessOperation.provider,
+        success: true
+      } satisfies BookingMutationResponse)
     }
 
     if (body.action === 'checkout') {
@@ -404,14 +447,7 @@ export async function PATCH(request: NextRequest) {
         }
       }
 
-      const { error: revokeError } = await supabase
-        .from('keycards')
-        .update({ status: 'revoked' })
-        .eq('booking_id', booking.id)
-
-      if (revokeError) {
-        return NextResponse.json({ error: revokeError.message }, { status: 500 })
-      }
+      const accessOperation = await accessService.revokeBookingAccess({ bookingId: booking.id })
 
       await createNotification(supabase, {
         type: 'booking_checked_out',
@@ -422,12 +458,17 @@ export async function PATCH(request: NextRequest) {
 
       await createNotification(supabase, {
         type: 'keycard_revoked',
-        message: `Keycards revoked for ${booking.guest_name}.`,
+        message: getCredentialRevokedMessage(booking.guest_name, accessOperation),
         triggered_by: actor,
         booking_id: booking.id
       })
 
-      return NextResponse.json({ success: true })
+      return NextResponse.json({
+        access: buildAccessPayload(accessOperation),
+        message: getCredentialRevokedMessage(booking.guest_name, accessOperation),
+        provider: accessService.provider,
+        success: true
+      } satisfies BookingMutationResponse)
     }
 
     if (body.action === 'extend') {
@@ -451,14 +492,10 @@ export async function PATCH(request: NextRequest) {
         return NextResponse.json({ error: bookingUpdateError.message }, { status: 500 })
       }
 
-      const { error: keycardError } = await supabase
-        .from('keycards')
-        .update({ valid_until: body.newCheckOutExpected })
-        .eq('booking_id', booking.id)
-
-      if (keycardError) {
-        return NextResponse.json({ error: keycardError.message }, { status: 500 })
-      }
+      const accessOperation = await accessService.extendBookingAccess({
+        bookingId: booking.id,
+        validUntil: body.newCheckOutExpected
+      })
 
       await createNotification(supabase, {
         type: 'booking_extended',
@@ -469,12 +506,17 @@ export async function PATCH(request: NextRequest) {
 
       await createNotification(supabase, {
         type: 'keycard_extended',
-        message: `Stay extended for ${booking.guest_name}.`,
+        message: getCredentialExtendedMessage(booking.guest_name, accessOperation),
         triggered_by: actor,
         booking_id: booking.id
       })
 
-      return NextResponse.json({ success: true })
+      return NextResponse.json({
+        access: buildAccessPayload(accessOperation),
+        message: getCredentialExtendedMessage(booking.guest_name, accessOperation),
+        provider: accessService.provider,
+        success: true
+      } satisfies BookingMutationResponse)
     }
 
     const { error: cancelError } = await supabase

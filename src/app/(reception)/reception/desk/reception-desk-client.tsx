@@ -3,6 +3,7 @@
 import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 
+import type { BookingAccessPresentation } from '@/lib/access-provider/types'
 import { formatDate, formatGHS } from '@/lib/utils/format'
 import type { Database } from '@/lib/supabase/types'
 
@@ -16,8 +17,28 @@ type BookingWithRoom = BookingRow & {
 }
 
 type ReceptionDeskClientProps = {
+  accessPresentation: BookingAccessPresentation
   bookings: BookingWithRoom[]
   rooms: RoomRow[]
+}
+
+type BookingMutationResponse = {
+  access?: {
+    code?: string | null
+    label?: string | null
+    note?: string | null
+    provider?: string | null
+  }
+  error?: string
+  message?: string
+}
+
+function formatAccessSuccess(payload: BookingMutationResponse, fallback: string) {
+  if (!payload.message) {
+    return fallback
+  }
+
+  return payload.access?.code ? `${payload.message} Code: ${payload.access.code}.` : payload.message
 }
 
 const paymentMethods: Array<{ label: string; tone: string; value: PayMethod }> = [
@@ -45,7 +66,7 @@ function needsReference(method: PayMethod) {
   return method === 'momo' || method === 'bank_transfer' || method === 'cheque'
 }
 
-export function ReceptionDeskClient({ bookings, rooms }: ReceptionDeskClientProps) {
+export function ReceptionDeskClient({ accessPresentation, bookings, rooms }: ReceptionDeskClientProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -93,7 +114,7 @@ export function ReceptionDeskClient({ bookings, rooms }: ReceptionDeskClientProp
       return
     }
 
-    if (bookingStatus === 'active' && !cardUid.trim()) {
+    if (bookingStatus === 'active' && accessPresentation.requiresManualCredential && !cardUid.trim()) {
       setErrorMessage('A card UID is required for a walk-in check-in.')
       return
     }
@@ -127,7 +148,7 @@ export function ReceptionDeskClient({ bookings, rooms }: ReceptionDeskClientProp
         })
       })
 
-      const payload = (await response.json()) as { error?: string }
+      const payload = (await response.json()) as BookingMutationResponse
 
       if (!response.ok) {
         setErrorMessage(payload.error ?? 'Booking creation failed.')
@@ -139,7 +160,14 @@ export function ReceptionDeskClient({ bookings, rooms }: ReceptionDeskClientProp
       setPaymentAmount('0')
       setPaymentReference('')
       setCardUid('')
-      refreshWithMessage(bookingStatus === 'active' ? 'Walk-in guest checked in.' : 'Reservation created.')
+      refreshWithMessage(
+        formatAccessSuccess(
+          payload,
+          bookingStatus === 'active'
+            ? `Walk-in guest checked in and ${accessPresentation.generatedCredentialLabel.toLowerCase()} issued.`
+            : 'Reservation created.'
+        )
+      )
     })
   }
 
@@ -147,7 +175,7 @@ export function ReceptionDeskClient({ bookings, rooms }: ReceptionDeskClientProp
     resetMessages()
     const value = checkInCardUids[bookingId]?.trim().toUpperCase()
 
-    if (!value) {
+    if (accessPresentation.requiresManualCredential && !value) {
       setErrorMessage('Enter a card UID before checking in a reservation.')
       return
     }
@@ -159,20 +187,24 @@ export function ReceptionDeskClient({ bookings, rooms }: ReceptionDeskClientProp
         body: JSON.stringify({
           bookingId,
           action: 'check_in',
-          cardUid: value,
+          cardUid: accessPresentation.requiresManualCredential ? value : undefined,
           issuedTo
         })
       })
 
-      const payload = (await response.json()) as { error?: string }
+      const payload = (await response.json()) as BookingMutationResponse
 
       if (!response.ok) {
         setErrorMessage(payload.error ?? 'Check-in failed.')
         return
       }
 
-      setCheckInCardUids((current) => ({ ...current, [bookingId]: '' }))
-      refreshWithMessage('Reservation checked in and keycard issued.')
+      if (accessPresentation.requiresManualCredential) {
+        setCheckInCardUids((current) => ({ ...current, [bookingId]: '' }))
+      }
+      refreshWithMessage(
+        formatAccessSuccess(payload, `Reservation checked in and ${accessPresentation.generatedCredentialLabel.toLowerCase()} issued.`)
+      )
     })
   }
 
@@ -204,7 +236,7 @@ export function ReceptionDeskClient({ bookings, rooms }: ReceptionDeskClientProp
         })
       })
 
-      const payload = (await response.json()) as { error?: string }
+      const payload = (await response.json()) as BookingMutationResponse
 
       if (!response.ok) {
         setErrorMessage(payload.error ?? 'Checkout failed.')
@@ -215,7 +247,7 @@ export function ReceptionDeskClient({ bookings, rooms }: ReceptionDeskClientProp
         ...current,
         [booking.id]: { amount: '', method: 'cash', reference: '' }
       }))
-      refreshWithMessage('Guest checked out successfully.')
+      refreshWithMessage(formatAccessSuccess(payload, 'Guest checked out successfully.'))
     })
   }
 
@@ -226,6 +258,10 @@ export function ReceptionDeskClient({ bookings, rooms }: ReceptionDeskClientProp
           <div>
             <p className="text-sm uppercase tracking-[0.28em] text-white/65">Reception Desk</p>
             <h1 className="font-[family-name:var(--font-display)] text-5xl">Live arrivals, stays, and checkout flow</h1>
+            <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-white/75">
+              <span className="rounded-full border border-white/20 px-3 py-1 font-semibold">{accessPresentation.providerLabel}</span>
+            </div>
+            {accessPresentation.statusNote ? <p className="mt-3 max-w-3xl text-sm leading-6 text-white/72">{accessPresentation.statusNote}</p> : null}
           </div>
         </header>
 
@@ -326,16 +362,22 @@ export function ReceptionDeskClient({ bookings, rooms }: ReceptionDeskClientProp
                 </div>
               </div>
 
-              {bookingStatus === 'active' ? (
+              {bookingStatus === 'active' && accessPresentation.requiresManualCredential ? (
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-ink/75">Card UID</span>
+                  <span className="text-sm font-semibold text-ink/75">{accessPresentation.manualCredentialLabel}</span>
                   <input
                     className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 uppercase outline-none transition focus:border-terracotta"
                     onChange={(event) => setCardUid(event.target.value)}
-                    placeholder="A3:F2:91:BC"
+                    placeholder={accessPresentation.manualCredentialPlaceholder}
                     value={cardUid}
                   />
                 </label>
+              ) : null}
+
+              {bookingStatus === 'active' && !accessPresentation.requiresManualCredential ? (
+                <div className="rounded-[1.5rem] border border-dashed border-ink/10 bg-white px-4 py-3 text-sm text-ink/65">
+                  {accessPresentation.generatedCredentialLabel} will be generated automatically after the guest is checked in.
+                </div>
               ) : null}
 
               <div className="rounded-[1.5rem] bg-parchment p-5">
@@ -431,19 +473,25 @@ export function ReceptionDeskClient({ bookings, rooms }: ReceptionDeskClientProp
                       <p className="mt-2 text-sm text-ink/65">Balance: {formatGHS(Number(booking.balance_ghs ?? booking.total_ghs - booking.paid_ghs))}</p>
                     </div>
                     <div className="w-full max-w-xs space-y-3">
-                      <input
-                        className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 uppercase outline-none transition focus:border-terracotta"
-                        onChange={(event) => setCheckInCardUids((current) => ({ ...current, [booking.id]: event.target.value }))}
-                        placeholder="Card UID for check-in"
-                        value={checkInCardUids[booking.id] ?? ''}
-                      />
+                      {accessPresentation.requiresManualCredential ? (
+                        <input
+                          className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 uppercase outline-none transition focus:border-terracotta"
+                          onChange={(event) => setCheckInCardUids((current) => ({ ...current, [booking.id]: event.target.value }))}
+                          placeholder={`${accessPresentation.manualCredentialLabel} for check-in`}
+                          value={checkInCardUids[booking.id] ?? ''}
+                        />
+                      ) : (
+                        <div className="rounded-2xl border border-dashed border-ink/10 bg-white px-4 py-3 text-sm text-ink/65">
+                          {accessPresentation.generatedCredentialLabel} will be generated automatically.
+                        </div>
+                      )}
                       <button
                         className="w-full rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-60"
                         disabled={isPending}
                         onClick={() => handleCheckIn(booking.id, booking.guest_name)}
                         type="button"
                       >
-                        Check in and issue keycard
+                        Check in and issue {accessPresentation.credentialKindLabel.toLowerCase()}
                       </button>
                     </div>
                   </div>

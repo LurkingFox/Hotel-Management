@@ -3,6 +3,7 @@
 import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 
+import type { BookingAccessPresentation } from '@/lib/access-provider/types'
 import { formatDate, formatGHS } from '@/lib/utils/format'
 import type { Database } from '@/lib/supabase/types'
 
@@ -16,6 +17,7 @@ type BookingWithRoom = BookingRow & {
 }
 
 type AdminBookingsClientProps = {
+  accessPresentation: BookingAccessPresentation
   bookings: BookingWithRoom[]
   rooms: RoomRow[]
 }
@@ -24,6 +26,25 @@ type SettlementState = {
   amount: string
   method: PayMethod
   reference: string
+}
+
+type BookingMutationResponse = {
+  access?: {
+    code?: string | null
+    label?: string | null
+    note?: string | null
+    provider?: string | null
+  }
+  error?: string
+  message?: string
+}
+
+function formatAccessSuccess(payload: BookingMutationResponse, fallback: string) {
+  if (!payload.message) {
+    return fallback
+  }
+
+  return payload.access?.code ? `${payload.message} Code: ${payload.access.code}.` : payload.message
 }
 
 const statusStyles: Record<BookingStatus, string> = {
@@ -49,7 +70,7 @@ function getNightCount(checkIn: string, checkOut: string) {
   return Math.max(1, Math.ceil(difference / 86400000))
 }
 
-export function AdminBookingsClient({ bookings, rooms }: AdminBookingsClientProps) {
+export function AdminBookingsClient({ accessPresentation, bookings, rooms }: AdminBookingsClientProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [activeFilter, setActiveFilter] = useState<'all' | BookingStatus>('all')
@@ -92,14 +113,14 @@ export function AdminBookingsClient({ bookings, rooms }: AdminBookingsClientProp
         body: JSON.stringify(body)
       })
 
-      const payload = (await response.json()) as { error?: string }
+      const payload = (await response.json()) as BookingMutationResponse
 
       if (!response.ok) {
         setErrorMessage(payload.error ?? 'Booking update failed.')
         return
       }
 
-      refreshWithMessage(successText)
+      refreshWithMessage(formatAccessSuccess(payload, successText))
     })
   }
 
@@ -107,7 +128,7 @@ export function AdminBookingsClient({ bookings, rooms }: AdminBookingsClientProp
     resetMessages()
     const cardUid = checkInCardUids[booking.id]?.trim().toUpperCase()
 
-    if (!cardUid) {
+    if (accessPresentation.requiresManualCredential && !cardUid) {
       setErrorMessage('Card UID is required before checking in a reservation.')
       return
     }
@@ -116,13 +137,15 @@ export function AdminBookingsClient({ bookings, rooms }: AdminBookingsClientProp
       {
         bookingId: booking.id,
         action: 'check_in',
-        cardUid,
+        cardUid: accessPresentation.requiresManualCredential ? cardUid : undefined,
         issuedTo: booking.guest_name
       },
-      'Reservation checked in and keycard issued.'
+      `Reservation checked in and ${accessPresentation.generatedCredentialLabel.toLowerCase()} issued.`
     )
 
-    setCheckInCardUids((current) => ({ ...current, [booking.id]: '' }))
+    if (accessPresentation.requiresManualCredential) {
+      setCheckInCardUids((current) => ({ ...current, [booking.id]: '' }))
+    }
   }
 
   function handleCancel(booking: BookingWithRoom) {
@@ -157,7 +180,7 @@ export function AdminBookingsClient({ bookings, rooms }: AdminBookingsClientProp
         newCheckOutExpected: nextDate,
         totalGhs
       },
-      'Stay extended and keycard updated.'
+      `Stay extended and ${accessPresentation.credentialKindLabel.toLowerCase()} updated.`
     )
   }
 
@@ -199,6 +222,10 @@ export function AdminBookingsClient({ bookings, rooms }: AdminBookingsClientProp
           <div>
             <p className="text-sm uppercase tracking-[0.28em] text-white/70">Admin Tower</p>
             <h1 className="font-[family-name:var(--font-display)] text-5xl">Live bookings command board</h1>
+            <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-white/75">
+              <span className="rounded-full border border-white/20 px-3 py-1 font-semibold">{accessPresentation.providerLabel}</span>
+            </div>
+            {accessPresentation.statusNote ? <p className="mt-3 max-w-3xl text-sm leading-6 text-white/72">{accessPresentation.statusNote}</p> : null}
           </div>
         </header>
 
@@ -298,15 +325,21 @@ export function AdminBookingsClient({ bookings, rooms }: AdminBookingsClientProp
                   {booking.status === 'reserved' ? (
                     <div className="mt-5 grid gap-4 xl:grid-cols-[1fr_auto]">
                       <div className="grid gap-4 md:grid-cols-2">
-                        <label className="space-y-2">
-                          <span className="text-sm font-semibold text-ink/75">Card UID for check-in</span>
-                          <input
-                            className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 uppercase outline-none transition focus:border-terracotta"
-                            onChange={(event) => setCheckInCardUids((current) => ({ ...current, [booking.id]: event.target.value }))}
-                            placeholder="A3:F2:91:BC"
-                            value={checkInCardUids[booking.id] ?? ''}
-                          />
-                        </label>
+                        {accessPresentation.requiresManualCredential ? (
+                          <label className="space-y-2">
+                            <span className="text-sm font-semibold text-ink/75">{accessPresentation.manualCredentialLabel} for check-in</span>
+                            <input
+                              className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 uppercase outline-none transition focus:border-terracotta"
+                              onChange={(event) => setCheckInCardUids((current) => ({ ...current, [booking.id]: event.target.value }))}
+                              placeholder={accessPresentation.manualCredentialPlaceholder}
+                              value={checkInCardUids[booking.id] ?? ''}
+                            />
+                          </label>
+                        ) : (
+                          <div className="rounded-2xl border border-dashed border-ink/10 bg-white px-4 py-3 text-sm text-ink/65">
+                            {accessPresentation.generatedCredentialLabel} will be generated automatically at check-in.
+                          </div>
+                        )}
                         <label className="space-y-2">
                           <span className="text-sm font-semibold text-ink/75">Cancel note</span>
                           <input

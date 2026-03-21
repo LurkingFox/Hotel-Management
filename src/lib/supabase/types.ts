@@ -149,6 +149,85 @@ export type Database = {
           },
         ]
       }
+      booking_access_credentials: {
+        Row: {
+          booking_id: string
+          created_at: string
+          credential_code: string | null
+          id: string
+          issued_by: string | null
+          issued_to: string | null
+          local_keycard_id: string | null
+          note: string | null
+          provider: string
+          provider_device_id: string | null
+          provider_reference: string | null
+          room_id: string | null
+          status: string
+          updated_at: string
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          booking_id: string
+          created_at?: string
+          credential_code?: string | null
+          id?: string
+          issued_by?: string | null
+          issued_to?: string | null
+          local_keycard_id?: string | null
+          note?: string | null
+          provider: string
+          provider_device_id?: string | null
+          provider_reference?: string | null
+          room_id?: string | null
+          status?: string
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          booking_id?: string
+          created_at?: string
+          credential_code?: string | null
+          id?: string
+          issued_by?: string | null
+          issued_to?: string | null
+          local_keycard_id?: string | null
+          note?: string | null
+          provider?: string
+          provider_device_id?: string | null
+          provider_reference?: string | null
+          room_id?: string | null
+          status?: string
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_access_credentials_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_access_credentials_local_keycard_id_fkey"
+            columns: ["local_keycard_id"]
+            isOneToOne: false
+            referencedRelation: "keycards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_access_credentials_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       door_controllers: {
         Row: {
           controller_id: string
@@ -389,6 +468,44 @@ export type Database = {
             columns: ["booking_id"]
             isOneToOne: false
             referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      room_access_devices: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          external_device_id: string
+          id: string
+          provider: string
+          room_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          external_device_id: string
+          id?: string
+          provider: string
+          room_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          external_device_id?: string
+          id?: string
+          provider?: string
+          room_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_access_devices_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: true
+            referencedRelation: "rooms"
             referencedColumns: ["id"]
           },
         ]

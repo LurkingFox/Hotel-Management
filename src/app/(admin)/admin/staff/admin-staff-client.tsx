@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 
+import { triggerHistoryExport } from '@/lib/admin-history/client'
 import { getRoleLabel, isStaffRole, STAFF_ROLE_OPTIONS, type StaffRole } from '@/lib/staff-roles'
 import { formatGHS } from '@/lib/utils/format'
 import type { Database } from '@/lib/supabase/types'
@@ -478,6 +479,15 @@ export function AdminStaffClient({
     navigateShiftHistory({ shiftFrom: range.from, shiftPage: undefined, shiftTo: range.to })
   }
 
+  function handleExportShiftHistory() {
+    triggerHistoryExport('staff', {
+      shiftFrom: historyFilters.fromDate || undefined,
+      shiftQuery: historyFilters.query || undefined,
+      shiftStatus: historyFilters.status === 'all' ? undefined : historyFilters.status,
+      shiftTo: historyFilters.toDate || undefined
+    })
+  }
+
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,_#11202f_0%,_#11202f_24%,_#f7f1e8_24%,_#f7f1e8_100%)] px-6 py-10 text-ink md:px-10">
       <div className="mx-auto max-w-7xl space-y-6">
@@ -745,7 +755,12 @@ export function AdminStaffClient({
             </div>
 
             <div className="mt-4 rounded-[1.5rem] bg-[#fcfaf6] px-4 py-4 text-sm text-ink/65">
-              Showing {historyShifts.length} of {totalShiftCount} matching shifts · {visibleRangeLabel}
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                <span>Showing {historyShifts.length} of {totalShiftCount} matching shifts · {visibleRangeLabel}</span>
+                <button className="rounded-full border border-ink/12 px-4 py-2 font-semibold text-ink transition hover:bg-parchment" onClick={handleExportShiftHistory} type="button">
+                  Export CSV
+                </button>
+              </div>
             </div>
 
             <div className="mt-6 space-y-3">

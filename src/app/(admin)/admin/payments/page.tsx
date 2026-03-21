@@ -1,6 +1,17 @@
 import { redirect } from 'next/navigation'
 
 import { AdminPaymentsClient } from '@/app/(admin)/admin/payments/admin-payments-client'
+import {
+  applyPaymentFilters,
+  applyPendingChargeFilters,
+  buildPaymentsQueryString,
+  getMatchingPaymentBookingIds,
+  getMatchingPaymentRoomIds,
+  parsePaymentMethod,
+  type PayMethod,
+  type PaymentsFilters
+} from '@/lib/admin-history/payments'
+import { getPage, getSingleParam, isDateInput } from '@/lib/admin-history/shared'
 import { createAuthenticatedServerSupabaseClient } from '@/lib/supabase/server'
 import type { Database } from '@/lib/supabase/types'
 
@@ -8,7 +19,6 @@ type RoomRow = Database['public']['Tables']['rooms']['Row']
 type BookingRow = Database['public']['Tables']['bookings']['Row']
 type PaymentRow = Database['public']['Tables']['payments']['Row']
 type ServiceChargeRow = Database['public']['Tables']['service_charges']['Row']
-type PayMethod = Database['public']['Enums']['pay_method']
 
 type PaymentWithBooking = PaymentRow & {
   bookings: Pick<BookingRow, 'id' | 'guest_name' | 'room_id' | 'status' | 'total_ghs' | 'paid_ghs' | 'balance_ghs'> | null
@@ -31,173 +41,7 @@ type PaymentsSearchParams = {
   to?: string | string[]
 }
 
-type PaymentsFilters = {
-  fromDate: string
-  method: 'all' | PayMethod
-  query: string
-  toDate: string
-}
-
 const PAGE_SIZE = 12
-const VALID_METHODS = new Set<PayMethod>(['cash', 'momo', 'bank_transfer', 'cheque'])
-
-function getSingleParam(value: string | string[] | undefined) {
-  return Array.isArray(value) ? value[0] ?? '' : value ?? ''
-}
-
-function getPage(value: string | string[] | undefined) {
-  const page = Number.parseInt(getSingleParam(value), 10)
-  return Number.isFinite(page) && page > 0 ? page : 1
-}
-
-function isDateInput(value: string) {
-  return /^\d{4}-\d{2}-\d{2}$/.test(value)
-}
-
-function toStartOfDayIso(value: string) {
-  return `${value}T00:00:00.000Z`
-}
-
-function toExclusiveEndOfDayIso(value: string) {
-  const date = new Date(`${value}T00:00:00.000Z`)
-  date.setUTCDate(date.getUTCDate() + 1)
-  return date.toISOString()
-}
-
-function buildPaymentsQueryString(filters: PaymentsFilters, paymentsPage: number, servicePage: number) {
-  const params = new URLSearchParams()
-
-  if (filters.query) {
-    params.set('query', filters.query)
-  }
-
-  if (filters.method !== 'all') {
-    params.set('method', filters.method)
-  }
-
-  if (filters.fromDate) {
-    params.set('from', filters.fromDate)
-  }
-
-  if (filters.toDate) {
-    params.set('to', filters.toDate)
-  }
-
-  if (paymentsPage > 1) {
-    params.set('ppage', String(paymentsPage))
-  }
-
-  if (servicePage > 1) {
-    params.set('spage', String(servicePage))
-  }
-
-  return params.toString()
-}
-
-async function getMatchingRoomIds(supabase: Awaited<ReturnType<typeof createAuthenticatedServerSupabaseClient>>['supabase'], query: string) {
-  if (!query) {
-    return [] as string[]
-  }
-
-  const { data, error } = await supabase.from('rooms').select('id').ilike('number', `%${query}%`).limit(20)
-
-  if (error) {
-    throw new Error(error.message)
-  }
-
-  return (data ?? []).map((room) => room.id)
-}
-
-async function getMatchingBookingIds(
-  supabase: Awaited<ReturnType<typeof createAuthenticatedServerSupabaseClient>>['supabase'],
-  query: string,
-  roomIds: string[]
-) {
-  if (!query && roomIds.length === 0) {
-    return [] as string[]
-  }
-
-  let bookingQuery = supabase.from('bookings').select('id').limit(50)
-
-  if (query && roomIds.length > 0) {
-    bookingQuery = bookingQuery.or(`guest_name.ilike.%${query}%,room_id.in.(${roomIds.join(',')})`)
-  } else if (query) {
-    bookingQuery = bookingQuery.ilike('guest_name', `%${query}%`)
-  } else if (roomIds.length > 0) {
-    bookingQuery = bookingQuery.in('room_id', roomIds)
-  }
-
-  const { data, error } = await bookingQuery
-
-  if (error) {
-    throw new Error(error.message)
-  }
-
-  return (data ?? []).map((booking) => booking.id)
-}
-
-function applyPaymentFilters(query: any, filters: PaymentsFilters, bookingIds: string[]) {
-  let nextQuery = query
-
-  if (filters.fromDate) {
-    nextQuery = nextQuery.gte('paid_at', toStartOfDayIso(filters.fromDate))
-  }
-
-  if (filters.toDate) {
-    nextQuery = nextQuery.lt('paid_at', toExclusiveEndOfDayIso(filters.toDate))
-  }
-
-  if (filters.method !== 'all') {
-    nextQuery = nextQuery.eq('method', filters.method)
-  }
-
-  if (filters.query) {
-    const escapedQuery = filters.query.replace(/[,%()]/g, ' ').trim()
-    const orParts = [
-      `reference.ilike.%${escapedQuery}%`,
-      `received_by.ilike.%${escapedQuery}%`,
-      `method.ilike.%${escapedQuery}%`
-    ]
-
-    if (bookingIds.length > 0) {
-      orParts.push(`booking_id.in.(${bookingIds.join(',')})`)
-    }
-
-    nextQuery = nextQuery.or(orParts.join(','))
-  }
-
-  return nextQuery
-}
-
-function applyPendingChargeFilters(query: any, filters: PaymentsFilters, bookingIds: string[]) {
-  let nextQuery = query.eq('resolved', true).eq('payment_confirmed', false)
-
-  if (filters.fromDate) {
-    nextQuery = nextQuery.gte('resolved_at', toStartOfDayIso(filters.fromDate))
-  }
-
-  if (filters.toDate) {
-    nextQuery = nextQuery.lt('resolved_at', toExclusiveEndOfDayIso(filters.toDate))
-  }
-
-  if (filters.query) {
-    const escapedQuery = filters.query.replace(/[,%()]/g, ' ').trim()
-    const orParts = [
-      `type.ilike.%${escapedQuery}%`,
-      `description.ilike.%${escapedQuery}%`,
-      `requested_by.ilike.%${escapedQuery}%`,
-      `resolved_by.ilike.%${escapedQuery}%`
-    ]
-
-    if (bookingIds.length > 0) {
-      orParts.push(`booking_id.in.(${bookingIds.join(',')})`)
-    }
-
-    nextQuery = nextQuery.or(orParts.join(','))
-  }
-
-  return nextQuery
-}
 
 export default async function AdminPaymentsPage({ searchParams }: { searchParams?: PaymentsSearchParams }) {
   const { supabase, user } = await createAuthenticatedServerSupabaseClient()
@@ -212,7 +56,7 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
   const toDate = getSingleParam(searchParams?.to)
   const requestedPaymentsPage = getPage(searchParams?.ppage)
   const requestedServicePage = getPage(searchParams?.spage)
-  const method: 'all' | PayMethod = VALID_METHODS.has(methodParam as PayMethod) ? (methodParam as PayMethod) : 'all'
+  const method: 'all' | PayMethod = parsePaymentMethod(methodParam)
 
   const filters: PaymentsFilters = {
     fromDate: isDateInput(fromDate) ? fromDate : '',
@@ -221,8 +65,8 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
     toDate: isDateInput(toDate) ? toDate : ''
   }
 
-  const roomIds = await getMatchingRoomIds(supabase, filters.query)
-  const bookingIds = await getMatchingBookingIds(supabase, filters.query, roomIds)
+  const roomIds = await getMatchingPaymentRoomIds(supabase, filters.query)
+  const bookingIds = await getMatchingPaymentBookingIds(supabase, filters.query, roomIds)
 
   const paymentsRangeFrom = (requestedPaymentsPage - 1) * PAGE_SIZE
   const paymentsRangeTo = paymentsRangeFrom + PAGE_SIZE - 1

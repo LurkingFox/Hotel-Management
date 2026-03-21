@@ -6,21 +6,57 @@ import { useState } from 'react'
 
 import { getHotelAddressLines, getHotelContactLines, type HotelProfile } from '@/lib/hotel-info'
 import type { SampleLogo } from '@/lib/sample-logos'
+import type { Database } from '@/lib/supabase/types'
+
+type RoomRow = Database['public']['Tables']['rooms']['Row']
+
+type SeamRoomMapping = {
+  displayName: string
+  externalDeviceId: string
+  provider: string
+  room: Pick<RoomRow, 'id' | 'number' | 'status' | 'type'>
+  roomAccessDeviceId: string | null
+  updatedAt: string | null
+}
 
 type HotelProfileSettingsClientProps = {
+  initialMappings: SeamRoomMapping[]
   initialProfile: HotelProfile
   sampleLogos: SampleLogo[]
 }
 
-export function HotelProfileSettingsClient({ initialProfile, sampleLogos }: HotelProfileSettingsClientProps) {
+type SeamMappingsResponse = {
+  error?: string
+  mappings?: SeamRoomMapping[]
+  message?: string
+}
+
+function formatUpdatedAt(value: string | null) {
+  if (!value) {
+    return 'Not saved yet'
+  }
+
+  return new Date(value).toLocaleString()
+}
+
+export function HotelProfileSettingsClient({ initialMappings, initialProfile, sampleLogos }: HotelProfileSettingsClientProps) {
   const [profile, setProfile] = useState(initialProfile)
+  const [mappings, setMappings] = useState(initialMappings)
   const [isSaving, setIsSaving] = useState(false)
+  const [isSavingMappings, setIsSavingMappings] = useState<Record<string, boolean>>({})
+  const [isSyncingMappings, setIsSyncingMappings] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   function update<K extends keyof HotelProfile>(key: K, value: HotelProfile[K]) {
     setProfile((current) => ({ ...current, [key]: value }))
+  }
+
+  function updateMapping(roomId: string, key: 'displayName' | 'externalDeviceId', value: string) {
+    setMappings((current) =>
+      current.map((mapping) => (mapping.room.id === roomId ? { ...mapping, [key]: value } : mapping))
+    )
   }
 
   function applySampleLogo(sampleLogo: SampleLogo) {
@@ -91,6 +127,68 @@ export function HotelProfileSettingsClient({ initialProfile, sampleLogos }: Hote
       event.target.value = ''
     } finally {
       setIsUploading(false)
+    }
+  }
+
+  async function saveMapping(roomId: string) {
+    const mapping = mappings.find((entry) => entry.room.id === roomId)
+
+    if (!mapping) {
+      return
+    }
+
+    setIsSavingMappings((current) => ({ ...current, [roomId]: true }))
+    setMessage(null)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/seam/room-access-devices', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          deviceId: mapping.externalDeviceId,
+          displayName: mapping.displayName,
+          roomId
+        })
+      })
+
+      const payload = (await response.json()) as SeamMappingsResponse
+
+      if (!response.ok) {
+        setError(payload.error ?? 'Could not save Seam room mapping.')
+        return
+      }
+
+      setMappings(payload.mappings ?? initialMappings)
+      setMessage(payload.message ?? `Saved Seam mapping for room ${mapping.room.number}.`)
+    } finally {
+      setIsSavingMappings((current) => ({ ...current, [roomId]: false }))
+    }
+  }
+
+  async function syncMappingsFromEnv() {
+    setIsSyncingMappings(true)
+    setMessage(null)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/seam/room-access-devices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'sync_from_env' })
+      })
+
+      const payload = (await response.json()) as SeamMappingsResponse
+
+      if (!response.ok) {
+        setError(payload.error ?? 'Could not sync Seam room mappings from environment variables.')
+        return
+      }
+
+      setMappings(payload.mappings ?? initialMappings)
+      setMessage(payload.message ?? 'Seam room mappings synced from environment variables.')
+    } finally {
+      setIsSyncingMappings(false)
     }
   }
 
@@ -218,6 +316,73 @@ export function HotelProfileSettingsClient({ initialProfile, sampleLogos }: Hote
               These details feed the report headers and print exports. The logo is stored in Supabase Storage so it can be replaced from the admin UI without redeploying the app.
             </div>
           </article>
+        </section>
+
+        <section className="rounded-[2rem] border border-ink/10 bg-white p-6 shadow-card">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Seam device bindings</p>
+              <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl">Room-to-device mapping</h2>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-ink/70">
+                Persist which Seam device controls each room. You can edit mappings directly here or push the current environment mapping into Supabase so operations stop depending on redeploy-time JSON alone.
+              </p>
+            </div>
+            <button
+              className="rounded-full border border-ink/15 bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#211d18] disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={isSyncingMappings}
+              onClick={syncMappingsFromEnv}
+              type="button"
+            >
+              {isSyncingMappings ? 'Syncing env mappings...' : 'Sync env mappings to Supabase'}
+            </button>
+          </div>
+
+          <div className="mt-6 grid gap-4">
+            {mappings.map((mapping) => (
+              <article key={mapping.room.id} className="rounded-[1.5rem] border border-ink/10 bg-[#fcfaf6] p-5">
+                <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                  <div>
+                    <p className="text-lg font-semibold text-ink">Room {mapping.room.number}</p>
+                    <p className="mt-1 text-sm text-ink/65">
+                      {mapping.room.type} · {mapping.room.status} · Last saved {formatUpdatedAt(mapping.updatedAt)}
+                    </p>
+                  </div>
+                  <div className="text-xs uppercase tracking-[0.22em] text-ink/45">Provider: Seam</div>
+                </div>
+
+                <div className="mt-4 grid gap-4 md:grid-cols-[1.2fr_1fr_auto]">
+                  <label className="space-y-2">
+                    <span className="text-sm font-semibold text-ink/75">Seam device ID</span>
+                    <input
+                      className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 text-sm text-ink outline-none transition focus:border-ink/25"
+                      onChange={(event) => updateMapping(mapping.room.id, 'externalDeviceId', event.target.value)}
+                      placeholder="device_abc123"
+                      value={mapping.externalDeviceId}
+                    />
+                  </label>
+                  <label className="space-y-2">
+                    <span className="text-sm font-semibold text-ink/75">Display name</span>
+                    <input
+                      className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 text-sm text-ink outline-none transition focus:border-ink/25"
+                      onChange={(event) => updateMapping(mapping.room.id, 'displayName', event.target.value)}
+                      placeholder={`Room ${mapping.room.number}`}
+                      value={mapping.displayName}
+                    />
+                  </label>
+                  <div className="flex items-end">
+                    <button
+                      className="w-full rounded-full border border-ink/15 bg-white px-5 py-3 text-sm font-semibold text-ink transition hover:bg-parchment disabled:cursor-not-allowed disabled:opacity-60"
+                      disabled={isSavingMappings[mapping.room.id] || !mapping.externalDeviceId.trim()}
+                      onClick={() => saveMapping(mapping.room.id)}
+                      type="button"
+                    >
+                      {isSavingMappings[mapping.room.id] ? 'Saving...' : 'Save mapping'}
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
         </section>
       </div>
     </main>

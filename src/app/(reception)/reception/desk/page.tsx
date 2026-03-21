@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 
 import { ReceptionDeskClient } from '@/app/(reception)/reception/desk/reception-desk-client'
+import { getBookingAccessPresentation } from '@/lib/access-provider/config'
 import { createAuthenticatedServerSupabaseClient } from '@/lib/supabase/server'
 import type { Database } from '@/lib/supabase/types'
 
@@ -31,5 +32,11 @@ export default async function ReceptionDeskPage() {
     throw new Error(bookingsError.message)
   }
 
-  return <ReceptionDeskClient bookings={(bookings ?? []) as BookingWithRoom[]} rooms={(rooms ?? []) as RoomRow[]} />
+  return (
+    <ReceptionDeskClient
+      accessPresentation={getBookingAccessPresentation()}
+      bookings={(bookings ?? []) as BookingWithRoom[]}
+      rooms={(rooms ?? []) as RoomRow[]}
+    />
+  )
 }

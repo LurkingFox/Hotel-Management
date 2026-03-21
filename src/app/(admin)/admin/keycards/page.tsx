@@ -1,6 +1,15 @@
 import { redirect } from 'next/navigation'
 
 import { AdminKeycardsClient } from '@/app/(admin)/admin/keycards/admin-keycards-client'
+import {
+  applyKeycardFilters,
+  buildKeycardsQueryString,
+  getMatchingKeycardBookingIds,
+  getMatchingKeycardRoomIds,
+  parseKeycardStatus,
+  type KeycardsFilters
+} from '@/lib/admin-history/keycards'
+import { getPage, getSingleParam, isDateInput } from '@/lib/admin-history/shared'
 import { createAuthenticatedServerSupabaseClient } from '@/lib/supabase/server'
 import type { Database } from '@/lib/supabase/types'
 
@@ -24,145 +33,7 @@ type KeycardsSearchParams = {
   to?: string | string[]
 }
 
-type KeycardsFilters = {
-  fromDate: string
-  query: string
-  status: 'all' | KeycardStatus
-  toDate: string
-}
-
 const PAGE_SIZE = 12
-const VALID_STATUSES = new Set<KeycardStatus>(['active', 'revoked'])
-
-function getSingleParam(value: string | string[] | undefined) {
-  return Array.isArray(value) ? value[0] ?? '' : value ?? ''
-}
-
-function getPage(value: string | string[] | undefined) {
-  const page = Number.parseInt(getSingleParam(value), 10)
-  return Number.isFinite(page) && page > 0 ? page : 1
-}
-
-function isDateInput(value: string) {
-  return /^\d{4}-\d{2}-\d{2}$/.test(value)
-}
-
-function toStartOfDayIso(value: string) {
-  return `${value}T00:00:00.000Z`
-}
-
-function toExclusiveEndOfDayIso(value: string) {
-  const date = new Date(`${value}T00:00:00.000Z`)
-  date.setUTCDate(date.getUTCDate() + 1)
-  return date.toISOString()
-}
-
-function buildKeycardsQueryString(filters: KeycardsFilters, page: number) {
-  const params = new URLSearchParams()
-
-  if (filters.query) {
-    params.set('query', filters.query)
-  }
-
-  if (filters.status !== 'all') {
-    params.set('status', filters.status)
-  }
-
-  if (filters.fromDate) {
-    params.set('from', filters.fromDate)
-  }
-
-  if (filters.toDate) {
-    params.set('to', filters.toDate)
-  }
-
-  if (page > 1) {
-    params.set('page', String(page))
-  }
-
-  return params.toString()
-}
-
-async function getMatchingRoomIds(supabase: Awaited<ReturnType<typeof createAuthenticatedServerSupabaseClient>>['supabase'], query: string) {
-  if (!query) {
-    return [] as string[]
-  }
-
-  const { data, error } = await supabase.from('rooms').select('id').ilike('number', `%${query}%`).limit(30)
-
-  if (error) {
-    throw new Error(error.message)
-  }
-
-  return (data ?? []).map((room) => room.id)
-}
-
-async function getMatchingBookingIds(
-  supabase: Awaited<ReturnType<typeof createAuthenticatedServerSupabaseClient>>['supabase'],
-  query: string,
-  roomIds: string[]
-) {
-  if (!query && roomIds.length === 0) {
-    return [] as string[]
-  }
-
-  let bookingQuery = supabase.from('bookings').select('id').limit(50)
-
-  if (query && roomIds.length > 0) {
-    bookingQuery = bookingQuery.or(`guest_name.ilike.%${query}%,room_id.in.(${roomIds.join(',')})`)
-  } else if (query) {
-    bookingQuery = bookingQuery.ilike('guest_name', `%${query}%`)
-  } else if (roomIds.length > 0) {
-    bookingQuery = bookingQuery.in('room_id', roomIds)
-  }
-
-  const { data, error } = await bookingQuery
-
-  if (error) {
-    throw new Error(error.message)
-  }
-
-  return (data ?? []).map((booking) => booking.id)
-}
-
-function applyKeycardFilters(query: any, filters: KeycardsFilters, bookingIds: string[], roomIds: string[]) {
-  let nextQuery = query
-
-  if (filters.fromDate) {
-    nextQuery = nextQuery.gte('issued_at', toStartOfDayIso(filters.fromDate))
-  }
-
-  if (filters.toDate) {
-    nextQuery = nextQuery.lt('issued_at', toExclusiveEndOfDayIso(filters.toDate))
-  }
-
-  if (filters.status !== 'all') {
-    nextQuery = nextQuery.eq('status', filters.status)
-  }
-
-  if (filters.query) {
-    const escapedQuery = filters.query.replace(/[,%()]/g, ' ').trim()
-    const orParts = [
-      `card_uid.ilike.%${escapedQuery}%`,
-      `issued_to.ilike.%${escapedQuery}%`,
-      `issued_by.ilike.%${escapedQuery}%`,
-      `status.ilike.%${escapedQuery}%`,
-      `scope.ilike.%${escapedQuery}%`
-    ]
-
-    if (bookingIds.length > 0) {
-      orParts.push(`booking_id.in.(${bookingIds.join(',')})`)
-    }
-
-    if (roomIds.length > 0) {
-      orParts.push(`room_id.in.(${roomIds.join(',')})`)
-    }
-
-    nextQuery = nextQuery.or(orParts.join(','))
-  }
-
-  return nextQuery
-}
 
 export default async function AdminKeycardsPage({ searchParams }: { searchParams?: KeycardsSearchParams }) {
   const { supabase, user } = await createAuthenticatedServerSupabaseClient()
@@ -176,7 +47,7 @@ export default async function AdminKeycardsPage({ searchParams }: { searchParams
   const toDate = getSingleParam(searchParams?.to)
   const statusParam = getSingleParam(searchParams?.status)
   const requestedPage = getPage(searchParams?.page)
-  const status: 'all' | KeycardStatus = VALID_STATUSES.has(statusParam as KeycardStatus) ? (statusParam as KeycardStatus) : 'all'
+  const status: 'all' | KeycardStatus = parseKeycardStatus(statusParam)
 
   const filters: KeycardsFilters = {
     fromDate: isDateInput(fromDate) ? fromDate : '',
@@ -185,8 +56,8 @@ export default async function AdminKeycardsPage({ searchParams }: { searchParams
     toDate: isDateInput(toDate) ? toDate : ''
   }
 
-  const roomIds = await getMatchingRoomIds(supabase, filters.query)
-  const bookingIds = await getMatchingBookingIds(supabase, filters.query, roomIds)
+  const roomIds = await getMatchingKeycardRoomIds(supabase, filters.query)
+  const bookingIds = await getMatchingKeycardBookingIds(supabase, filters.query, roomIds)
   const rangeFrom = (requestedPage - 1) * PAGE_SIZE
   const rangeTo = rangeFrom + PAGE_SIZE - 1
 
