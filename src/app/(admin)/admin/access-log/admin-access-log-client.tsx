@@ -210,15 +210,15 @@ export function AdminAccessLogClient({ currentPage, events, filters, latestDenie
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <article className="rounded-[1.75rem] border border-white/40 bg-white/80 p-5 shadow-card backdrop-blur">
-            <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Granted taps</p>
+            <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Granted entries</p>
             <p className="mt-3 text-4xl font-semibold text-ink">{summary.granted}</p>
           </article>
           <article className="rounded-[1.75rem] border border-white/40 bg-white/80 p-5 shadow-card backdrop-blur">
-            <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Denied taps</p>
+            <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Denied entries</p>
             <p className="mt-3 text-4xl font-semibold text-ink">{summary.denied}</p>
           </article>
           <article className="rounded-[1.75rem] border border-white/40 bg-white/80 p-5 shadow-card backdrop-blur">
-            <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Expired cards used</p>
+            <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Expired credentials used</p>
             <p className="mt-3 text-4xl font-semibold text-ink">{summary.expired}</p>
           </article>
           <article className="rounded-[1.75rem] border border-white/40 bg-white/80 p-5 shadow-card backdrop-blur">
@@ -231,8 +231,8 @@ export function AdminAccessLogClient({ currentPage, events, filters, latestDenie
           <article className="rounded-[2rem] border border-ink/10 bg-white p-6 shadow-card">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
               <div>
-                <p className="text-sm uppercase tracking-[0.24em] text-ink/45">RFID audit trail</p>
-                <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl">Historical access search</h2>
+                <p className="text-sm uppercase tracking-[0.24em] text-ink/45">Access audit trail</p>
+                <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl">Historical entry search</h2>
               </div>
               <div className="flex flex-wrap gap-3">
                 {(['all', 'granted', 'denied', 'expired'] as const).map((filter) => (
@@ -256,7 +256,7 @@ export function AdminAccessLogClient({ currentPage, events, filters, latestDenie
                   className="mt-2 w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 text-sm outline-none transition focus:border-terracotta"
                   disabled={isPending}
                   onChange={(event) => setSearchDraft(event.target.value)}
-                  placeholder="Search room, card UID, guest, issuer, result, note"
+                  placeholder="Search room, credential identifier, guest, issuer, result, note"
                   value={searchDraft}
                 />
               </label>
@@ -323,8 +323,8 @@ export function AdminAccessLogClient({ currentPage, events, filters, latestDenie
                           <p className="mt-1 font-semibold text-ink">{event.rooms ? `Room ${event.rooms.number}` : 'Unknown room'}</p>
                         </div>
                         <div>
-                          <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Card UID</p>
-                          <p className="mt-1 font-semibold text-ink">{event.card_uid}</p>
+                          <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Credential identifier</p>
+                          <p className="mt-1 font-semibold text-ink">{event.credential_identifier}</p>
                         </div>
                         <div>
                           <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Guest</p>
@@ -377,7 +377,7 @@ export function AdminAccessLogClient({ currentPage, events, filters, latestDenie
 
           <article className="rounded-[2rem] border border-ink/10 bg-white p-6 shadow-card">
             <p className="text-sm uppercase tracking-[0.24em] text-ink/45">Security watch</p>
-            <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl">Recent denied events</h2>
+            <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl">Recent denied entries</h2>
             <p className="mt-3 text-sm leading-6 text-ink/65">
               This watchlist follows the active search and date range, but it stays focused on denied access only.
             </p>
@@ -387,7 +387,7 @@ export function AdminAccessLogClient({ currentPage, events, filters, latestDenie
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="font-semibold text-ink">{event.rooms ? `Room ${event.rooms.number}` : 'Unknown room'}</p>
-                      <p className="text-sm text-ink/60">{event.card_uid}</p>
+                      <p className="text-sm text-ink/60">{event.credential_identifier}</p>
                     </div>
                     <p className="text-sm text-ink/55">{formatDateTime(event.accessed_at)}</p>
                   </div>

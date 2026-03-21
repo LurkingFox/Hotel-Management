@@ -9,16 +9,15 @@ import type { Database } from '@/lib/supabase/types'
 
 type RoomRow = Database['public']['Tables']['rooms']['Row']
 type BookingRow = Database['public']['Tables']['bookings']['Row']
-type KeycardRow = Database['public']['Tables']['keycards']['Row']
-type KeycardScope = 'room' | 'master'
+type AccessCredentialRow = Database['public']['Tables']['booking_access_credentials']['Row']
 
-type KeycardWithRelations = KeycardRow & {
-  scope?: KeycardScope | null
+type AccessCredentialWithRelations = AccessCredentialRow & {
   bookings: Pick<BookingRow, 'id' | 'guest_name' | 'status' | 'check_in' | 'check_out_expected'> | null
   rooms: Pick<RoomRow, 'id' | 'number' | 'type' | 'status'> | null
 }
 
-type AdminKeycardsClientProps = {
+type AdminGuestAccessClientProps = {
+  activeProvider: 'seam'
   currentPage: number
   filters: {
     fromDate: string
@@ -26,26 +25,33 @@ type AdminKeycardsClientProps = {
     status: 'all' | 'active' | 'revoked'
     toDate: string
   }
-  keycards: KeycardWithRelations[]
-  liveActiveMasterCount: number
+  credentials: AccessCredentialWithRelations[]
   roomCoverage: Array<{
-    activeCards: number
+    activeCredentials: number
+    mappedDeviceId: string | null
+    mappedDeviceName: string | null
     room: RoomRow
   }>
   summary: {
     active: number
-    master: number
+    legacyRfid: number
     revoked: number
     roomsCovered: number
-    taps: number
+    seam: number
+    warnings: number
   }
   totalCount: number
   totalPages: number
 }
 
-const keycardStatusStyles: Record<'active' | 'revoked', string> = {
+const credentialStatusStyles: Record<'active' | 'revoked', string> = {
   active: 'bg-green-50 border-green-200 text-green-800',
   revoked: 'bg-red-50 border-red-200 text-red-800'
+}
+
+const providerStyles: Record<'local_rfid' | 'seam', string> = {
+  local_rfid: 'bg-[#e7edf5] text-[#27435a]',
+  seam: 'bg-[#f8e8dc] text-[#8a431d]'
 }
 
 function toInputDate(value: Date) {
@@ -106,17 +112,29 @@ function getVisiblePages(currentPage: number, totalPages: number, maxButtons = 5
   return Array.from({ length: end - start + 1 }, (_, index) => start + index)
 }
 
-export function AdminKeycardsClient({ currentPage, filters, keycards, liveActiveMasterCount, roomCoverage, summary, totalCount, totalPages }: AdminKeycardsClientProps) {
+function getCredentialLabel(credential: AccessCredentialWithRelations) {
+  return credential.credential_code ?? credential.note ?? credential.provider_reference ?? credential.id
+}
+
+function getProviderLabel(provider: string) {
+  return provider === 'seam' ? 'Seam' : 'Local RFID'
+}
+
+function getProviderStatusLabel(value: string | null) {
+  if (!value) {
+    return 'No provider events yet'
+  }
+
+  return value.replaceAll('_', ' ')
+}
+
+export function AdminGuestAccessClient({ activeProvider, currentPage, filters, credentials, roomCoverage, summary, totalCount, totalPages }: AdminGuestAccessClientProps) {
   const pathname = usePathname()
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [extendDates, setExtendDates] = useState<Record<string, string>>({})
-  const [masterCardUid, setMasterCardUid] = useState('')
-  const [masterIssuedTo, setMasterIssuedTo] = useState('')
-  const [masterValidFrom, setMasterValidFrom] = useState(new Date().toISOString().split('T')[0])
-  const [masterValidUntil, setMasterValidUntil] = useState(new Date(Date.now() + 86400000 * 30).toISOString().split('T')[0])
   const [searchDraft, setSearchDraft] = useState(filters.query)
   const [fromDateDraft, setFromDateDraft] = useState(filters.fromDate)
   const [toDateDraft, setToDateDraft] = useState(filters.toDate)
@@ -140,7 +158,7 @@ export function AdminKeycardsClient({ currentPage, filters, keycards, liveActive
       return `Up to ${filters.toDate}`
     }
 
-    return 'All issue dates'
+    return 'All credential dates'
   }, [filters.fromDate, filters.toDate])
 
   const activePreset = useMemo(() => getActivePreset(filters.fromDate, filters.toDate), [filters.fromDate, filters.toDate])
@@ -174,100 +192,62 @@ export function AdminKeycardsClient({ currentPage, filters, keycards, liveActive
     startTransition(() => router.replace(nextUrl))
   }
 
-  function handleRevoke(keycard: KeycardWithRelations) {
+  function handleRevoke(credential: AccessCredentialWithRelations) {
     resetMessages()
 
     startTransition(async () => {
-      const response = await fetch('/api/keycards', {
+      const response = await fetch('/api/access-credentials', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          id: keycard.id,
-          action: 'revoke',
-          bookingId: keycard.booking_id,
-          scope: keycard.scope ?? 'room'
+          id: credential.id,
+          action: 'revoke'
         })
       })
 
       const payload = (await response.json()) as { error?: string }
       if (!response.ok) {
-        setErrorMessage(payload.error ?? 'Could not revoke keycard.')
+        setErrorMessage(payload.error ?? 'Could not revoke access credential.')
         return
       }
 
-      setSuccessMessage(`Keycard ${keycard.card_uid} revoked.`)
+      setSuccessMessage(`${credential.provider === 'seam' ? 'Access code' : 'Guest credential'} revoked.`)
       router.refresh()
     })
   }
 
-  function handleExtend(keycard: KeycardWithRelations) {
+  function handleExtend(credential: AccessCredentialWithRelations) {
     resetMessages()
-    const validUntil = extendDates[keycard.id] ?? keycard.valid_until
+    const validUntil = extendDates[credential.id] ?? (credential.valid_until ? credential.valid_until.slice(0, 10) : '')
 
-    if (Date.parse(validUntil) < Date.parse(keycard.valid_from)) {
+    if (!validUntil) {
+      setErrorMessage('Extended valid-until date is required.')
+      return
+    }
+
+    if (credential.valid_from && Date.parse(validUntil) < Date.parse(credential.valid_from)) {
       setErrorMessage('Extended valid-until date must be on or after the valid-from date.')
       return
     }
 
     startTransition(async () => {
-      const response = await fetch('/api/keycards', {
+      const response = await fetch('/api/access-credentials', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          id: keycard.id,
+          id: credential.id,
           action: 'extend',
-          validUntil,
-          bookingId: keycard.booking_id,
-          scope: keycard.scope ?? 'room'
+          validUntil
         })
       })
 
       const payload = (await response.json()) as { error?: string }
       if (!response.ok) {
-        setErrorMessage(payload.error ?? 'Could not extend keycard validity.')
+        setErrorMessage(payload.error ?? 'Could not extend access validity.')
         return
       }
 
-      setSuccessMessage(`Keycard ${keycard.card_uid} extended to ${formatDate(validUntil)}.`)
-      router.refresh()
-    })
-  }
-
-  function handleIssueMasterKey() {
-    resetMessages()
-
-    if (!masterCardUid.trim() || !masterIssuedTo.trim()) {
-      setErrorMessage('Master key UID and issued-to name are required.')
-      return
-    }
-
-    if (Date.parse(masterValidUntil) < Date.parse(masterValidFrom)) {
-      setErrorMessage('Master key valid-until date must be on or after valid-from.')
-      return
-    }
-
-    startTransition(async () => {
-      const response = await fetch('/api/keycards', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          cardUid: masterCardUid.trim().toUpperCase(),
-          issuedTo: masterIssuedTo.trim(),
-          validFrom: masterValidFrom,
-          validUntil: masterValidUntil,
-          scope: 'master'
-        })
-      })
-
-      const payload = (await response.json()) as { error?: string }
-      if (!response.ok) {
-        setErrorMessage(payload.error ?? 'Could not issue master key.')
-        return
-      }
-
-      setMasterCardUid('')
-      setMasterIssuedTo('')
-      setSuccessMessage('Master key issued successfully.')
+      setSuccessMessage(`Validity extended to ${formatDate(validUntil)}.`)
       router.refresh()
     })
   }
@@ -297,7 +277,7 @@ export function AdminKeycardsClient({ currentPage, filters, keycards, liveActive
   }
 
   function handleExport() {
-    triggerHistoryExport('keycards', {
+    triggerHistoryExport('guest-access', {
       from: filters.fromDate || undefined,
       query: filters.query || undefined,
       status: filters.status === 'all' ? undefined : filters.status,
@@ -311,7 +291,10 @@ export function AdminKeycardsClient({ currentPage, filters, keycards, liveActive
         <header className="flex flex-col gap-4 text-white lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-sm uppercase tracking-[0.28em] text-white/70">Admin Tower</p>
-            <h1 className="font-[family-name:var(--font-display)] text-5xl">Keycard registry</h1>
+            <h1 className="font-[family-name:var(--font-display)] text-5xl">Guest access registry</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-white/75">
+              Review live guest credentials, provider state, mapped room devices, and manual intervention history from one registry.
+            </p>
           </div>
         </header>
 
@@ -320,24 +303,24 @@ export function AdminKeycardsClient({ currentPage, filters, keycards, liveActive
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
           <article className="rounded-[1.75rem] border border-white/40 bg-white/80 p-5 shadow-card backdrop-blur">
-            <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Matching active cards</p>
+            <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Matching active credentials</p>
             <p className="mt-3 text-4xl font-semibold text-ink">{summary.active}</p>
           </article>
           <article className="rounded-[1.75rem] border border-white/40 bg-white/80 p-5 shadow-card backdrop-blur">
-            <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Matching master keys</p>
-            <p className="mt-3 text-4xl font-semibold text-ink">{summary.master}</p>
+            <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Matching Seam credentials</p>
+            <p className="mt-3 text-4xl font-semibold text-ink">{summary.seam}</p>
           </article>
           <article className="rounded-[1.75rem] border border-white/40 bg-white/80 p-5 shadow-card backdrop-blur">
-            <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Matching revoked cards</p>
+            <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Matching revoked credentials</p>
             <p className="mt-3 text-4xl font-semibold text-ink">{summary.revoked}</p>
           </article>
           <article className="rounded-[1.75rem] border border-white/40 bg-white/80 p-5 shadow-card backdrop-blur">
-            <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Logged taps</p>
-            <p className="mt-3 text-4xl font-semibold text-ink">{summary.taps}</p>
+            <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Provider warnings</p>
+            <p className="mt-3 text-4xl font-semibold text-ink">{summary.warnings}</p>
           </article>
           <article className="rounded-[1.75rem] border border-white/40 bg-white/80 p-5 shadow-card backdrop-blur">
-            <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Rooms covered</p>
-            <p className="mt-3 text-4xl font-semibold text-ink">{summary.roomsCovered}</p>
+            <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Legacy RFID credentials</p>
+            <p className="mt-3 text-4xl font-semibold text-ink">{summary.legacyRfid}</p>
           </article>
         </section>
 
@@ -346,68 +329,22 @@ export function AdminKeycardsClient({ currentPage, filters, keycards, liveActive
             <div className="rounded-[1.5rem] bg-parchment p-5">
               <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
                 <div>
-                  <p className="text-sm uppercase tracking-[0.24em] text-ink/45">Admin override</p>
-                  <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl">Issue master keys</h2>
+                  <p className="text-sm uppercase tracking-[0.24em] text-ink/45">Registry mode</p>
+                  <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl">Credential operations</h2>
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-ink/65">
-                    Master keys are admin-only cards that can unlock any room while still writing every granted and denied tap to the access log.
+                    The live provider is {getProviderLabel(activeProvider)}. Revoke or extend active guest credentials here without switching back to the bookings screen.
                   </p>
                 </div>
-                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                  <label className="space-y-2 text-sm text-ink/65">
-                    <span className="font-semibold text-ink">Card UID</span>
-                    <input
-                      className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 uppercase outline-none transition focus:border-terracotta"
-                      onChange={(event) => setMasterCardUid(event.target.value)}
-                      placeholder="A3:F2:91:BC"
-                      value={masterCardUid}
-                    />
-                  </label>
-                  <label className="space-y-2 text-sm text-ink/65">
-                    <span className="font-semibold text-ink">Issued to</span>
-                    <input
-                      className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta"
-                      onChange={(event) => setMasterIssuedTo(event.target.value)}
-                      placeholder="Night Manager"
-                      value={masterIssuedTo}
-                    />
-                  </label>
-                  <label className="space-y-2 text-sm text-ink/65">
-                    <span className="font-semibold text-ink">Valid from</span>
-                    <input
-                      className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta"
-                      onChange={(event) => setMasterValidFrom(event.target.value)}
-                      type="date"
-                      value={masterValidFrom}
-                    />
-                  </label>
-                  <label className="space-y-2 text-sm text-ink/65">
-                    <span className="font-semibold text-ink">Valid until</span>
-                    <input
-                      className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta"
-                      min={masterValidFrom}
-                      onChange={(event) => setMasterValidUntil(event.target.value)}
-                      type="date"
-                      value={masterValidUntil}
-                    />
-                  </label>
+                <div className="rounded-2xl bg-white px-4 py-3 text-sm text-ink/70">
+                  <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Rooms covered</p>
+                  <p className="mt-1 text-2xl font-semibold text-ink">{summary.roomsCovered}</p>
                 </div>
-              </div>
-
-              <div className="mt-5 flex justify-end">
-                <button
-                  className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90 disabled:opacity-60"
-                  disabled={isPending}
-                  onClick={handleIssueMasterKey}
-                  type="button"
-                >
-                  Issue master key
-                </button>
               </div>
             </div>
 
             <div className="mt-6 flex flex-wrap gap-3">
               {([
-                { label: 'All cards', value: 'all' },
+                { label: 'All credentials', value: 'all' },
                 { label: 'Active', value: 'active' },
                 { label: 'Revoked', value: 'revoked' }
               ] as const).map((statusOption) => (
@@ -430,13 +367,13 @@ export function AdminKeycardsClient({ currentPage, filters, keycards, liveActive
                   className="w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 outline-none transition focus:border-terracotta"
                   disabled={isPending}
                   onChange={(event) => setSearchDraft(event.target.value)}
-                  placeholder="Search by card UID, guest, issuer, room, or scope"
+                  placeholder="Search by code, guest, issuer, room, device id, provider, or provider status"
                   value={searchDraft}
                 />
               </label>
               <div className="grid gap-3 md:grid-cols-2">
                 <label className="space-y-2 text-sm text-ink/65">
-                  <span className="font-semibold text-ink">Issued from</span>
+                  <span className="font-semibold text-ink">Created from</span>
                   <input
                     className="w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 outline-none transition focus:border-terracotta"
                     disabled={isPending}
@@ -446,7 +383,7 @@ export function AdminKeycardsClient({ currentPage, filters, keycards, liveActive
                   />
                 </label>
                 <label className="space-y-2 text-sm text-ink/65">
-                  <span className="font-semibold text-ink">Issued until</span>
+                  <span className="font-semibold text-ink">Created until</span>
                   <input
                     className="w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 outline-none transition focus:border-terracotta"
                     disabled={isPending}
@@ -482,7 +419,7 @@ export function AdminKeycardsClient({ currentPage, filters, keycards, liveActive
 
             <div className="mt-4 rounded-[1.5rem] bg-[#fcfaf6] px-4 py-4 text-sm text-ink/65">
               <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                <span>Showing {keycards.length} of {totalCount} matching keycards · {visibleRangeLabel}</span>
+                <span>Showing {credentials.length} of {totalCount} matching credentials · {visibleRangeLabel}</span>
                 <button className="rounded-full border border-ink/12 px-4 py-2 font-semibold text-ink transition hover:bg-parchment" onClick={handleExport} type="button">
                   Export CSV
                 </button>
@@ -490,49 +427,53 @@ export function AdminKeycardsClient({ currentPage, filters, keycards, liveActive
             </div>
 
             <div className="mt-6 grid gap-4">
-              {keycards.map((keycard) => {
-                const extendValue = extendDates[keycard.id] ?? keycard.valid_until
+              {credentials.map((credential) => {
+                const extendValue = extendDates[credential.id] ?? (credential.valid_until ? credential.valid_until.slice(0, 10) : '')
 
                 return (
-                  <article key={keycard.id} className="rounded-[1.5rem] border border-ink/10 bg-[#fcfaf6] p-5">
+                  <article key={credential.id} className="rounded-[1.5rem] border border-ink/10 bg-[#fcfaf6] p-5">
                     <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                       <div className="space-y-3">
                         <div className="flex flex-wrap items-center gap-3">
-                          <h3 className="text-2xl font-semibold text-ink">{keycard.card_uid}</h3>
-                          <span className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase ${keycardStatusStyles[keycard.status === 'revoked' ? 'revoked' : 'active']}`}>
-                            {keycard.status}
+                          <h3 className="text-2xl font-semibold text-ink">{getCredentialLabel(credential)}</h3>
+                          <span className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase ${credentialStatusStyles[credential.status === 'revoked' ? 'revoked' : 'active']}`}>
+                            {credential.status}
                           </span>
-                          <span className="rounded-full bg-[#e7edf5] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#27435a]">
-                            {(keycard.scope ?? 'room') === 'master' ? 'master key' : 'room key'}
+                          <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${providerStyles[credential.provider === 'seam' ? 'seam' : 'local_rfid']}`}>
+                            {getProviderLabel(credential.provider)}
+                          </span>
+                          <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-ink/65">
+                            {getProviderStatusLabel(credential.provider_status)}
                           </span>
                         </div>
                         <div className="grid gap-3 text-sm text-ink/70 md:grid-cols-2 xl:grid-cols-5">
                           <div>
                             <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Guest</p>
-                            <p className="mt-1 font-semibold text-ink">{keycard.bookings?.guest_name ?? keycard.issued_to}</p>
+                            <p className="mt-1 font-semibold text-ink">{credential.bookings?.guest_name ?? credential.issued_to}</p>
                           </div>
                           <div>
                             <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Room</p>
-                            <p className="mt-1 font-semibold text-ink">{(keycard.scope ?? 'room') === 'master' ? 'All rooms' : keycard.rooms ? `Room ${keycard.rooms.number}` : 'Unassigned'}</p>
+                            <p className="mt-1 font-semibold text-ink">{credential.rooms ? `Room ${credential.rooms.number}` : 'Unassigned'}</p>
                           </div>
                           <div>
-                            <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Issued</p>
-                            <p className="mt-1 font-semibold text-ink">{keycard.issued_at ? formatDate(keycard.issued_at) : 'Not recorded'}</p>
+                            <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Created</p>
+                            <p className="mt-1 font-semibold text-ink">{credential.created_at ? formatDate(credential.created_at) : 'Not recorded'}</p>
                           </div>
                           <div>
                             <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Validity</p>
-                            <p className="mt-1 font-semibold text-ink">{formatDate(keycard.valid_from)} to {formatDate(keycard.valid_until)}</p>
+                            <p className="mt-1 font-semibold text-ink">{credential.valid_from ? formatDate(credential.valid_from) : 'Unknown'} to {credential.valid_until ? formatDate(credential.valid_until) : 'Unknown'}</p>
                           </div>
                           <div>
-                            <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Access count</p>
-                            <p className="mt-1 font-semibold text-ink">{keycard.access_count}</p>
+                            <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Device / reference</p>
+                            <p className="mt-1 font-semibold text-ink">{credential.provider_device_id ?? credential.provider_reference ?? 'Not linked yet'}</p>
                           </div>
                         </div>
                       </div>
 
                       <div className="rounded-2xl bg-white px-4 py-3 text-sm text-ink/70">
                         <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Issued by</p>
-                        <p className="mt-1 font-semibold text-ink">{keycard.issued_by}</p>
+                        <p className="mt-1 font-semibold text-ink">{credential.issued_by}</p>
+                        {credential.provider_error_message ? <p className="mt-3 max-w-xs text-sm text-red-700">{credential.provider_error_message}</p> : null}
                       </div>
                     </div>
 
@@ -541,27 +482,27 @@ export function AdminKeycardsClient({ currentPage, filters, keycards, liveActive
                         <span className="text-sm font-semibold text-ink/75">Extend valid until</span>
                         <input
                           className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta"
-                          min={keycard.valid_from}
-                          onChange={(event) => setExtendDates((current) => ({ ...current, [keycard.id]: event.target.value }))}
+                          min={credential.valid_from ? credential.valid_from.slice(0, 10) : undefined}
+                          onChange={(event) => setExtendDates((current) => ({ ...current, [credential.id]: event.target.value }))}
                           type="date"
                           value={extendValue}
                         />
                       </label>
                       <div className="flex flex-wrap items-end gap-3 xl:justify-end">
-                        {keycard.status !== 'revoked' ? (
+                        {credential.status !== 'revoked' ? (
                           <button
                             className="rounded-full bg-red-100 px-5 py-3 text-sm font-semibold text-red-700 transition hover:bg-red-200 disabled:opacity-60"
                             disabled={isPending}
-                            onClick={() => handleRevoke(keycard)}
+                            onClick={() => handleRevoke(credential)}
                             type="button"
                           >
-                            Revoke keycard
+                            Revoke credential
                           </button>
                         ) : null}
                         <button
                           className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90 disabled:opacity-60"
                           disabled={isPending}
-                          onClick={() => handleExtend(keycard)}
+                          onClick={() => handleExtend(credential)}
                           type="button"
                         >
                           Extend validity
@@ -572,9 +513,9 @@ export function AdminKeycardsClient({ currentPage, filters, keycards, liveActive
                 )
               })}
 
-              {keycards.length === 0 ? (
+              {credentials.length === 0 ? (
                 <div className="rounded-[1.75rem] border border-dashed border-ink/15 bg-[#fcfaf6] px-6 py-10 text-center text-sm text-ink/55">
-                  No keycards match the current registry filters.
+                  No access credentials match the current registry filters.
                 </div>
               ) : null}
             </div>
@@ -605,21 +546,22 @@ export function AdminKeycardsClient({ currentPage, filters, keycards, liveActive
 
           <article className="rounded-[2rem] border border-ink/10 bg-white p-6 shadow-card">
             <p className="text-sm uppercase tracking-[0.24em] text-ink/45">Room coverage</p>
-            <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl">Door-readiness view</h2>
+            <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl">Access coverage</h2>
             <div className="mt-4 rounded-2xl bg-[#f8f5f0] px-4 py-3 text-sm text-ink/70">
-              {liveActiveMasterCount} active master {liveActiveMasterCount === 1 ? 'key is' : 'keys are'} available across the hotel.
+              {activeProvider === 'seam' ? 'Mapped Seam devices are shown alongside active credential counts per room.' : 'Legacy RFID coverage is shown from active booking credentials per room.'}
             </div>
             <div className="mt-6 space-y-3">
-              {roomCoverage.map(({ room, activeCards }) => (
+              {roomCoverage.map(({ room, activeCredentials, mappedDeviceId, mappedDeviceName }) => (
                 <div key={room.id} className="rounded-2xl bg-[#fcfaf6] p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="font-semibold text-ink">Room {room.number}</p>
                       <p className="text-sm capitalize text-ink/60">{room.type} · {room.status}</p>
+                      {mappedDeviceId ? <p className="mt-2 text-xs uppercase tracking-[0.16em] text-ink/45">{mappedDeviceName ?? mappedDeviceId}</p> : null}
                     </div>
                     <div className="text-right">
-                      <p className="text-sm text-ink/55">Active cards</p>
-                      <p className="font-semibold text-ink">{activeCards}</p>
+                      <p className="text-sm text-ink/55">Active credentials</p>
+                      <p className="font-semibold text-ink">{activeCredentials}</p>
                     </div>
                   </div>
                 </div>

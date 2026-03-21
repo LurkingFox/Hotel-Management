@@ -1,4 +1,4 @@
-export type AccessProviderTarget = 'local_rfid' | 'seam'
+export type AccessProviderTarget = 'seam'
 
 export type BookingAccessPresentation = {
   credentialKindLabel: string

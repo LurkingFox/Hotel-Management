@@ -11,7 +11,7 @@ type PaymentsFilters = {
   toDate: string
 }
 
-type SupabaseClient = ReturnType<typeof createServerSupabaseClient>
+type SupabaseClient = Awaited<ReturnType<typeof createServerSupabaseClient>>
 
 const VALID_METHODS = new Set<PayMethod>(['cash', 'momo', 'bank_transfer', 'cheque'])
 

@@ -1,7 +1,5 @@
 import type { AccessProviderTarget, BookingAccessPresentation } from '@/lib/access-provider/types'
 
-const VALID_TARGETS = new Set<AccessProviderTarget>(['local_rfid', 'seam'])
-
 function getTrimmedEnv(name: string) {
   const value = process.env[name]
   return typeof value === 'string' ? value.trim() : ''
@@ -25,47 +23,35 @@ function parseRoomDeviceMap(value: string) {
 }
 
 export function getAccessProviderTarget(): AccessProviderTarget {
-  const configured = getTrimmedEnv('ACCESS_PROVIDER_TARGET')
-  return VALID_TARGETS.has(configured as AccessProviderTarget) ? (configured as AccessProviderTarget) : 'local_rfid'
+  return 'seam'
 }
 
 export function getAccessMigrationState() {
-  const targetProvider = getAccessProviderTarget()
   const seamApiKey = getTrimmedEnv('SEAM_API_KEY')
   const seamWebhookSecret = getTrimmedEnv('SEAM_WEBHOOK_SECRET')
   const seamRoomDeviceMap = parseRoomDeviceMap(getTrimmedEnv('SEAM_ROOM_DEVICE_MAP_JSON'))
   const seamConfigured = Boolean(seamApiKey)
 
   return {
-    bookingOperationsProvider: targetProvider === 'seam' && seamConfigured ? ('seam' as const) : ('local_rfid' as const),
+    bookingOperationsProvider: 'seam' as const,
     seamApiKey,
     seamConfigured,
     seamRoomDeviceMap,
     seamWebhookSecret,
-    targetProvider
+    targetProvider: 'seam' as const
   }
 }
 
 export function getBookingAccessPresentation(state = getAccessMigrationState()): BookingAccessPresentation {
-  if (state.bookingOperationsProvider === 'seam') {
-    return {
-      credentialKindLabel: 'Access code',
-      generatedCredentialLabel: 'Generated access code',
-      manualCredentialLabel: 'Access code',
-      manualCredentialPlaceholder: 'Generated automatically at check-in',
-      providerLabel: 'Provider: Seam',
-      requiresManualCredential: false,
-      statusNote: 'Seam is now issuing live guest access codes. Room-to-device mappings can be bootstrapped from SEAM_ROOM_DEVICE_MAP_JSON and are persisted after first use.'
-    }
-  }
-
   return {
-    credentialKindLabel: 'Keycard',
-    generatedCredentialLabel: 'Issued keycard',
-    manualCredentialLabel: 'Card UID',
-    manualCredentialPlaceholder: 'A3:F2:91:BC',
-    providerLabel: 'Provider: Local RFID',
-    requiresManualCredential: true,
-    statusNote: null
+    credentialKindLabel: 'Access code',
+    generatedCredentialLabel: 'Generated access code',
+    manualCredentialLabel: 'Access code',
+    manualCredentialPlaceholder: 'Generated automatically at check-in',
+    providerLabel: 'Provider: Seam',
+    requiresManualCredential: false,
+    statusNote: state.seamConfigured
+      ? 'Seam is now issuing live guest access codes. Room-to-device mappings can be bootstrapped from SEAM_ROOM_DEVICE_MAP_JSON and are persisted after first use.'
+      : 'Seam is the only active access provider on this branch. Configure SEAM_API_KEY and room-device mappings before running live booking operations.'
   }
 }

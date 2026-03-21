@@ -10,6 +10,7 @@ const smokeReceptionName = 'Smoke Reception'
 const smokeLogoPngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aF9sAAAAASUVORK5CYII='
 const smokeBaseUrl = (process.env.SMOKE_BASE_URL ?? 'http://localhost:3000').replace(/\/$/, '')
 const sampleLogoRoute = '/api/sample-logos/Bespoke%20Minimalist%20Logo%20System%20for%20University%20Hotel.png'
+const requireLiveBookingFlow = /^(1|true|yes)$/i.test(process.env.SMOKE_REQUIRE_LIVE_BOOKING ?? '')
 
 function loadEnv() {
   const envText = fs.readFileSync(path.join(process.cwd(), '.env.local'), 'utf8')
@@ -88,11 +89,6 @@ function safeJson(value) {
   }
 }
 
-function createCardUid(seed) {
-  const bytes = Array.from({ length: 4 }, (_, index) => ((seed >> (index * 5)) + index * 53) & 0xff)
-  return bytes.map((byte) => byte.toString(16).toUpperCase().padStart(2, '0')).join(':')
-}
-
 function base64ToUint8Array(value) {
   return Uint8Array.from(Buffer.from(value, 'base64'))
 }
@@ -108,6 +104,22 @@ function createCheck(name, result, validate) {
     name,
     result,
     passed: validate(result)
+  }
+}
+
+function createSkippedCheck(name, reason, details = null) {
+  return {
+    name,
+    passed: true,
+    reason,
+    result: {
+      headers: {},
+      json: details,
+      location: null,
+      status: 204,
+      text: reason
+    },
+    skipped: true
   }
 }
 
@@ -162,66 +174,66 @@ async function callStaffAuthFunction(env, accessToken, payload, method = 'POST')
   return data
 }
 
-async function callValidateKeycard(env, payload) {
-  const response = await fetch(`${env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/validate_keycard`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-      apikey: env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(payload),
-    cache: 'no-store'
-  })
+async function reconcileSmokeStaffRecord(env, existingStaff, authUserId = null) {
+  const supabase = createServiceRoleClient(env)
 
-  const text = await response.text()
-  return {
-    status: response.status,
-    text,
-    json: text ? safeJson(text) : null
+  if (!existingStaff) {
+    const { data, error } = await supabase
+      .from('staff')
+      .insert({
+        name: smokeReceptionName,
+        role: 'receptionist',
+        daily_rate_ghs: 1,
+        on_shift: false,
+        active: true,
+        auth_user_id: authUserId
+      })
+      .select('*')
+      .single()
+
+    if (error || !data) {
+      throw new Error(error?.message ?? 'Could not create the smoke staff record.')
+    }
+
+    return data
   }
+
+  const nextAuthUserId = authUserId ?? existingStaff.auth_user_id ?? null
+  const { data, error } = await supabase
+    .from('staff')
+    .update({
+      active: existingStaff.active ?? true,
+      auth_user_id: nextAuthUserId,
+      daily_rate_ghs: existingStaff.daily_rate_ghs ?? 1,
+      name: existingStaff.name ?? smokeReceptionName,
+      on_shift: existingStaff.on_shift ?? false,
+      role: existingStaff.role ?? 'receptionist'
+    })
+    .eq('id', existingStaff.id)
+    .select('*')
+    .single()
+
+  if (error || !data) {
+    throw new Error(error?.message ?? 'Could not reconcile the smoke staff record.')
+  }
+
+  return data
 }
 
-async function listAccessLogEntries(env, cardUid) {
+async function getLatestExtensionAudit(env, bookingId) {
   const supabase = createServiceRoleClient(env)
-  const { data, error } = await supabase.from('access_log').select('*').eq('card_uid', cardUid).order('accessed_at', { ascending: true })
+  const { data, error } = await supabase
+    .from('booking_extension_audits')
+    .select('*')
+    .eq('booking_id', bookingId)
+    .order('created_at', { ascending: false })
+    .limit(1)
 
   if (error) {
     throw error
   }
 
-  return data ?? []
-}
-
-async function listDoorControllers(env, controllerId) {
-  const supabase = createServiceRoleClient(env)
-  const { data, error } = await supabase.from('door_controllers').select('*').eq('controller_id', controllerId).limit(1)
-
-  if (error) {
-    throw error
-  }
-
-  return data ?? []
-}
-
-async function callControllerHeartbeat(env, payload) {
-  const response = await fetch(`${env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/report_controller_status`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-      apikey: env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(payload),
-    cache: 'no-store'
-  })
-
-  const text = await response.text()
-  return {
-    status: response.status,
-    text,
-    json: text ? safeJson(text) : null
-  }
+  return Array.isArray(data) ? (data[0] ?? null) : null
 }
 
 async function ensureSmokeReceptionFixture(env, adminAuth, adminCookie) {
@@ -229,42 +241,70 @@ async function ensureSmokeReceptionFixture(env, adminAuth, adminCookie) {
   const staffList = Array.isArray(staffListResponse.json) ? staffListResponse.json : []
   const staffAccounts = await callStaffAuthFunction(env, adminAuth.session.access_token, null, 'GET')
   const existingAccount = Array.isArray(staffAccounts) ? staffAccounts.find((account) => account.email === smokeReceptionEmail) : null
-  const existingStaff = existingAccount
+  const linkedStaff = existingAccount
     ? staffList.find((staffMember) => staffMember.auth_user_id === existingAccount.id || (existingAccount.staff_id && staffMember.id === existingAccount.staff_id))
     : null
+  const namedStaff = staffList.find((staffMember) => staffMember.name === smokeReceptionName && staffMember.role === 'receptionist')
+  let existingStaff = linkedStaff ?? namedStaff ?? null
 
-  if (!existingAccount || !existingStaff) {
-    const createResponse = await request('/api/staff', {
-      method: 'POST',
-      headers: {
-        Cookie: adminCookie,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        name: smokeReceptionName,
-        role: 'receptionist',
-        dailyRateGhs: 1,
-        email: smokeReceptionEmail,
-        password: smokeReceptionPassword
-      })
+  if (!existingAccount && !existingStaff) {
+    const staff = await reconcileSmokeStaffRecord(env, null)
+    const authUser = await callStaffAuthFunction(env, adminAuth.session.access_token, {
+      action: 'create',
+      email: smokeReceptionEmail,
+      password: smokeReceptionPassword,
+      name: staff.name,
+      role: staff.role,
+      staffId: staff.id,
+      active: staff.active !== false
     })
 
-    if (createResponse.status !== 201 || !createResponse.json?.staff?.id || !createResponse.json?.authUser?.id) {
-      throw new Error('Could not create the smoke receptionist fixture.')
-    }
+    const linked = await reconcileSmokeStaffRecord(env, staff, authUser.id)
 
     return {
       created: true,
-      initialActive: false,
-      staff: createResponse.json.staff,
+      initialActive: linked.active !== false,
+      staff: linked,
       authUser: {
-        email: createResponse.json.authUser.email,
-        id: createResponse.json.authUser.id
+        email: authUser.email,
+        id: authUser.id
       },
-      staffListResponse,
-      staffAccounts
+      staffAccounts,
+      staffListResponse
     }
   }
+
+  if (!existingAccount && existingStaff) {
+    const authUser = await callStaffAuthFunction(env, adminAuth.session.access_token, {
+      action: 'create',
+      email: smokeReceptionEmail,
+      password: smokeReceptionPassword,
+      name: existingStaff.name,
+      role: existingStaff.role,
+      staffId: existingStaff.id,
+      active: existingStaff.active !== false
+    })
+
+    existingStaff = await reconcileSmokeStaffRecord(env, existingStaff, authUser.id)
+
+    return {
+      created: false,
+      initialActive: existingStaff.active !== false,
+      staff: existingStaff,
+      authUser: {
+        email: authUser.email,
+        id: authUser.id
+      },
+      staffAccounts,
+      staffListResponse
+    }
+  }
+
+  if (existingAccount && !existingStaff) {
+    existingStaff = await reconcileSmokeStaffRecord(env, null, existingAccount.id)
+  }
+
+  existingStaff = await reconcileSmokeStaffRecord(env, existingStaff, existingAccount.id)
 
   await callStaffAuthFunction(env, adminAuth.session.access_token, {
     action: 'update',
@@ -297,6 +337,8 @@ async function main() {
   const checks = []
   const smokeReceptionFixture = await ensureSmokeReceptionFixture(env, adminAuth, adminCookie)
   let originalHotelProfile = null
+  let smokeBookingId = null
+  let smokeRoomId = null
 
   checks.push(createCheck('admin staff api', smokeReceptionFixture.staffListResponse, isJsonArrayResponse))
   checks.push(
@@ -328,6 +370,16 @@ async function main() {
 
   checks.push(
     createCheck(
+      'admin root redirects to today',
+      await request('/admin', { headers: { Cookie: adminCookie }, redirect: 'manual' }),
+      (response) => [302, 303, 307, 308].includes(response.status) && response.location?.endsWith('/admin/today')
+    ),
+    createCheck(
+      'admin today page',
+      await request('/admin/today', { headers: { Cookie: adminCookie }, redirect: 'manual' }),
+      (response) => response.status === 200 && response.text.includes('Pending extension confirmations')
+    ),
+    createCheck(
       'admin dashboard page',
       await request('/admin/dashboard', { headers: { Cookie: adminCookie }, redirect: 'manual' }),
       (response) => response.status === 200 && response.text.includes('Operational command')
@@ -343,9 +395,14 @@ async function main() {
       (response) => response.status === 200 && response.text.includes('Payments ledger')
     ),
     createCheck(
-      'admin keycards page',
+      'admin guest access page',
+      await request('/admin/guest-access', { headers: { Cookie: adminCookie }, redirect: 'manual' }),
+      (response) => response.status === 200 && response.text.includes('Guest access registry')
+    ),
+    createCheck(
+      'legacy keycards route removed',
       await request('/admin/keycards', { headers: { Cookie: adminCookie }, redirect: 'manual' }),
-      (response) => response.status === 200 && response.text.includes('Keycard registry')
+      (response) => response.status === 404
     ),
     createCheck(
       'admin access log page',
@@ -459,236 +516,227 @@ async function main() {
       createCheck('reception desk baseline access', baselineDeskResponse, (response) => response.status === 200 && response.text.includes('Live arrivals, stays, and checkout flow'))
     )
 
+    const syncMappingsResponse = await request('/api/seam/room-access-devices', {
+      method: 'POST',
+      headers: {
+        Cookie: adminCookie,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ action: 'sync_from_env' })
+    })
+    checks.push(
+      createCheck(
+        'admin syncs Seam room mappings',
+        syncMappingsResponse,
+        (response) => response.status === 200 && Array.isArray(response.json?.mappings)
+      )
+    )
+
+    const mappingsResponse = await request('/api/seam/room-access-devices', { headers: { Cookie: adminCookie } })
+    const roomMappings = Array.isArray(mappingsResponse.json?.mappings) ? mappingsResponse.json.mappings : []
+    checks.push(
+      createCheck(
+        'admin seam room mappings api',
+        mappingsResponse,
+        (response) => response.status === 200 && Array.isArray(response.json?.mappings)
+      )
+    )
+
     const roomsResponse = await request('/api/rooms', { headers: { Cookie: adminCookie } })
     const rooms = Array.isArray(roomsResponse.json) ? roomsResponse.json : []
-    let smokeRoom = rooms.find((room) => room.status === 'vacant') ?? null
+    const mappedVacantRoomId = roomMappings.find((mapping) => mapping.externalDeviceId && mapping.room?.status === 'vacant')?.room?.id ?? null
+    const smokeRoom = mappedVacantRoomId ? rooms.find((room) => room.id === mappedVacantRoomId) ?? null : null
 
     checks.push(createCheck('admin rooms api', roomsResponse, (response) => response.status === 200 && Array.isArray(response.json) && response.json.length > 0))
 
+    const today = new Date().toISOString().split('T')[0]
+    const nextMonth = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0]
+    const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0]
+    const dayAfterTomorrow = new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0]
+    const removedKeycardsApiResponse = await request('/api/keycards', {
+      method: 'POST',
+      headers: {
+        Cookie: adminCookie,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        issuedTo: 'Smoke Legacy Request',
+        validFrom: today,
+        validUntil: nextMonth
+      })
+    })
+    checks.push(
+      createCheck(
+        'legacy keycards api removed',
+        removedKeycardsApiResponse,
+        (response) => response.status === 404
+      )
+    )
+
     if (!smokeRoom?.id) {
-      const createRoomResponse = await request('/api/rooms', {
+      const skipReason = 'No vacant Seam-mapped room is available for live smoke booking tests.'
+
+      if (requireLiveBookingFlow) {
+        throw new Error(skipReason)
+      }
+
+      checks.push(
+        createSkippedCheck('live Seam booking flow', skipReason, {
+          mappedRoomCount: roomMappings.filter((mapping) => mapping.externalDeviceId).length,
+          vacantRoomCount: rooms.filter((room) => room.status === 'vacant').length
+        })
+      )
+    } else {
+      smokeRoomId = smokeRoom.id
+
+      const createBookingResponse = await request('/api/bookings', {
         method: 'POST',
+        headers: {
+          Cookie: receptionCookie,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          roomId: smokeRoom.id,
+          guestName: `Smoke Guest ${Date.now().toString().slice(-6)}`,
+          guestPhone: '0200000000',
+          checkIn: today,
+          checkOutExpected: tomorrow,
+          totalGhs: Number(smokeRoom.rate_ghs ?? 250),
+          status: 'active',
+          payment: {
+            amountGhs: Number(smokeRoom.rate_ghs ?? 250),
+            method: 'cash'
+          }
+        })
+      })
+      checks.push(
+        createCheck(
+          'reception creates active booking with Seam access issuance',
+          createBookingResponse,
+          (response) =>
+            response.status === 201
+            && response.json?.booking?.status === 'active'
+            && response.json?.booking?.room_id === smokeRoom.id
+            && response.json?.access?.provider === 'seam'
+        )
+      )
+
+      if (!createBookingResponse.json?.booking?.id) {
+        throw new Error(
+          `Could not create the smoke Seam booking. Status: ${createBookingResponse.status}. `
+          + `Body: ${createBookingResponse.text || JSON.stringify(createBookingResponse.json)}`
+        )
+      }
+
+      smokeBookingId = createBookingResponse.json.booking.id
+
+      const extendBookingResponse = await request('/api/bookings', {
+        method: 'PATCH',
+        headers: {
+          Cookie: receptionCookie,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'extend',
+          bookingId: smokeBookingId,
+          extensionAcknowledged: true,
+          extensionAuthorization: {
+            reason: 'Smoke extension accountability flow.'
+          },
+          extensionPayment: {
+            amountGhs: Number(smokeRoom.rate_ghs ?? 250),
+            method: 'cash'
+          },
+          newCheckOutExpected: dayAfterTomorrow
+        })
+      })
+      checks.push(
+        createCheck(
+          'reception extends booking pending confirmation',
+          extendBookingResponse,
+          (response) => response.status === 200 && response.json?.success === true
+        )
+      )
+
+      const pendingExtensionAudit = await getLatestExtensionAudit(env, smokeBookingId)
+      checks.push(
+        createCheck(
+          'pending extension audit recorded',
+          {
+            headers: {},
+            json: pendingExtensionAudit,
+            location: null,
+            status: pendingExtensionAudit ? 200 : 404,
+            text: pendingExtensionAudit ? JSON.stringify(pendingExtensionAudit) : ''
+          },
+          (response) => response.status === 200 && response.json?.confirmation_status === 'pending'
+        )
+      )
+
+      if (!pendingExtensionAudit?.id) {
+        throw new Error('The smoke extension audit was not recorded as pending manager confirmation.')
+      }
+
+      const confirmExtensionResponse = await request('/api/bookings', {
+        method: 'PATCH',
         headers: {
           Cookie: adminCookie,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          number: `SM-${Date.now().toString().slice(-4)}`,
-          type: 'single',
-          rate_ghs: 250,
-          status: 'vacant'
+          action: 'confirm_extension',
+          confirmationNote: 'Smoke manager confirmation.',
+          extensionAuditId: pendingExtensionAudit.id
         })
       })
-
-      checks.push(createCheck('admin creates smoke room', createRoomResponse, (response) => response.status === 201 && !!response.json?.id))
-      smokeRoom = createRoomResponse.json
-    }
-
-    if (!smokeRoom?.id) {
-      throw new Error('No room is available for keycard smoke tests.')
-    }
-
-    const smokeControllerId = `controller-${smokeRoom.number ?? Date.now()}`
-    const heartbeatResponse = await callControllerHeartbeat(env, {
-      controller_id: smokeControllerId,
-      firmware_version: 'smoke-1.0.0',
-      heartbeat_status: 'online',
-      last_note: 'Smoke heartbeat OK.',
-      room_id: smokeRoom.id
-    })
-    checks.push(createCheck('controller heartbeat accepted', heartbeatResponse, (response) => response.status === 200 && response.json?.controller_id === smokeControllerId))
-
-    const controllerRows = await listDoorControllers(env, smokeControllerId)
-    checks.push(
-      createCheck(
-        'controller heartbeat persisted',
-        { json: controllerRows, location: null, status: 200 },
-        (response) => Array.isArray(response.json) && response.json.length === 1 && response.json[0]?.heartbeat_status === 'online' && response.json[0]?.room_id === smokeRoom.id
+      checks.push(
+        createCheck(
+          'admin confirms pending extension',
+          confirmExtensionResponse,
+          (response) => response.status === 200 && response.json?.success === true
+        )
       )
-    )
 
-    const smokeMasterCardUid = createCardUid(Date.now())
-    const smokeRoomCardUid = createCardUid(Date.now() + 91)
-    const today = new Date().toISOString().split('T')[0]
-    const nextMonth = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0]
-    const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0]
-    const masterKeyResponse = await request('/api/keycards', {
-      method: 'POST',
-      headers: {
-        Cookie: adminCookie,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        cardUid: smokeMasterCardUid.toLowerCase(),
-        issuedTo: 'Smoke Master Key',
-        validFrom: today,
-        validUntil: nextMonth,
-        scope: 'master'
+      const confirmedExtensionAudit = await getLatestExtensionAudit(env, smokeBookingId)
+      checks.push(
+        createCheck(
+          'extension audit marked confirmed',
+          {
+            headers: {},
+            json: confirmedExtensionAudit,
+            location: null,
+            status: confirmedExtensionAudit ? 200 : 404,
+            text: confirmedExtensionAudit ? JSON.stringify(confirmedExtensionAudit) : ''
+          },
+          (response) => response.status === 200 && response.json?.confirmation_status === 'confirmed'
+        )
+      )
+
+      const checkoutResponse = await request('/api/bookings', {
+        method: 'PATCH',
+        headers: {
+          Cookie: receptionCookie,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          bookingId: smokeBookingId,
+          action: 'checkout'
+        })
       })
-    })
+      checks.push(createCheck('reception checks out smoke booking', checkoutResponse, (response) => response.status === 200 && response.json?.success === true))
+      smokeBookingId = null
 
-    checks.push(
-      createCheck(
-        'admin creates master keycard',
-        masterKeyResponse,
-        (response) => response.status === 201 && response.json?.card_uid === smokeMasterCardUid && response.json?.scope === 'master'
-      )
-    )
-
-    if (!masterKeyResponse.json?.id) {
-      throw new Error('Could not create the smoke master keycard.')
+      const resetRoomResponse = await request('/api/rooms', {
+        method: 'PATCH',
+        headers: {
+          Cookie: adminCookie,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: smokeRoom.id, status: 'vacant' })
+      })
+      checks.push(createCheck('admin resets smoke room to vacant', resetRoomResponse, (response) => response.status === 200 && response.json?.status === 'vacant'))
+      smokeRoomId = null
     }
-
-    const grantedValidationResponse = await callValidateKeycard(env, {
-      card_uid: smokeMasterCardUid.toLowerCase(),
-      room_id: smokeRoom.id
-    })
-    checks.push(
-      createCheck(
-        'master key validation granted',
-        grantedValidationResponse,
-        (response) => response.status === 200 && response.json?.granted === true && response.json?.result === 'granted'
-      )
-    )
-
-    const revokeMasterKeyResponse = await request('/api/keycards', {
-      method: 'PATCH',
-      headers: {
-        Cookie: adminCookie,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        id: masterKeyResponse.json.id,
-        action: 'revoke',
-        scope: 'master'
-      })
-    })
-    checks.push(
-      createCheck(
-        'admin revokes master keycard',
-        revokeMasterKeyResponse,
-        (response) => response.status === 200 && response.json?.status === 'revoked'
-      )
-    )
-
-    const deniedValidationResponse = await callValidateKeycard(env, {
-      card_uid: smokeMasterCardUid.toLowerCase(),
-      room_id: smokeRoom.id
-    })
-    checks.push(
-      createCheck(
-        'revoked master key denied',
-        deniedValidationResponse,
-        (response) => response.status === 200 && response.json?.granted === false && response.json?.result === 'denied'
-      )
-    )
-
-    const roomCardLogCountBefore = (await listAccessLogEntries(env, smokeRoomCardUid)).length
-    const createBookingResponse = await request('/api/bookings', {
-      method: 'POST',
-      headers: {
-        Cookie: receptionCookie,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        roomId: smokeRoom.id,
-        guestName: `Smoke Guest ${Date.now().toString().slice(-6)}`,
-        guestPhone: '0200000000',
-        checkIn: today,
-        checkOutExpected: tomorrow,
-        totalGhs: Number(smokeRoom.rate_ghs ?? 250),
-        status: 'active',
-        cardUid: smokeRoomCardUid.toLowerCase(),
-        payment: {
-          amountGhs: Number(smokeRoom.rate_ghs ?? 250),
-          method: 'cash'
-        }
-      })
-    })
-    checks.push(
-      createCheck(
-        'reception creates active booking with room card',
-        createBookingResponse,
-        (response) => response.status === 201 && response.json?.status === 'active' && response.json?.room_id === smokeRoom.id
-      )
-    )
-
-    if (!createBookingResponse.json?.id) {
-      throw new Error('Could not create the smoke room-card booking.')
-    }
-
-    const grantedRoomCardResponse = await callValidateKeycard(env, {
-      card_uid: smokeRoomCardUid.toLowerCase(),
-      room_id: smokeRoom.id
-    })
-    checks.push(
-      createCheck(
-        'room card validation granted',
-        grantedRoomCardResponse,
-        (response) => response.status === 200 && response.json?.granted === true && response.json?.result === 'granted'
-      )
-    )
-
-    const roomCardLogsAfterGrant = await listAccessLogEntries(env, smokeRoomCardUid)
-    checks.push(
-      createCheck(
-        'room card access log grant recorded',
-        { json: roomCardLogsAfterGrant, location: null, status: 200 },
-        (response) =>
-          Array.isArray(response.json)
-          && response.json.length === roomCardLogCountBefore + 1
-          && response.json.at(-1)?.result === 'granted'
-          && response.json.at(-1)?.room_id === smokeRoom.id
-      )
-    )
-
-    const checkoutResponse = await request('/api/bookings', {
-      method: 'PATCH',
-      headers: {
-        Cookie: receptionCookie,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        bookingId: createBookingResponse.json.id,
-        action: 'checkout'
-      })
-    })
-    checks.push(createCheck('reception checks out smoke booking', checkoutResponse, (response) => response.status === 200 && response.json?.success === true))
-
-    const deniedRoomCardResponse = await callValidateKeycard(env, {
-      card_uid: smokeRoomCardUid.toLowerCase(),
-      room_id: smokeRoom.id
-    })
-    checks.push(
-      createCheck(
-        'revoked room card denied',
-        deniedRoomCardResponse,
-        (response) => response.status === 200 && response.json?.granted === false && response.json?.result === 'denied'
-      )
-    )
-
-    const roomCardLogsAfterDeny = await listAccessLogEntries(env, smokeRoomCardUid)
-    checks.push(
-      createCheck(
-        'room card access log denial recorded',
-        { json: roomCardLogsAfterDeny, location: null, status: 200 },
-        (response) =>
-          Array.isArray(response.json)
-          && response.json.length === roomCardLogCountBefore + 2
-          && response.json.at(-1)?.result === 'denied'
-          && response.json.at(-1)?.note === 'Unknown card or wrong room.'
-      )
-    )
-
-    const resetRoomResponse = await request('/api/rooms', {
-      method: 'PATCH',
-      headers: {
-        Cookie: adminCookie,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ id: smokeRoom.id, status: 'vacant' })
-    })
-    checks.push(createCheck('admin resets smoke room to vacant', resetRoomResponse, (response) => response.status === 200 && response.json?.status === 'vacant'))
 
     const archiveResponse = await ensureStaffActivation(adminCookie, smokeReceptionFixture.staff.id, smokeReceptionFixture.authUser.id, false)
     checks.push(createCheck('admin archives receptionist', archiveResponse, (response) => response.status === 200 && response.json?.active === false))
@@ -720,6 +768,31 @@ async function main() {
       createCheck('reactivated receptionist access restored', restoredDeskResponse, (response) => response.status === 200 && response.text.includes('Live arrivals, stays, and checkout flow'))
     )
   } finally {
+    if (smokeBookingId) {
+      await request('/api/bookings', {
+        method: 'PATCH',
+        headers: {
+          Cookie: adminCookie,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          bookingId: smokeBookingId,
+          action: 'checkout'
+        })
+      }).catch(() => null)
+    }
+
+    if (smokeRoomId) {
+      await request('/api/rooms', {
+        method: 'PATCH',
+        headers: {
+          Cookie: adminCookie,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: smokeRoomId, status: 'vacant' })
+      }).catch(() => null)
+    }
+
     if (originalHotelProfile) {
       await request('/api/hotel-profile', {
         method: 'PATCH',
@@ -739,6 +812,8 @@ async function main() {
   const report = checks.map((check) => ({
     name: check.name,
     location: check.result.location ?? null,
+    reason: check.reason ?? null,
+    skipped: check.skipped ?? false,
     status: check.result.status,
     passed: check.passed
   }))

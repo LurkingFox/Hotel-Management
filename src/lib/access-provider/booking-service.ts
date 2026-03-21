@@ -24,17 +24,12 @@ type RoomAccessDeviceRow = {
 type BookingAccessCredentialRow = {
   credential_code: string | null
   id: string
-  local_keycard_id: string | null
   note: string | null
   provider: 'local_rfid' | 'seam'
   provider_device_id: string | null
   provider_reference: string | null
   room_id: string | null
   status: 'active' | 'revoked'
-}
-
-function normalizeCardUid(value: string | null | undefined) {
-  return value?.trim().toUpperCase() ?? ''
 }
 
 function toAccessWindowStart(value: string) {
@@ -46,7 +41,7 @@ function toAccessWindowEnd(value: string) {
 }
 
 function buildCredentialResult(
-  provider: 'local_rfid' | 'seam',
+  provider: 'seam',
   details: Partial<Omit<BookingAccessOperationResult, 'provider'>> = {}
 ): BookingAccessOperationResult {
   return {
@@ -67,9 +62,8 @@ async function createAccessCredentialRecord(
     credentialCode?: string | null
     issuedBy?: string | null
     issuedTo?: string | null
-    localKeycardId?: string | null
     note?: string | null
-    provider: 'local_rfid' | 'seam'
+    provider: 'seam'
     providerDeviceId?: string | null
     providerReference?: string | null
     roomId?: string | null
@@ -84,7 +78,6 @@ async function createAccessCredentialRecord(
       credential_code: values.credentialCode ?? null,
       issued_by: values.issuedBy ?? null,
       issued_to: values.issuedTo ?? null,
-      local_keycard_id: values.localKeycardId ?? null,
       note: values.note ?? null,
       provider: values.provider,
       provider_device_id: values.providerDeviceId ?? null,
@@ -174,7 +167,7 @@ async function upsertSeamRoomDevice(
 async function listActiveAccessCredentials(supabase: SupabaseClient, bookingId: string) {
   const { data, error } = await supabase
     .from('booking_access_credentials')
-    .select('id, provider, provider_reference, provider_device_id, local_keycard_id, credential_code, note, room_id, status')
+    .select('id, provider, provider_reference, provider_device_id, credential_code, note, room_id, status')
     .eq('booking_id', bookingId)
     .eq('status', 'active')
     .returns<BookingAccessCredentialRow[]>()
@@ -194,98 +187,6 @@ function createSeamClient() {
   }
 
   return new Seam({ apiKey: migrationState.seamApiKey })
-}
-
-function createLocalRfidBookingAccessService(supabase: SupabaseClient): BookingAccessService {
-  return {
-    provider: 'local_rfid',
-
-    async issueBookingAccess(input: BookingAccessIssueInput): Promise<BookingAccessOperationResult> {
-      const normalizedCardUid = normalizeCardUid(input.manualCredential)
-
-      if (!normalizedCardUid) {
-        throw new Error('Card UID is required before issuing room access.')
-      }
-
-      const { data, error } = await supabase
-        .from('keycards')
-        .insert({
-          booking_id: input.bookingId,
-          card_uid: normalizedCardUid,
-          issued_by: input.issuedBy,
-          issued_to: input.issuedTo,
-          room_id: input.roomId,
-          status: 'active',
-          valid_from: input.validFrom,
-          valid_until: input.validUntil
-        })
-        .select('id')
-        .single()
-
-      if (error) {
-        throw new Error(error.message)
-      }
-
-      await createAccessCredentialRecord(supabase, {
-        bookingId: input.bookingId,
-        issuedBy: input.issuedBy,
-        issuedTo: input.issuedTo,
-        localKeycardId: data?.id ?? null,
-        note: normalizedCardUid,
-        provider: 'local_rfid',
-        roomId: input.roomId,
-        validFrom: input.validFrom,
-        validUntil: input.validUntil
-      })
-
-      return buildCredentialResult('local_rfid', {
-        localRecordId: data?.id ?? null,
-        note: normalizedCardUid
-      })
-    },
-
-    async extendBookingAccess(input: BookingAccessExtendInput): Promise<BookingAccessOperationResult> {
-      const { error } = await supabase.from('keycards').update({ valid_until: input.validUntil }).eq('booking_id', input.bookingId)
-
-      if (error) {
-        throw new Error(error.message)
-      }
-
-      const { error: credentialUpdateError } = await supabase
-        .from('booking_access_credentials')
-        .update({ updated_at: new Date().toISOString(), valid_until: input.validUntil })
-        .eq('booking_id', input.bookingId)
-        .eq('provider', 'local_rfid')
-        .eq('status', 'active')
-
-      if (credentialUpdateError) {
-        throw new Error(credentialUpdateError.message)
-      }
-
-      return buildCredentialResult('local_rfid')
-    },
-
-    async revokeBookingAccess(input: BookingAccessRevokeInput): Promise<BookingAccessOperationResult> {
-      const { error } = await supabase.from('keycards').update({ status: 'revoked' }).eq('booking_id', input.bookingId)
-
-      if (error) {
-        throw new Error(error.message)
-      }
-
-      const { error: credentialUpdateError } = await supabase
-        .from('booking_access_credentials')
-        .update({ status: 'revoked', updated_at: new Date().toISOString() })
-        .eq('booking_id', input.bookingId)
-        .eq('provider', 'local_rfid')
-        .eq('status', 'active')
-
-      if (credentialUpdateError) {
-        throw new Error(credentialUpdateError.message)
-      }
-
-      return buildCredentialResult('local_rfid')
-    }
-  }
 }
 
 function createSeamBookingAccessService(supabase: SupabaseClient): BookingAccessService {
@@ -426,11 +327,5 @@ function createSeamBookingAccessService(supabase: SupabaseClient): BookingAccess
 }
 
 export function createBookingAccessService(supabase: SupabaseClient) {
-  const migrationState = getAccessMigrationState()
-
-  if (migrationState.bookingOperationsProvider === 'seam') {
-    return createSeamBookingAccessService(supabase)
-  }
-
-  return createLocalRfidBookingAccessService(supabase)
+  return createSeamBookingAccessService(supabase)
 }

@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
+import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 
 import { findSampleLogoById, getSampleLogoFilePath } from '@/lib/sample-logos'
@@ -12,8 +13,9 @@ const contentTypes: Record<string, string> = {
   '.webp': 'image/webp'
 }
 
-export async function GET(_: Request, { params }: { params: { logoId: string } }) {
-  const sampleLogo = findSampleLogoById(params.logoId)
+export async function GET(_: NextRequest, { params }: { params: Promise<{ logoId: string }> }) {
+  const { logoId } = await params
+  const sampleLogo = findSampleLogoById(logoId)
 
   if (!sampleLogo) {
     return new NextResponse('Not found', { status: 404 })

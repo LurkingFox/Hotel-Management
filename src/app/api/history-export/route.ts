@@ -2,12 +2,12 @@ import { NextResponse } from 'next/server'
 
 import { applyAccessFilters, getMatchingAccessRoomIds, parseAccessResult, type AccessResult } from '@/lib/admin-history/access-log'
 import {
-  applyKeycardFilters,
-  getMatchingKeycardBookingIds,
-  getMatchingKeycardRoomIds,
-  parseKeycardStatus,
-  type KeycardsFilters
-} from '@/lib/admin-history/keycards'
+  applyGuestAccessFilters,
+  getMatchingGuestAccessBookingIds,
+  getMatchingGuestAccessRoomIds,
+  parseGuestAccessStatus,
+  type GuestAccessFilters
+} from '@/lib/admin-history/guest-access'
 import {
   applyPaymentFilters,
   applyPendingChargeFilters,
@@ -36,7 +36,7 @@ type PaymentRow = Database['public']['Tables']['payments']['Row']
 type ServiceChargeRow = Database['public']['Tables']['service_charges']['Row']
 type ShiftRow = Database['public']['Tables']['shifts']['Row']
 type StaffRow = Database['public']['Tables']['staff']['Row']
-type KeycardRow = Database['public']['Tables']['keycards']['Row']
+type AccessCredentialRow = Database['public']['Tables']['booking_access_credentials']['Row']
 
 type AccessLogWithRoom = AccessLogRow & {
   rooms: Pick<RoomRow, 'id' | 'number' | 'status' | 'type'> | null
@@ -58,7 +58,7 @@ type ShiftHistoryRow = ShiftRow & {
   staff: Pick<StaffRow, 'id' | 'name' | 'role'> | null
 }
 
-type KeycardWithRelations = KeycardRow & {
+type AccessCredentialWithRelations = AccessCredentialRow & {
   bookings: Pick<BookingRow, 'id' | 'guest_name' | 'status' | 'check_in' | 'check_out_expected'> | null
   rooms: Pick<RoomRow, 'id' | 'number' | 'type' | 'status'> | null
 }
@@ -100,7 +100,7 @@ export async function GET(request: Request) {
         const response = await applyAccessFilters(
           supabase
             .from('access_log')
-            .select('id, accessed_at, result, card_uid, guest_name, issued_by, note, room_id, rooms(id, number, status, type)')
+            .select('id, accessed_at, result, credential_identifier, guest_name, issued_by, note, room_id, rooms(id, number, status, type)')
             .order('accessed_at', { ascending: false }),
           filters,
           roomIds,
@@ -118,7 +118,7 @@ export async function GET(request: Request) {
           event.rooms?.number ?? '',
           event.rooms?.type ?? '',
           event.rooms?.status ?? '',
-          event.card_uid,
+          event.credential_identifier,
           event.guest_name,
           event.issued_by,
           event.note,
@@ -127,7 +127,7 @@ export async function GET(request: Request) {
 
         return csvResponse(
           buildExportFilename('access-log'),
-          ['Event ID', 'Accessed At', 'Result', 'Room Number', 'Room Type', 'Room Status', 'Card UID', 'Guest Name', 'Issued By', 'Note', 'Room ID'],
+          ['Event ID', 'Accessed At', 'Result', 'Room Number', 'Room Type', 'Room Status', 'Credential Identifier', 'Guest Name', 'Issued By', 'Note', 'Room ID'],
           rows
         )
       }
@@ -277,24 +277,24 @@ export async function GET(request: Request) {
         )
       }
 
-      case 'keycards': {
+      case 'guest-access': {
         const query = getSingleParam(searchParams.getAll('query')).trim()
-        const status = parseKeycardStatus(getSingleParam(searchParams.getAll('status')))
+        const status = parseGuestAccessStatus(getSingleParam(searchParams.getAll('status')))
         const fromDate = getSingleParam(searchParams.getAll('from'))
         const toDate = getSingleParam(searchParams.getAll('to'))
-        const filters: KeycardsFilters = {
+        const filters: GuestAccessFilters = {
           fromDate: isDateInput(fromDate) ? fromDate : '',
           query,
           status,
           toDate: isDateInput(toDate) ? toDate : ''
         }
-        const roomIds = await getMatchingKeycardRoomIds(supabase, filters.query)
-        const bookingIds = await getMatchingKeycardBookingIds(supabase, filters.query, roomIds)
-        const response = await applyKeycardFilters(
+        const roomIds = await getMatchingGuestAccessRoomIds(supabase, filters.query)
+        const bookingIds = await getMatchingGuestAccessBookingIds(supabase, filters.query, roomIds)
+        const response = await applyGuestAccessFilters(
           supabase
-            .from('keycards')
-            .select('id, card_uid, issued_at, issued_by, issued_to, valid_from, valid_until, status, scope, access_count, booking_id, room_id, bookings(id, guest_name, status, check_in, check_out_expected), rooms(id, number, type, status)')
-            .order('issued_at', { ascending: false }),
+            .from('booking_access_credentials')
+            .select('id, credential_code, created_at, issued_by, issued_to, valid_from, valid_until, status, provider, provider_reference, provider_device_id, provider_status, note, booking_id, room_id, bookings(id, guest_name, status, check_in, check_out_expected), rooms(id, number, type, status)')
+            .order('created_at', { ascending: false }),
           filters,
           bookingIds,
           roomIds
@@ -304,31 +304,33 @@ export async function GET(request: Request) {
           throw new Error(response.error.message)
         }
 
-        const rows = ((response.data ?? []) as KeycardWithRelations[]).map((keycard) => [
-          keycard.id,
-          keycard.card_uid,
-          formatTimestampForExport(keycard.issued_at),
-          keycard.issued_by,
-          keycard.issued_to,
-          keycard.scope,
-          keycard.status,
-          keycard.access_count,
-          formatDateForExport(keycard.valid_from),
-          formatDateForExport(keycard.valid_until),
-          keycard.room_id,
-          keycard.rooms?.number,
-          keycard.rooms?.type,
-          keycard.rooms?.status,
-          keycard.booking_id,
-          keycard.bookings?.guest_name,
-          keycard.bookings?.status,
-          formatDateForExport(keycard.bookings?.check_in ?? null),
-          formatDateForExport(keycard.bookings?.check_out_expected ?? null)
+        const rows = ((response.data ?? []) as AccessCredentialWithRelations[]).map((credential) => [
+          credential.id,
+          credential.credential_code ?? credential.note ?? credential.provider_reference,
+          formatTimestampForExport(credential.created_at),
+          credential.issued_by,
+          credential.issued_to,
+          credential.provider,
+          credential.status,
+          credential.provider_status,
+          formatDateForExport(credential.valid_from),
+          formatDateForExport(credential.valid_until),
+          credential.provider_device_id,
+          credential.provider_reference,
+          credential.room_id,
+          credential.rooms?.number,
+          credential.rooms?.type,
+          credential.rooms?.status,
+          credential.booking_id,
+          credential.bookings?.guest_name,
+          credential.bookings?.status,
+          formatDateForExport(credential.bookings?.check_in ?? null),
+          formatDateForExport(credential.bookings?.check_out_expected ?? null)
         ])
 
         return csvResponse(
-          buildExportFilename('keycard-registry'),
-          ['Keycard ID', 'Card UID', 'Issued At', 'Issued By', 'Issued To', 'Scope', 'Status', 'Access Count', 'Valid From', 'Valid Until', 'Room ID', 'Room Number', 'Room Type', 'Room Status', 'Booking ID', 'Guest Name', 'Booking Status', 'Check In', 'Check Out Expected'],
+          buildExportFilename('guest-access-registry'),
+          ['Credential ID', 'Credential Label', 'Created At', 'Issued By', 'Issued To', 'Provider', 'Status', 'Provider Status', 'Valid From', 'Valid Until', 'Provider Device ID', 'Provider Reference', 'Room ID', 'Room Number', 'Room Type', 'Room Status', 'Booking ID', 'Guest Name', 'Booking Status', 'Check In', 'Check Out Expected'],
           rows
         )
       }

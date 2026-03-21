@@ -20,7 +20,7 @@ function getCookieMethods(cookieStore: Awaited<ReturnType<typeof cookies>>) {
   }
 }
 
-export function createServerSupabaseClient(accessToken?: string) {
+export async function createServerSupabaseClient(accessToken?: string) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
@@ -28,7 +28,7 @@ export function createServerSupabaseClient(accessToken?: string) {
     throw new Error('Supabase environment variables are missing.')
   }
 
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
 
   return createServerClient(url, anonKey, {
     cookies: getCookieMethods(cookieStore),
@@ -42,10 +42,10 @@ export function createServerSupabaseClient(accessToken?: string) {
   })
 }
 
-export type AuthenticatedUser = Awaited<ReturnType<ReturnType<typeof createServerSupabaseClient>['auth']['getUser']>>['data']['user']
+export type AuthenticatedUser = Awaited<ReturnType<Awaited<ReturnType<typeof createServerSupabaseClient>>['auth']['getUser']>>['data']['user']
 
 export async function createAuthenticatedServerSupabaseClient() {
-  const sessionClient = createServerSupabaseClient()
+  const sessionClient = await createServerSupabaseClient()
   const [
     {
       data: { user },
@@ -67,7 +67,7 @@ export async function createAuthenticatedServerSupabaseClient() {
   }
 
   return {
-    supabase: createServerSupabaseClient(session.access_token),
+    supabase: await createServerSupabaseClient(session.access_token),
     session,
     user,
     error: userError ?? sessionError

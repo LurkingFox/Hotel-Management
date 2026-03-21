@@ -22,14 +22,19 @@ type CreateBookingBody = {
   checkOutExpected?: string
   totalGhs?: number
   status?: BookingStatus
-  cardUid?: string
   payment?: PaymentInput
 }
 
 type UpdateBookingBody = {
   bookingId?: string
-  action?: 'check_in' | 'checkout' | 'extend' | 'cancel'
-  cardUid?: string
+  action?: 'check_in' | 'checkout' | 'extend' | 'cancel' | 'confirm_extension' | 'flag_extension'
+  confirmationNote?: string
+  extensionAcknowledged?: boolean
+  extensionAuditId?: string
+  extensionAuthorization?: {
+    reason?: string
+  }
+  extensionPayment?: PaymentInput
   issuedTo?: string
   settlement?: PaymentInput
   newCheckOutExpected?: string
@@ -61,6 +66,10 @@ function getActorName(user: AuthenticatedUser) {
   return user?.email ?? 'system'
 }
 
+function getActorRole(user: AuthenticatedUser) {
+  return typeof user?.user_metadata?.role === 'string' ? user.user_metadata.role : null
+}
+
 function getNightCount(checkIn: string, checkOut: string): number {
   const difference = Date.parse(checkOut) - Date.parse(checkIn)
   return Math.max(1, Math.ceil(difference / 86400000))
@@ -76,21 +85,58 @@ function getErrorResponse(error: unknown) {
 }
 
 function getCredentialIssuedMessage(guestName: string, access: BookingAccessOperationResult) {
-  if (access.provider === 'seam') {
-    return access.credentialCode
-      ? `Access code ${access.credentialCode} issued for ${guestName}.`
-      : `Access code issued for ${guestName}.`
-  }
-
-  return `Keycard issued for ${guestName}.`
+  return access.credentialCode
+    ? `Access code ${access.credentialCode} issued for ${guestName}.`
+    : `Access code issued for ${guestName}.`
 }
 
 function getCredentialExtendedMessage(guestName: string, access: BookingAccessOperationResult) {
-  return access.provider === 'seam' ? `Access code updated for ${guestName}.` : `Stay extended for ${guestName}.`
+  return `Access code updated for ${guestName}.`
 }
 
 function getCredentialRevokedMessage(guestName: string, access: BookingAccessOperationResult) {
-  return access.provider === 'seam' ? `Access code revoked for ${guestName}.` : `Keycards revoked for ${guestName}.`
+  return `Access code revoked for ${guestName}.`
+}
+
+function formatCurrencyAmount(amount: number) {
+  return `GHS ${amount.toFixed(2)}`
+}
+
+function buildBookingExtensionMessage(values: {
+  actor: string
+  addedAmount: number
+  authorizationMode: 'admin_direct' | 'reception_confirmed'
+  confirmationStatus: 'confirmed' | 'pending'
+  guestName: string
+  newCheckOutExpected: string
+  paymentRecorded: number
+  reason: string
+  remainingBalance: number
+}) {
+  const amountLine = `Stay extended for ${values.guestName} to ${values.newCheckOutExpected} (+${formatCurrencyAmount(values.addedAmount)}).`
+  const paymentLine = values.paymentRecorded > 0
+    ? `${formatCurrencyAmount(values.paymentRecorded)} recorded now; remaining balance ${formatCurrencyAmount(values.remainingBalance)}.`
+    : `No extension payment was recorded; remaining balance ${formatCurrencyAmount(values.remainingBalance)}.`
+
+  if (values.authorizationMode === 'reception_confirmed' && values.confirmationStatus === 'pending') {
+    return `${amountLine} Confirmed by reception staff ${values.actor}. Reason: ${values.reason}. Pending manager confirmation. ${paymentLine}`
+  }
+
+  return `${amountLine} Updated by ${values.actor}. ${paymentLine}`
+}
+
+function buildExtensionReviewMessage(values: {
+  confirmationNote: string | null
+  guestName: string
+  manager: string
+  newCheckOutExpected: string
+  status: 'confirmed' | 'disputed'
+}) {
+  const statusLine = values.status === 'confirmed'
+    ? `Manager ${values.manager} confirmed the stay extension for ${values.guestName} through ${values.newCheckOutExpected}.`
+    : `Manager ${values.manager} marked the stay extension for ${values.guestName} as disputed.`
+
+  return values.confirmationNote ? `${statusLine} Note: ${values.confirmationNote}` : statusLine
 }
 
 function buildAccessPayload(access: BookingAccessOperationResult) {
@@ -114,6 +160,17 @@ async function createNotification(
   payload: Database['public']['Tables']['notifications']['Insert']
 ) {
   const { error } = await supabase.from('notifications').insert(payload)
+
+  if (error) {
+    throw new Error(error.message)
+  }
+}
+
+async function createExtensionAudit(
+  supabase: Awaited<ReturnType<typeof createAuthenticatedServerSupabaseClient>>['supabase'],
+  payload: Database['public']['Tables']['booking_extension_audits']['Insert']
+) {
+  const { error } = await supabase.from('booking_extension_audits').insert(payload)
 
   if (error) {
     throw new Error(error.message)
@@ -168,10 +225,6 @@ export async function POST(request: NextRequest) {
 
     const nights = getNightCount(body.checkIn, body.checkOutExpected)
     const bookingStatus = body.status ?? 'reserved'
-
-    if (bookingStatus === 'active' && accessService.provider === 'local_rfid' && !body.cardUid?.trim()) {
-      return NextResponse.json({ error: 'cardUid is required for a walk-in check-in.' }, { status: 400 })
-    }
 
     const { data: booking, error: bookingError } = await supabase
       .from('bookings')
@@ -234,7 +287,7 @@ export async function POST(request: NextRequest) {
         bookingId: booking.id,
         issuedBy: actor,
         issuedTo: body.guestName,
-        manualCredential: body.cardUid ?? null,
+        manualCredential: null,
         roomId: body.roomId,
         validFrom: body.checkIn,
         validUntil: body.checkOutExpected
@@ -248,11 +301,10 @@ export async function POST(request: NextRequest) {
       })
 
       await createNotification(supabase, {
-        type: 'keycard_issued',
+        type: 'access_credential_issued',
         message: getCredentialIssuedMessage(body.guestName, accessOperation),
         triggered_by: actor,
-        booking_id: booking.id,
-        keycard_id: accessOperation.localRecordId
+        booking_id: booking.id
       })
 
       const { data: persistedBooking, error: persistedBookingError } = await getBookingWithRoom(supabase, booking.id)
@@ -318,8 +370,86 @@ export async function PATCH(request: NextRequest) {
     const actor = getActorName(user)
     const body = (await request.json()) as UpdateBookingBody
 
-    if (!body.bookingId || !body.action) {
-      return NextResponse.json({ error: 'Booking id and action are required.' }, { status: 400 })
+    if (!body.action) {
+      return NextResponse.json({ error: 'Booking action is required.' }, { status: 400 })
+    }
+
+    if (body.action === 'confirm_extension' || body.action === 'flag_extension') {
+      if (getActorRole(user) !== 'admin') {
+        return NextResponse.json({ error: 'Only admin users can review pending stay extensions.' }, { status: 403 })
+      }
+
+      if (!body.extensionAuditId) {
+        return NextResponse.json({ error: 'Extension audit id is required for manager review.' }, { status: 400 })
+      }
+
+      const confirmationStatus = body.action === 'confirm_extension' ? 'confirmed' : 'disputed'
+      const confirmationNote = body.confirmationNote?.trim() || null
+
+      if (confirmationStatus === 'disputed' && !confirmationNote) {
+        return NextResponse.json({ error: 'Add a discrepancy note before flagging the extension.' }, { status: 400 })
+      }
+
+      const { data: extensionAudit, error: extensionAuditError } = await supabase
+        .from('booking_extension_audits')
+        .select('*')
+        .eq('id', body.extensionAuditId)
+        .single()
+
+      if (extensionAuditError || !extensionAudit) {
+        return NextResponse.json({ error: extensionAuditError?.message ?? 'Extension audit not found.' }, { status: 404 })
+      }
+
+      if (extensionAudit.confirmation_status !== 'pending') {
+        return NextResponse.json({ error: 'This stay extension has already been reviewed.' }, { status: 400 })
+      }
+
+      const reviewedAt = new Date().toISOString()
+      const managerNote = confirmationNote ?? 'Manager confirmed the extension.'
+
+      const { error: reviewError } = await supabase
+        .from('booking_extension_audits')
+        .update({
+          confirmation_note: managerNote,
+          confirmation_status: confirmationStatus,
+          confirmed_at: reviewedAt,
+          confirmed_by: actor
+        })
+        .eq('id', extensionAudit.id)
+
+      if (reviewError) {
+        return NextResponse.json({ error: reviewError.message }, { status: 500 })
+      }
+
+      const { data: reviewedBooking, error: reviewedBookingError } = await getBookingWithRoom(supabase, extensionAudit.booking_id)
+
+      if (reviewedBookingError || !reviewedBooking) {
+        return NextResponse.json(
+          { error: reviewedBookingError?.message ?? 'Extension review saved but the booking could not be reloaded.' },
+          { status: 500 }
+        )
+      }
+
+      const reviewMessage = buildExtensionReviewMessage({
+        confirmationNote: confirmationStatus === 'confirmed' ? confirmationNote : managerNote,
+        guestName: reviewedBooking.guest_name,
+        manager: actor,
+        newCheckOutExpected: extensionAudit.new_check_out_expected,
+        status: confirmationStatus
+      })
+
+      await createNotification(supabase, {
+        type: confirmationStatus === 'confirmed' ? 'extension_confirmation_confirmed' : 'extension_confirmation_disputed',
+        message: reviewMessage,
+        triggered_by: actor,
+        booking_id: reviewedBooking.id
+      })
+
+      return NextResponse.json({ booking: reviewedBooking, message: reviewMessage, success: true } satisfies BookingMutationResponse)
+    }
+
+    if (!body.bookingId) {
+      return NextResponse.json({ error: 'Booking id is required.' }, { status: 400 })
     }
 
     const { data: booking, error: bookingError } = await supabase
@@ -333,10 +463,6 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (body.action === 'check_in') {
-      if (accessService.provider === 'local_rfid' && !body.cardUid?.trim()) {
-        return NextResponse.json({ error: 'cardUid is required to check in.' }, { status: 400 })
-      }
-
       const { error: bookingUpdateError } = await supabase
         .from('bookings')
         .update({ status: 'active' })
@@ -361,7 +487,7 @@ export async function PATCH(request: NextRequest) {
         bookingId: booking.id,
         issuedBy: actor,
         issuedTo: body.issuedTo ?? booking.guest_name,
-        manualCredential: body.cardUid ?? null,
+        manualCredential: null,
         roomId: booking.room_id,
         validFrom: booking.check_in,
         validUntil: booking.check_out_expected
@@ -375,11 +501,10 @@ export async function PATCH(request: NextRequest) {
       })
 
       await createNotification(supabase, {
-        type: 'keycard_issued',
+        type: 'access_credential_issued',
         message: getCredentialIssuedMessage(booking.guest_name, accessOperation),
         triggered_by: actor,
-        booking_id: booking.id,
-        keycard_id: accessOperation.localRecordId
+        booking_id: booking.id
       })
 
       return NextResponse.json({
@@ -457,7 +582,7 @@ export async function PATCH(request: NextRequest) {
       })
 
       await createNotification(supabase, {
-        type: 'keycard_revoked',
+        type: 'access_credential_revoked',
         message: getCredentialRevokedMessage(booking.guest_name, accessOperation),
         triggered_by: actor,
         booking_id: booking.id
@@ -472,18 +597,98 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (body.action === 'extend') {
-      if (!body.newCheckOutExpected || typeof body.totalGhs !== 'number') {
-        return NextResponse.json({ error: 'New checkout date and total are required to extend a stay.' }, { status: 400 })
+      if (!body.newCheckOutExpected) {
+        return NextResponse.json({ error: 'New checkout date is required to extend a stay.' }, { status: 400 })
+      }
+
+      if (Date.parse(body.newCheckOutExpected) <= Date.parse(booking.check_out_expected)) {
+        return NextResponse.json({ error: 'Extended checkout date must be after the current checkout date.' }, { status: 400 })
+      }
+
+      const { data: bookingWithRoom, error: bookingWithRoomError } = await getBookingWithRoom(supabase, booking.id)
+
+      if (bookingWithRoomError || !bookingWithRoom) {
+        return NextResponse.json({ error: bookingWithRoomError?.message ?? 'Booking could not be reloaded for extension.' }, { status: 500 })
+      }
+
+      const roomRate = bookingWithRoom.rooms?.rate_ghs ?? 0
+
+      if (roomRate <= 0) {
+        return NextResponse.json({ error: 'A room rate is required before extending this stay.' }, { status: 400 })
       }
 
       const nights = getNightCount(booking.check_in, body.newCheckOutExpected)
+      const recalculatedTotal = roomRate * nights
+      const addedAmount = recalculatedTotal - booking.total_ghs
+
+      if (addedAmount <= 0) {
+        return NextResponse.json({ error: 'This extension does not increase the stay total. Check the checkout date and room rate.' }, { status: 400 })
+      }
+
+      const actorRole = getActorRole(user)
+      let authorizationMode: 'admin_direct' | 'reception_confirmed' = 'admin_direct'
+      let authorizedBy: string | null = actor
+      let authorizationReason = body.extensionAuthorization?.reason?.trim() || 'Stay extension processed.'
+      let confirmationStatus: 'confirmed' | 'pending' = 'confirmed'
+      let confirmedAt: string | null = new Date().toISOString()
+      let confirmedBy: string | null = actor
+      let confirmationNote: string | null = 'Confirmed directly at extension time.'
+
+      if (actorRole === 'receptionist') {
+        if (!body.extensionAcknowledged) {
+          return NextResponse.json({ error: 'Reception must confirm the extension summary before the stay can be updated.' }, { status: 400 })
+        }
+
+        if (!body.extensionAuthorization?.reason?.trim()) {
+          return NextResponse.json({ error: 'Reception must capture the reason for the stay extension.' }, { status: 400 })
+        }
+
+        authorizationMode = 'reception_confirmed'
+        authorizedBy = null
+        authorizationReason = body.extensionAuthorization.reason.trim()
+        confirmationStatus = 'pending'
+        confirmedAt = null
+        confirmedBy = null
+        confirmationNote = null
+      }
+
+      let paymentRecorded = 0
+
+      if (body.extensionPayment && body.extensionPayment.amountGhs > 0) {
+        if (requiresReference(body.extensionPayment.method) && !body.extensionPayment.reference?.trim()) {
+          return NextResponse.json({ error: 'Reference is required for this payment method.' }, { status: 400 })
+        }
+
+        const maxReceivable = recalculatedTotal - booking.paid_ghs
+
+        if (body.extensionPayment.amountGhs > maxReceivable) {
+          return NextResponse.json({ error: 'Extension payment cannot exceed the booking balance after the extension.' }, { status: 400 })
+        }
+
+        const { error: paymentError } = await supabase.from('payments').insert({
+          booking_id: booking.id,
+          amount_ghs: body.extensionPayment.amountGhs,
+          method: body.extensionPayment.method,
+          reference: body.extensionPayment.reference ?? null,
+          received_by: actor
+        })
+
+        if (paymentError) {
+          return NextResponse.json({ error: paymentError.message }, { status: 500 })
+        }
+
+        paymentRecorded = body.extensionPayment.amountGhs
+      }
+
+      const newPaidTotal = booking.paid_ghs + paymentRecorded
 
       const { error: bookingUpdateError } = await supabase
         .from('bookings')
         .update({
           check_out_expected: body.newCheckOutExpected,
           nights,
-          total_ghs: body.totalGhs,
+          paid_ghs: newPaidTotal,
+          total_ghs: recalculatedTotal,
           status: 'active'
         })
         .eq('id', booking.id)
@@ -497,15 +702,50 @@ export async function PATCH(request: NextRequest) {
         validUntil: body.newCheckOutExpected
       })
 
+      const remainingBalance = recalculatedTotal - newPaidTotal
+
+      await createExtensionAudit(supabase, {
+        authorization_mode: authorizationMode,
+        authorized_by: authorizedBy,
+        booking_id: booking.id,
+        confirmation_note: confirmationNote,
+        confirmation_status: confirmationStatus,
+        confirmed_at: confirmedAt,
+        confirmed_by: confirmedBy,
+        incremental_amount_ghs: addedAmount,
+        new_check_out_expected: body.newCheckOutExpected,
+        new_total_ghs: recalculatedTotal,
+        payment_method: body.extensionPayment?.amountGhs ? body.extensionPayment.method : null,
+        payment_recorded_ghs: paymentRecorded,
+        payment_reference: body.extensionPayment?.amountGhs ? body.extensionPayment.reference ?? null : null,
+        previous_check_out_expected: booking.check_out_expected,
+        previous_total_ghs: booking.total_ghs,
+        reason: authorizationReason,
+        requested_by: actor,
+        requester_role: actorRole ?? 'unknown'
+      })
+
+      const extensionMessage = buildBookingExtensionMessage({
+        actor,
+        addedAmount,
+        authorizationMode,
+        confirmationStatus,
+        guestName: booking.guest_name,
+        newCheckOutExpected: body.newCheckOutExpected,
+        paymentRecorded,
+        reason: authorizationReason,
+        remainingBalance
+      })
+
       await createNotification(supabase, {
-        type: 'booking_extended',
-        message: `Stay extended for ${booking.guest_name}.`,
+        type: confirmationStatus === 'pending' ? 'extension_confirmation_pending' : 'booking_extended',
+        message: extensionMessage,
         triggered_by: actor,
         booking_id: booking.id
       })
 
       await createNotification(supabase, {
-        type: 'keycard_extended',
+        type: 'access_credential_extended',
         message: getCredentialExtendedMessage(booking.guest_name, accessOperation),
         triggered_by: actor,
         booking_id: booking.id
@@ -513,7 +753,7 @@ export async function PATCH(request: NextRequest) {
 
       return NextResponse.json({
         access: buildAccessPayload(accessOperation),
-        message: getCredentialExtendedMessage(booking.guest_name, accessOperation),
+        message: extensionMessage,
         provider: accessService.provider,
         success: true
       } satisfies BookingMutationResponse)

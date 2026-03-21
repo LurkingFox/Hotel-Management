@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 
@@ -16,9 +17,15 @@ type BookingWithRoom = BookingRow & {
   rooms: Pick<RoomRow, 'id' | 'number' | 'type' | 'rate_ghs' | 'status'> | null
 }
 
+type PendingExtensionAudit = Pick<
+  Database['public']['Tables']['booking_extension_audits']['Row'],
+  'id' | 'booking_id' | 'requested_by' | 'reason' | 'created_at' | 'incremental_amount_ghs' | 'new_check_out_expected' | 'confirmation_status'
+>
+
 type AdminBookingsClientProps = {
   accessPresentation: BookingAccessPresentation
   bookings: BookingWithRoom[]
+  pendingExtensionAudits: PendingExtensionAudit[]
   rooms: RoomRow[]
 }
 
@@ -70,30 +77,42 @@ function getNightCount(checkIn: string, checkOut: string) {
   return Math.max(1, Math.ceil(difference / 86400000))
 }
 
-export function AdminBookingsClient({ accessPresentation, bookings, rooms }: AdminBookingsClientProps) {
+export function AdminBookingsClient({ accessPresentation, bookings, pendingExtensionAudits, rooms }: AdminBookingsClientProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
-  const [activeFilter, setActiveFilter] = useState<'all' | BookingStatus>('all')
+  const [activeFilter, setActiveFilter] = useState<'all' | BookingStatus | 'pending_confirmation'>('all')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
-  const [checkInCardUids, setCheckInCardUids] = useState<Record<string, string>>({})
   const [cancelNotes, setCancelNotes] = useState<Record<string, string>>({})
   const [extendDates, setExtendDates] = useState<Record<string, string>>({})
   const [checkoutSettlement, setCheckoutSettlement] = useState<Record<string, SettlementState>>({})
 
-  const filteredBookings = useMemo(
-    () => (activeFilter === 'all' ? bookings : bookings.filter((booking) => booking.status === activeFilter)),
-    [activeFilter, bookings]
+  const pendingAuditByBookingId = useMemo(
+    () => new Map(pendingExtensionAudits.map((audit) => [audit.booking_id, audit])),
+    [pendingExtensionAudits]
   )
+
+  const filteredBookings = useMemo(() => {
+    if (activeFilter === 'all') {
+      return bookings
+    }
+
+    if (activeFilter === 'pending_confirmation') {
+      return bookings.filter((booking) => pendingAuditByBookingId.has(booking.id))
+    }
+
+    return bookings.filter((booking) => booking.status === activeFilter)
+  }, [activeFilter, bookings, pendingAuditByBookingId])
 
   const summary = useMemo(() => {
     return {
       total: bookings.length,
       active: bookings.filter((booking) => booking.status === 'active').length,
+      pendingConfirmations: pendingExtensionAudits.length,
       reserved: bookings.filter((booking) => booking.status === 'reserved').length,
       outstanding: bookings.reduce((sum, booking) => sum + (booking.balance_ghs ?? 0), 0)
     }
-  }, [bookings])
+  }, [bookings, pendingExtensionAudits.length])
 
   function resetMessages() {
     setErrorMessage(null)
@@ -126,26 +145,15 @@ export function AdminBookingsClient({ accessPresentation, bookings, rooms }: Adm
 
   function handleCheckIn(booking: BookingWithRoom) {
     resetMessages()
-    const cardUid = checkInCardUids[booking.id]?.trim().toUpperCase()
-
-    if (accessPresentation.requiresManualCredential && !cardUid) {
-      setErrorMessage('Card UID is required before checking in a reservation.')
-      return
-    }
 
     runAction(
       {
         bookingId: booking.id,
         action: 'check_in',
-        cardUid: accessPresentation.requiresManualCredential ? cardUid : undefined,
         issuedTo: booking.guest_name
       },
       `Reservation checked in and ${accessPresentation.generatedCredentialLabel.toLowerCase()} issued.`
     )
-
-    if (accessPresentation.requiresManualCredential) {
-      setCheckInCardUids((current) => ({ ...current, [booking.id]: '' }))
-    }
   }
 
   function handleCancel(booking: BookingWithRoom) {
@@ -165,20 +173,16 @@ export function AdminBookingsClient({ accessPresentation, bookings, rooms }: Adm
     resetMessages()
     const nextDate = extendDates[booking.id] ?? booking.check_out_expected
 
-    if (Date.parse(nextDate) <= Date.parse(booking.check_in)) {
-      setErrorMessage('Extended checkout date must be after check-in.')
+    if (Date.parse(nextDate) <= Date.parse(booking.check_out_expected)) {
+      setErrorMessage('Extended checkout date must be after the current checkout date.')
       return
     }
-
-    const rate = booking.rooms?.rate_ghs ?? rooms.find((room) => room.id === booking.room_id)?.rate_ghs ?? 0
-    const totalGhs = rate * getNightCount(booking.check_in, nextDate)
 
     runAction(
       {
         bookingId: booking.id,
         action: 'extend',
-        newCheckOutExpected: nextDate,
-        totalGhs
+        newCheckOutExpected: nextDate
       },
       `Stay extended and ${accessPresentation.credentialKindLabel.toLowerCase()} updated.`
     )
@@ -232,7 +236,7 @@ export function AdminBookingsClient({ accessPresentation, bookings, rooms }: Adm
         {errorMessage ? <div className="rounded-2xl bg-red-50 px-5 py-4 text-sm text-red-700">{errorMessage}</div> : null}
         {successMessage ? <div className="rounded-2xl bg-green-50 px-5 py-4 text-sm text-green-700">{successMessage}</div> : null}
 
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
           <article className="rounded-[1.75rem] border border-white/40 bg-white/80 p-5 shadow-card backdrop-blur">
             <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Total bookings</p>
             <p className="mt-3 text-4xl font-semibold text-ink">{summary.total}</p>
@@ -249,6 +253,10 @@ export function AdminBookingsClient({ accessPresentation, bookings, rooms }: Adm
             <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Outstanding balance</p>
             <p className="mt-3 text-4xl font-semibold text-ink">{formatGHS(summary.outstanding)}</p>
           </article>
+          <article className="rounded-[1.75rem] border border-white/40 bg-white/80 p-5 shadow-card backdrop-blur">
+            <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Pending confirmations</p>
+            <p className="mt-3 text-4xl font-semibold text-ink">{summary.pendingConfirmations}</p>
+          </article>
         </section>
 
         <section className="rounded-[2rem] border border-ink/10 bg-white p-6 shadow-card">
@@ -258,7 +266,7 @@ export function AdminBookingsClient({ accessPresentation, bookings, rooms }: Adm
               <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl">Track every stay state</h2>
             </div>
             <div className="flex flex-wrap gap-3">
-              {(['all', 'reserved', 'active', 'checked_out', 'cancelled'] as const).map((filter) => (
+              {(['all', 'pending_confirmation', 'reserved', 'active', 'checked_out', 'cancelled'] as const).map((filter) => (
                 <button
                   key={filter}
                   className={`rounded-full px-5 py-3 text-sm font-semibold transition ${activeFilter === filter ? 'bg-ink text-white' : 'bg-parchment text-ink hover:bg-[#eadfce]'}`}
@@ -273,6 +281,7 @@ export function AdminBookingsClient({ accessPresentation, bookings, rooms }: Adm
 
           <div className="mt-8 grid gap-5">
             {filteredBookings.map((booking) => {
+              const pendingAudit = pendingAuditByBookingId.get(booking.id)
               const settlement = checkoutSettlement[booking.id] ?? {
                 amount: String(booking.balance_ghs ?? 0),
                 method: 'cash' as PayMethod,
@@ -281,6 +290,7 @@ export function AdminBookingsClient({ accessPresentation, bookings, rooms }: Adm
               const extensionDate = extendDates[booking.id] ?? booking.check_out_expected
               const extensionRate = booking.rooms?.rate_ghs ?? rooms.find((room) => room.id === booking.room_id)?.rate_ghs ?? 0
               const extensionTotal = extensionRate * getNightCount(booking.check_in, extensionDate)
+              const extensionIncrease = Math.max(0, extensionTotal - booking.total_ghs)
 
               return (
                 <article key={booking.id} className="rounded-[1.75rem] border border-ink/10 bg-[#fcfaf6] p-5">
@@ -291,6 +301,11 @@ export function AdminBookingsClient({ accessPresentation, bookings, rooms }: Adm
                         <span className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase ${statusStyles[booking.status]}`}>
                           {booking.status.replace('_', ' ')}
                         </span>
+                        {pendingAudit ? (
+                          <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold uppercase text-amber-800">
+                            Pending confirmation
+                          </span>
+                        ) : null}
                       </div>
                       <div className="grid gap-3 text-sm text-ink/70 md:grid-cols-2 xl:grid-cols-4">
                         <div>
@@ -322,24 +337,37 @@ export function AdminBookingsClient({ accessPresentation, bookings, rooms }: Adm
                     </div>
                   </div>
 
+                  {pendingAudit ? (
+                    <div className="mt-5 rounded-[1.5rem] border border-amber-200 bg-amber-50 p-5">
+                      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                        <div>
+                          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-amber-800">Pending manager confirmation</p>
+                          <p className="mt-2 text-sm leading-6 text-ink/72">
+                            Requested by {pendingAudit.requested_by}. Reason: {pendingAudit.reason}
+                          </p>
+                          <p className="mt-1 text-sm text-ink/60">
+                            Added {formatGHS(pendingAudit.incremental_amount_ghs)} and extended checkout to {formatDate(pendingAudit.new_check_out_expected)}.
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-3">
+                          <p className="text-sm text-ink/60">Review this item on Today.</p>
+                          <Link
+                            className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90"
+                            href="/admin/today"
+                          >
+                            Open Today
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
+
                   {booking.status === 'reserved' ? (
                     <div className="mt-5 grid gap-4 xl:grid-cols-[1fr_auto]">
                       <div className="grid gap-4 md:grid-cols-2">
-                        {accessPresentation.requiresManualCredential ? (
-                          <label className="space-y-2">
-                            <span className="text-sm font-semibold text-ink/75">{accessPresentation.manualCredentialLabel} for check-in</span>
-                            <input
-                              className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 uppercase outline-none transition focus:border-terracotta"
-                              onChange={(event) => setCheckInCardUids((current) => ({ ...current, [booking.id]: event.target.value }))}
-                              placeholder={accessPresentation.manualCredentialPlaceholder}
-                              value={checkInCardUids[booking.id] ?? ''}
-                            />
-                          </label>
-                        ) : (
-                          <div className="rounded-2xl border border-dashed border-ink/10 bg-white px-4 py-3 text-sm text-ink/65">
-                            {accessPresentation.generatedCredentialLabel} will be generated automatically at check-in.
-                          </div>
-                        )}
+                        <div className="rounded-2xl border border-dashed border-ink/10 bg-white px-4 py-3 text-sm text-ink/65">
+                          {accessPresentation.generatedCredentialLabel} will be generated automatically at check-in.
+                        </div>
                         <label className="space-y-2">
                           <span className="text-sm font-semibold text-ink/75">Cancel note</span>
                           <input
@@ -380,7 +408,7 @@ export function AdminBookingsClient({ accessPresentation, bookings, rooms }: Adm
                             <span className="text-sm font-semibold text-ink/75">New checkout date</span>
                             <input
                               className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta"
-                              min={booking.check_in}
+                              min={booking.check_out_expected}
                               onChange={(event) => setExtendDates((current) => ({ ...current, [booking.id]: event.target.value }))}
                               type="date"
                               value={extensionDate}
@@ -393,7 +421,7 @@ export function AdminBookingsClient({ accessPresentation, bookings, rooms }: Adm
                               onClick={() => handleExtend(booking)}
                               type="button"
                             >
-                              Extend to {formatGHS(extensionTotal)}
+                              Extend by {formatGHS(extensionIncrease)}
                             </button>
                           </div>
                         </div>

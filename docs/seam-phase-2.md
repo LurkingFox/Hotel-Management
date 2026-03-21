@@ -4,13 +4,14 @@ Phase 2 cuts live booking access issuance over from local RFID keycards to Seam 
 
 ## What Changed
 
-- booking check-in, stay extension, and checkout now run through the provider abstraction instead of writing only to `keycards`
+- booking check-in, stay extension, and checkout now run through the provider abstraction instead of writing only to legacy RFID tables
 - Seam-backed bookings create, update, and revoke real Seam access codes through the official SDK
 - issued guest credentials are persisted in `booking_access_credentials`
 - room-to-device mappings are persisted in `room_access_devices`
 - `SEAM_ROOM_DEVICE_MAP_JSON` can still be used as a bootstrap source and is written through to the persistent room mapping table on first use
 - admin settings now include a Seam room-to-device manager with a "Sync env mappings to Supabase" action
-- booking and reception clients now switch between manual RFID entry and auto-generated Seam codes based on the active provider
+- booking and reception clients now issue Seam-backed guest access codes without manual RFID entry in the active app flow
+- verified Seam webhooks now reconcile matching `booking_access_credentials` rows with the latest provider event metadata
 
 ## New Tables
 
@@ -22,7 +23,6 @@ Stores the provider-agnostic record of every issued guest credential.
 - `provider_reference`: external provider record, such as a Seam `access_code_id`
 - `provider_device_id`: mapped Seam device ID
 - `credential_code`: guest-facing code when available
-- `local_keycard_id`: legacy linkage for RFID-issued records
 - `status`: `active` or `revoked`
 
 ### `room_access_devices`
@@ -52,12 +52,10 @@ Stores the room-to-provider-device mapping used for live Seam issuance.
 
 ## Current Limitations
 
-- admin keycard registry and access log surfaces are still RFID-shaped and have not yet been redesigned into provider-agnostic lock-management screens
-- legacy `validate_keycard`, `report_controller_status`, and the Raspberry Pi `rfid-controller` remain in the repo and are not yet retired
-- Seam webhook events are verified and can be persisted, but they are not yet reconciling `booking_access_credentials` state transitions
+- retired RFID tables and foreign-key columns have been removed; historical access events are preserved through `access_log.credential_identifier` and provider-agnostic credential rows
+- webhook reconciliation is generic and currently keyed by `access_code_id`; it does not yet drive a richer admin credential timeline UI
 
 ## Suggested Next Phase
 
-- replace or repurpose the keycards/admin access surfaces into a provider-agnostic locks and credentials console
 - wire Seam webhook lifecycle events back into local credential status updates
-- begin retirement of the legacy RFID validation and controller heartbeat path once the hotel is fully cut over
+- deepen the guest access timeline and reporting surfaces with richer provider event history

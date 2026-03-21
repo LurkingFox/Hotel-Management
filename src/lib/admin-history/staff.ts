@@ -9,7 +9,7 @@ type ShiftHistoryFilters = {
   toDate: string
 }
 
-type SupabaseClient = ReturnType<typeof createServerSupabaseClient>
+type SupabaseClient = Awaited<ReturnType<typeof createServerSupabaseClient>>
 
 const VALID_SHIFT_STATUS = new Set(['all', 'open', 'closed'])
 

@@ -1,14 +1,14 @@
 # University Hotel — HMS Copilot Workspace Instructions
 
 You are building the **University Hotel Management System (HMS)** — a full-stack web application
-with an RFID keycard security layer. Read every instruction in this file before writing any code.
+with a Seam-backed guest access layer. Read every instruction in this file before writing any code.
 
 ---
 
 ## 1. Project identity
 
 - **Hotel name:** University Hotel
-- **Purpose:** Hotel management — rooms, bookings, payments, RFID keycards, staff, finances
+- **Purpose:** Hotel management — rooms, bookings, payments, guest access, staff, finances
 - **Currency:** GHS (Ghanaian Cedis) — always format as `GHS 1,200` never as `$` or `€`
 - **User roles:** `admin` (manager) and `receptionist` — enforced at middleware and RLS level
 
@@ -25,7 +25,7 @@ with an RFID keycard security layer. Read every instruction in this file before 
 | Auth | Supabase Auth | No NextAuth. No Auth.js. No Clerk. Roles live in `user_metadata`. |
 | DB client | `@supabase/supabase-js` + `@supabase/ssr` | Use `createBrowserClient` in components, `createServerClient` in route handlers and server components. |
 | Realtime | Supabase Realtime | Use `supabase.channel()` subscriptions for live dashboard updates. |
-| RFID bridge | Python (Raspberry Pi) + Supabase Edge Function (Deno) | Door controller calls `validate_keycard` Edge Function via HTTPS. |
+| Access provider | Seam + Supabase | Guest access is issued through Seam access codes and room-to-device mappings stored in Supabase. |
 | Hosting | Vercel (web) + Supabase (DB + functions) | Free tier for both. |
 
 **Never suggest:** Prisma, NextAuth, Clerk, Auth.js, Drizzle, TypeORM, Redux, React Query,
@@ -45,10 +45,12 @@ When starting any task, read the relevant files in this order:
 5. The specific page or route handler you are editing
 ```
 
-For RFID / keycard tasks, also read:
+For access-provider tasks, also read:
 ```
-6. supabase/functions/validate_keycard/index.ts   ← Edge Function
-7. rfid-controller/main.py                        ← Raspberry Pi controller
+6. src/lib/access-provider/config.ts              ← active provider and presentation rules
+7. src/lib/access-provider/booking-service.ts     ← live access issuance flow
+8. src/app/api/seam/room-access-devices/route.ts  ← room-to-device mapping API
+9. src/app/api/seam/webhooks/route.ts             ← verified Seam webhook intake
 ```
 
 For database tasks, also read:
@@ -67,7 +69,7 @@ src/
       dashboard/page.tsx
       rooms/page.tsx
       bookings/page.tsx
-      keycards/page.tsx
+      guest-access/page.tsx
       access-log/page.tsx
       payments/page.tsx
       staff/page.tsx
@@ -77,11 +79,14 @@ src/
     api/
       rooms/route.ts
       bookings/route.ts
-      keycards/route.ts
+      access-credentials/route.ts
       payments/route.ts
       services/route.ts
       notifications/route.ts
       staff/route.ts
+      seam/
+        room-access-devices/route.ts
+        webhooks/route.ts
     login/page.tsx
     layout.tsx
   lib/
@@ -94,10 +99,8 @@ supabase/
   migrations/
     001_schema.sql
   functions/
-    validate_keycard/
+    manage_staff_auth/
       index.ts
-rfid-controller/
-  main.py
 .env.local
 ```
 
@@ -114,11 +117,12 @@ Key tables and their primary columns:
 | `bookings` | `id`, `room_id`, `guest_name`, `guest_phone`, `check_in`, `check_out_expected`, `check_out_actual`, `nights`, `total_ghs`, `paid_ghs`, `balance_ghs` (computed), `status` |
 | `payments` | `id`, `booking_id`, `amount_ghs`, `method` (cash/momo/bank_transfer/cheque), `reference`, `received_by`, `paid_at` |
 | `service_charges` | `id`, `booking_id`, `type` (laundry/food/minibar/other), `amount_ghs`, `description`, `resolved` |
-| `keycards` | `id`, `card_uid`, `room_id`, `booking_id`, `issued_to`, `issued_by`, `issued_at`, `valid_from`, `valid_until`, `status` (active/revoked), `access_count` |
-| `access_log` | `id`, `room_id`, `card_uid`, `keycard_id`, `guest_name`, `issued_by`, `result` (granted/denied/expired), `note`, `accessed_at` |
+| `booking_access_credentials` | `id`, `booking_id`, `provider`, `provider_reference`, `provider_device_id`, `credential_code`, `issued_to`, `issued_by`, `valid_from`, `valid_until`, `status`, `provider_status` |
+| `room_access_devices` | `id`, `room_id`, `provider`, `external_device_id`, `display_name`, `updated_at` |
+| `access_log` | `id`, `room_id`, `credential_identifier`, `guest_name`, `issued_by`, `result` (granted/denied/expired), `note`, `accessed_at` |
 | `staff` | `id`, `name`, `role`, `daily_rate_ghs`, `on_shift` |
 | `shifts` | `id`, `staff_id`, `started_at`, `ended_at` |
-| `notifications` | `id`, `type`, `message`, `triggered_by`, `booking_id`, `keycard_id`, `read` |
+| `notifications` | `id`, `type`, `message`, `triggered_by`, `booking_id`, `read` |
 
 **`balance_ghs` is a computed column** — never write to it. It is always `total_ghs - paid_ghs`.
 **`access_log` is append-only** — never update or delete rows from this table.
@@ -188,27 +192,27 @@ return () => supabase.removeChannel(sub)
 ```
 RESERVED  →  check_in arrives today  →  ACTIVE
 ACTIVE    →  checkout confirmed       →  CHECKED_OUT
-ACTIVE    →  stay extended            →  ACTIVE  (update check_out_expected + keycard valid_until)
+ACTIVE    →  stay extended            →  ACTIVE  (update check_out_expected + access credential validity)
 RESERVED  →  cancelled               →  CANCELLED  (record cancel_note)
 ```
 
 On **RESERVED → ACTIVE:**
 1. Set `bookings.status = active`
 2. Set `rooms.status = occupied`
-3. Issue keycard (insert into `keycards`)
-4. Insert row into `notifications` (type = `keycard_issued`)
+3. Issue access credential through the booking access service
+4. Insert row into `notifications` (type = `access_credential_issued`)
 
 On **ACTIVE → CHECKED_OUT:**
 1. If `balance_ghs > 0`, open payment settlement modal first
 2. Set `bookings.status = checked_out`, record `check_out_actual = today`
 3. Set `rooms.status = cleaning`
-4. Set `keycards.status = revoked` where `booking_id = this booking`
-5. Insert row into `notifications` (type = `keycard_revoked`)
+4. Revoke the linked access credential through the booking access service
+5. Insert row into `notifications` (type = `access_credential_revoked`)
 
 On **extend stay:**
 1. Update `bookings.check_out_expected`, `nights`, `total_ghs`
-2. Update `keycards.valid_until` to new check-out date — no new card needed
-3. Insert row into `notifications` (type = `keycard_extended`)
+2. Update the linked access credential validity — no new credential needed
+3. Insert row into `notifications` (type = `access_credential_extended`)
 
 ---
 
@@ -228,18 +232,17 @@ Payment method UI must use a visual button group (not a `<select>` dropdown):
 
 ---
 
-## 10. RFID keycard rules — follow these exactly
+## 10. Guest access rules — follow these exactly
 
-- Every keycard row has: `card_uid` (hex UID from MIFARE card), `room_id`, `booking_id`,
-  `valid_from` (check-in date), `valid_until` (check-out date), `status`, `access_count`
-- `card_uid` format: `A3:F2:91:BC` — four uppercase hex bytes separated by colons
-- Door validation logic lives **only** in `supabase/functions/validate_keycard/index.ts`
-  — never replicate validation logic in the Next.js app
-- The Raspberry Pi controller (`rfid-controller/main.py`) only reads the UID and POSTs to the
-  Edge Function — it contains no business logic
-- Every door tap (granted AND denied) must be logged to `access_log` — never skip denied entries
-- On revoke: set `keycards.status = revoked` — do not delete the row
-- On extend: update `valid_until` only — do not insert a new keycard row
+- Active guest access is issued through Seam-backed booking access credentials.
+- Room-to-device mappings live in `room_access_devices` and are managed through `/admin/settings`
+  and `/api/seam/room-access-devices`.
+- Booking issuance, extension, and revocation logic lives in `src/lib/access-provider/booking-service.ts`
+  — do not duplicate provider logic across pages.
+- Seam webhook intake lives in `src/app/api/seam/webhooks/route.ts` and updates local credential state.
+- Historical RFID references may still appear in old migrations or retired stubs; treat them as archive material, not active runtime dependencies.
+- Every guest-access lifecycle event should emit provider-agnostic notification types such as
+  `access_credential_issued`, `access_credential_revoked`, and `access_credential_extended`.
 
 ---
 
@@ -311,8 +314,9 @@ NEXT_PUBLIC_SITE_URL              ← base URL for the app
 ```
 
 The `SUPABASE_SERVICE_ROLE_KEY` is used **only** inside:
-- `supabase/functions/validate_keycard/index.ts` (Edge Function)
-- Any server-side seed or migration scripts
+- Supabase Edge Functions that require admin auth operations
+- Server-side seed or migration scripts
+- Local tooling such as smoke scripts when explicitly needed
 
 Never import or reference `SUPABASE_SERVICE_ROLE_KEY` in any Next.js page, component, or route handler.
 
@@ -323,7 +327,7 @@ Never import or reference `SUPABASE_SERVICE_ROLE_KEY` in any Next.js page, compo
 ```bash
 npm run dev                          # start local dev server
 supabase gen types typescript --linked > src/lib/supabase/types.ts   # regenerate types after schema changes
-supabase functions deploy validate_keycard                            # deploy Edge Function
+supabase functions deploy manage_staff_auth                           # deploy active auth Edge Function
 supabase db push                     # apply new migration files
 ```
 

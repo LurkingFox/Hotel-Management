@@ -18,7 +18,7 @@ function createLoginRedirect(request: NextRequest, error?: 'config' | 'inactive'
   return loginUrl
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const response = NextResponse.next()
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY

@@ -97,6 +97,18 @@ function mapNotificationType(type: string) {
     return 'Stay extended'
   }
 
+  if (type === 'extension_confirmation_pending') {
+    return 'Stay extension pending confirmation'
+  }
+
+  if (type === 'extension_confirmation_confirmed') {
+    return 'Stay extension confirmed'
+  }
+
+  if (type === 'extension_confirmation_disputed') {
+    return 'Stay extension disputed'
+  }
+
   if (type === 'service_charge_added') {
     return 'Service charge added'
   }
@@ -105,16 +117,16 @@ function mapNotificationType(type: string) {
     return 'Service charge resolved'
   }
 
-  if (type === 'keycard_issued' || type === 'master_key_issued') {
-    return 'Keycard issued'
+  if (type === 'keycard_issued' || type === 'master_key_issued' || type === 'access_credential_issued') {
+    return 'Access credential issued'
   }
 
-  if (type === 'keycard_revoked' || type === 'master_key_revoked') {
-    return 'Keycard revoked'
+  if (type === 'keycard_revoked' || type === 'master_key_revoked' || type === 'access_credential_revoked') {
+    return 'Access credential revoked'
   }
 
-  if (type === 'keycard_extended' || type === 'master_key_extended') {
-    return 'Keycard validity extended'
+  if (type === 'keycard_extended' || type === 'master_key_extended' || type === 'access_credential_extended') {
+    return 'Access validity extended'
   }
 
   return type.replaceAll('_', ' ')
@@ -165,7 +177,7 @@ export default async function AdminReportsPage({ searchParams }: { searchParams?
     supabase.from('staff').select('id, name, role, active').order('active', { ascending: false }).order('name'),
     supabase
       .from('notifications')
-      .select('id, type, message, triggered_by, created_at, booking_id, keycard_id, read, bookings(id, guest_name, check_in, check_out_expected, rooms(number, type))')
+      .select('id, type, message, triggered_by, created_at, booking_id, read, bookings(id, guest_name, check_in, check_out_expected, rooms(number, type))')
       .gte('created_at', dateRange.startIso)
       .lt('created_at', dateRange.endExclusiveIso)
       .order('created_at', { ascending: false }),
@@ -183,7 +195,7 @@ export default async function AdminReportsPage({ searchParams }: { searchParams?
       .order('created_at', { ascending: false }),
     supabase
       .from('access_log')
-      .select('id, card_uid, guest_name, issued_by, note, result, accessed_at, rooms(number, type)')
+      .select('id, credential_identifier, guest_name, issued_by, note, result, accessed_at, rooms(number, type)')
       .gte('accessed_at', dateRange.startIso)
       .lt('accessed_at', dateRange.endExclusiveIso)
       .order('accessed_at', { ascending: false }),
@@ -328,7 +340,7 @@ export default async function AdminReportsPage({ searchParams }: { searchParams?
       actorStaffId: matchedStaff?.id ?? null,
       amountGhs: null,
       category: 'access',
-      detail: event.note?.trim() || (event.guest_name ? `${event.guest_name} tapped ${event.card_uid}` : `Card ${event.card_uid} scanned`),
+      detail: event.note?.trim() || (event.guest_name ? `${event.guest_name} presented credential ${event.credential_identifier}` : `Credential ${event.credential_identifier} presented`),
       id: `access-${event.id}`,
       occurredAt: event.accessed_at,
       roomLabel: room?.number ? `Room ${room.number}` : null,

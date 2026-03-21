@@ -17,12 +17,13 @@ const adminSections: AppNavSection[] = [
   {
     title: 'Admin operations',
     items: [
+      { href: '/admin/today', label: 'Today', description: 'Pending confirmations, arrivals, due-outs, and manager exceptions.' },
       { href: '/admin/dashboard', label: 'Dashboard', description: 'Command overview and live hotel status.' },
       { href: '/admin/bookings', label: 'Bookings', description: 'Arrivals, extensions, cancellations, and stays.' },
       { href: '/admin/payments', label: 'Payments', description: 'Receipts, balances, and collection channels.' },
       { href: '/admin/reports', label: 'Reports', description: 'Manager-facing packs, exports, and rollups.' },
       { href: '/admin/rooms', label: 'Rooms', description: 'Inventory, readiness, and nightly pricing.' },
-      { href: '/admin/keycards', label: 'Keycards', description: 'Room keys, master keys, and validity control.' },
+      { href: '/admin/guest-access', label: 'Guest access', description: 'Access codes, provider state, and validity control.' },
       { href: '/admin/staff', label: 'Staff', description: 'Roster, shifts, and access-linked identities.' },
       { href: '/admin/access-log', label: 'Access log', description: 'Granted, denied, and expired entry history.' },
       { href: '/admin/settings', label: 'Settings', description: 'Hotel identity, logo, and Seam room-device mappings.' }
@@ -49,7 +50,7 @@ const receptionSections: AppNavSection[] = [
   },
   {
     title: 'Admin handoff',
-    items: [{ href: '/admin/dashboard', label: 'Admin dashboard', description: 'Visible when admin users enter reception flow.' }]
+    items: [{ href: '/admin/today', label: 'Today', description: 'Visible when admin users enter reception flow.' }]
   }
 ]
 

@@ -16,9 +16,18 @@ type BookingWithRoom = BookingRow & {
   rooms: Pick<RoomRow, 'id' | 'number' | 'type' | 'rate_ghs' | 'status'> | null
 }
 
+type ExtensionState = {
+  acknowledged: boolean
+  method: PayMethod
+  paymentAmount: string
+  reason: string
+  reference: string
+}
+
 type ReceptionDeskClientProps = {
   accessPresentation: BookingAccessPresentation
   bookings: BookingWithRoom[]
+  currentRole: string | null
   rooms: RoomRow[]
 }
 
@@ -66,7 +75,12 @@ function needsReference(method: PayMethod) {
   return method === 'momo' || method === 'bank_transfer' || method === 'cheque'
 }
 
-export function ReceptionDeskClient({ accessPresentation, bookings, rooms }: ReceptionDeskClientProps) {
+function getNightCount(checkIn: string, checkOut: string) {
+  const difference = Date.parse(checkOut) - Date.parse(checkIn)
+  return Math.max(1, Math.ceil(difference / 86400000))
+}
+
+export function ReceptionDeskClient({ accessPresentation, bookings, currentRole, rooms }: ReceptionDeskClientProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -80,20 +94,19 @@ export function ReceptionDeskClient({ accessPresentation, bookings, rooms }: Rec
   const [paymentMethod, setPaymentMethod] = useState<PayMethod>('cash')
   const [paymentAmount, setPaymentAmount] = useState('0')
   const [paymentReference, setPaymentReference] = useState('')
-  const [cardUid, setCardUid] = useState('')
-  const [checkInCardUids, setCheckInCardUids] = useState<Record<string, string>>({})
   const [checkoutSettlement, setCheckoutSettlement] = useState<Record<string, { amount: string; method: PayMethod; reference: string }>>({})
+  const [extendDates, setExtendDates] = useState<Record<string, string>>({})
+  const [extensionState, setExtensionState] = useState<Record<string, ExtensionState>>({})
+  const [extensionReviewBookingId, setExtensionReviewBookingId] = useState<string | null>(null)
 
   const availableRooms = useMemo(() => rooms.filter((room) => room.status === 'vacant'), [rooms])
   const selectedRoom = rooms.find((entry) => entry.id === roomId) ?? null
-  const nights = useMemo(() => {
-    const difference = Date.parse(checkOutExpected) - Date.parse(checkIn)
-    return Math.max(1, Math.ceil(difference / 86400000))
-  }, [checkIn, checkOutExpected])
+  const nights = useMemo(() => getNightCount(checkIn, checkOutExpected), [checkIn, checkOutExpected])
   const totalGhs = (selectedRoom?.rate_ghs ?? 0) * nights
 
   const reservedBookings = bookings.filter((booking) => booking.status === 'reserved')
   const activeBookings = bookings.filter((booking) => booking.status === 'active')
+  const extensionReviewBooking = extensionReviewBookingId ? activeBookings.find((booking) => booking.id === extensionReviewBookingId) ?? null : null
 
   function resetMessages() {
     setErrorMessage(null)
@@ -114,11 +127,6 @@ export function ReceptionDeskClient({ accessPresentation, bookings, rooms }: Rec
       return
     }
 
-    if (bookingStatus === 'active' && accessPresentation.requiresManualCredential && !cardUid.trim()) {
-      setErrorMessage('A card UID is required for a walk-in check-in.')
-      return
-    }
-
     if (needsReference(paymentMethod) && Number(paymentAmount) > 0 && !paymentReference.trim()) {
       setErrorMessage('Payment reference is required for this payment method.')
       return
@@ -136,7 +144,6 @@ export function ReceptionDeskClient({ accessPresentation, bookings, rooms }: Rec
           checkOutExpected,
           totalGhs,
           status: bookingStatus,
-          cardUid: bookingStatus === 'active' ? cardUid.trim().toUpperCase() : undefined,
           payment:
             Number(paymentAmount) > 0
               ? {
@@ -159,7 +166,6 @@ export function ReceptionDeskClient({ accessPresentation, bookings, rooms }: Rec
       setGuestPhone('')
       setPaymentAmount('0')
       setPaymentReference('')
-      setCardUid('')
       refreshWithMessage(
         formatAccessSuccess(
           payload,
@@ -173,12 +179,6 @@ export function ReceptionDeskClient({ accessPresentation, bookings, rooms }: Rec
 
   function handleCheckIn(bookingId: string, issuedTo: string) {
     resetMessages()
-    const value = checkInCardUids[bookingId]?.trim().toUpperCase()
-
-    if (accessPresentation.requiresManualCredential && !value) {
-      setErrorMessage('Enter a card UID before checking in a reservation.')
-      return
-    }
 
     startTransition(async () => {
       const response = await fetch('/api/bookings', {
@@ -187,7 +187,6 @@ export function ReceptionDeskClient({ accessPresentation, bookings, rooms }: Rec
         body: JSON.stringify({
           bookingId,
           action: 'check_in',
-          cardUid: accessPresentation.requiresManualCredential ? value : undefined,
           issuedTo
         })
       })
@@ -199,9 +198,6 @@ export function ReceptionDeskClient({ accessPresentation, bookings, rooms }: Rec
         return
       }
 
-      if (accessPresentation.requiresManualCredential) {
-        setCheckInCardUids((current) => ({ ...current, [bookingId]: '' }))
-      }
       refreshWithMessage(
         formatAccessSuccess(payload, `Reservation checked in and ${accessPresentation.generatedCredentialLabel.toLowerCase()} issued.`)
       )
@@ -248,6 +244,108 @@ export function ReceptionDeskClient({ accessPresentation, bookings, rooms }: Rec
         [booking.id]: { amount: '', method: 'cash', reference: '' }
       }))
       refreshWithMessage(formatAccessSuccess(payload, 'Guest checked out successfully.'))
+    })
+  }
+
+  function getExtensionForm(bookingId: string): ExtensionState {
+    return extensionState[bookingId] ?? {
+      acknowledged: false,
+      method: 'cash',
+      paymentAmount: '',
+      reason: '',
+      reference: ''
+    }
+  }
+
+  function validateExtensionForm(booking: BookingWithRoom, form: ExtensionState, nextDate: string) {
+    const paymentAmountValue = form.paymentAmount ? Number(form.paymentAmount) : 0
+
+    if (Date.parse(nextDate) <= Date.parse(booking.check_out_expected)) {
+      return 'Extended checkout date must be after the current checkout date.'
+    }
+
+    if (currentRole === 'receptionist' && !form.reason.trim()) {
+      return 'Reception must record the reason for the stay extension.'
+    }
+
+    if (needsReference(form.method) && paymentAmountValue > 0 && !form.reference.trim()) {
+      return 'Payment reference is required for this payment method.'
+    }
+
+    return null
+  }
+
+  function openExtensionReview(booking: BookingWithRoom) {
+    resetMessages()
+    const nextDate = extendDates[booking.id] ?? booking.check_out_expected
+    const form = getExtensionForm(booking.id)
+    const validationError = validateExtensionForm(booking, form, nextDate)
+
+    if (validationError) {
+      setErrorMessage(validationError)
+      return
+    }
+
+    setExtensionReviewBookingId(booking.id)
+  }
+
+  function handleExtend(booking: BookingWithRoom) {
+    resetMessages()
+    const nextDate = extendDates[booking.id] ?? booking.check_out_expected
+    const form = getExtensionForm(booking.id)
+    const validationError = validateExtensionForm(booking, form, nextDate)
+    const paymentAmountValue = form.paymentAmount ? Number(form.paymentAmount) : 0
+
+    if (validationError) {
+      setErrorMessage(validationError)
+      return
+    }
+
+    if (currentRole === 'receptionist' && !form.acknowledged) {
+      setErrorMessage('Reception must accept the accountability confirmation before extending the stay.')
+      return
+    }
+
+    startTransition(async () => {
+      const response = await fetch('/api/bookings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'extend',
+          bookingId: booking.id,
+          extensionAcknowledged: currentRole === 'receptionist' ? form.acknowledged : undefined,
+          extensionAuthorization: form.reason.trim() ? { reason: form.reason.trim() } : undefined,
+          extensionPayment:
+            paymentAmountValue > 0
+              ? {
+                  amountGhs: paymentAmountValue,
+                  method: form.method,
+                  reference: form.reference.trim() || null
+                }
+              : undefined,
+          newCheckOutExpected: nextDate
+        })
+      })
+
+      const payload = (await response.json()) as BookingMutationResponse
+
+      if (!response.ok) {
+        setErrorMessage(payload.error ?? 'Stay extension failed.')
+        return
+      }
+
+      setExtensionState((current) => ({
+        ...current,
+        [booking.id]: {
+          acknowledged: false,
+          method: 'cash',
+          paymentAmount: '',
+          reason: '',
+          reference: ''
+        }
+      }))
+      setExtensionReviewBookingId(null)
+      refreshWithMessage(formatAccessSuccess(payload, 'Stay extended successfully.'))
     })
   }
 
@@ -362,19 +460,7 @@ export function ReceptionDeskClient({ accessPresentation, bookings, rooms }: Rec
                 </div>
               </div>
 
-              {bookingStatus === 'active' && accessPresentation.requiresManualCredential ? (
-                <label className="space-y-2">
-                  <span className="text-sm font-semibold text-ink/75">{accessPresentation.manualCredentialLabel}</span>
-                  <input
-                    className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 uppercase outline-none transition focus:border-terracotta"
-                    onChange={(event) => setCardUid(event.target.value)}
-                    placeholder={accessPresentation.manualCredentialPlaceholder}
-                    value={cardUid}
-                  />
-                </label>
-              ) : null}
-
-              {bookingStatus === 'active' && !accessPresentation.requiresManualCredential ? (
+              {bookingStatus === 'active' ? (
                 <div className="rounded-[1.5rem] border border-dashed border-ink/10 bg-white px-4 py-3 text-sm text-ink/65">
                   {accessPresentation.generatedCredentialLabel} will be generated automatically after the guest is checked in.
                 </div>
@@ -473,18 +559,9 @@ export function ReceptionDeskClient({ accessPresentation, bookings, rooms }: Rec
                       <p className="mt-2 text-sm text-ink/65">Balance: {formatGHS(Number(booking.balance_ghs ?? booking.total_ghs - booking.paid_ghs))}</p>
                     </div>
                     <div className="w-full max-w-xs space-y-3">
-                      {accessPresentation.requiresManualCredential ? (
-                        <input
-                          className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 uppercase outline-none transition focus:border-terracotta"
-                          onChange={(event) => setCheckInCardUids((current) => ({ ...current, [booking.id]: event.target.value }))}
-                          placeholder={`${accessPresentation.manualCredentialLabel} for check-in`}
-                          value={checkInCardUids[booking.id] ?? ''}
-                        />
-                      ) : (
-                        <div className="rounded-2xl border border-dashed border-ink/10 bg-white px-4 py-3 text-sm text-ink/65">
-                          {accessPresentation.generatedCredentialLabel} will be generated automatically.
-                        </div>
-                      )}
+                      <div className="rounded-2xl border border-dashed border-ink/10 bg-white px-4 py-3 text-sm text-ink/65">
+                        {accessPresentation.generatedCredentialLabel} will be generated automatically.
+                      </div>
                       <button
                         className="w-full rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-60"
                         disabled={isPending}
@@ -514,6 +591,10 @@ export function ReceptionDeskClient({ accessPresentation, bookings, rooms }: Rec
               {activeBookings.map((booking) => {
                 const balance = Number(booking.balance_ghs ?? booking.total_ghs - booking.paid_ghs)
                 const settlement = checkoutSettlement[booking.id] ?? { amount: '', method: 'cash' as PayMethod, reference: '' }
+                const nextExtensionDate = extendDates[booking.id] ?? booking.check_out_expected
+                const extensionForm = getExtensionForm(booking.id)
+                const projectedTotal = (booking.rooms?.rate_ghs ?? 0) * getNightCount(booking.check_in, nextExtensionDate)
+                const additionalCharge = Math.max(0, projectedTotal - booking.total_ghs)
 
                 return (
                   <div key={booking.id} className="rounded-[1.5rem] border border-ink/10 bg-[#fcfaf6] p-5">
@@ -582,6 +663,112 @@ export function ReceptionDeskClient({ accessPresentation, bookings, rooms }: Rec
                         </div>
                       ) : null}
 
+                      <div className="rounded-2xl border border-ink/10 bg-white p-4">
+                        <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
+                          <div>
+                            <p className="text-sm font-semibold text-ink/75">Extend stay and access validity</p>
+                            <p className="mt-1 text-sm text-ink/60">
+                              The system recalculates the stay total automatically. Reception extensions apply immediately and remain pending manager confirmation until reviewed.
+                            </p>
+                          </div>
+                          <div className="rounded-2xl bg-parchment px-4 py-3 text-right">
+                            <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Added charge</p>
+                            <p className="text-xl font-semibold text-ink">{formatGHS(additionalCharge)}</p>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 grid gap-4 md:grid-cols-2">
+                          <label className="space-y-2">
+                            <span className="text-sm font-semibold text-ink/75">New checkout date</span>
+                            <input
+                              className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta"
+                              min={booking.check_out_expected}
+                              onChange={(event) => setExtendDates((current) => ({ ...current, [booking.id]: event.target.value }))}
+                              type="date"
+                              value={nextExtensionDate}
+                            />
+                          </label>
+                          <label className="space-y-2">
+                            <span className="text-sm font-semibold text-ink/75">Reason for extension</span>
+                            <input
+                              className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta"
+                              onChange={(event) =>
+                                setExtensionState((current) => ({
+                                  ...current,
+                                  [booking.id]: { ...extensionForm, reason: event.target.value }
+                                }))
+                              }
+                              placeholder="Late flight, guest requested extra night, payment pending, etc."
+                              value={extensionForm.reason}
+                            />
+                          </label>
+                        </div>
+
+                        <div className="mt-4 rounded-2xl border border-dashed border-ink/10 bg-parchment px-4 py-3 text-sm text-ink/65">
+                          {currentRole === 'receptionist'
+                            ? 'Reception extensions become pending manager confirmation after the final review. Managers will see them immediately on Today.'
+                            : 'Admin users confirm the extension directly at the final review step.'}
+                        </div>
+
+                        <div className="mt-4 rounded-2xl bg-parchment p-4">
+                          <p className="text-sm font-semibold text-ink/75">Optional payment recorded now</p>
+                          <div className="mt-3 flex flex-wrap gap-3">
+                            {paymentMethods.map((method) => (
+                              <button
+                                key={`${booking.id}-extend-${method.value}`}
+                                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${extensionForm.method === method.value ? 'bg-ink text-white' : method.tone}`}
+                                onClick={() =>
+                                  setExtensionState((current) => ({
+                                    ...current,
+                                    [booking.id]: { ...extensionForm, method: method.value }
+                                  }))
+                                }
+                                type="button"
+                              >
+                                {method.label}
+                              </button>
+                            ))}
+                          </div>
+                          <div className="mt-4 grid gap-4 md:grid-cols-2">
+                            <input
+                              className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta"
+                              max={Math.max(0, projectedTotal - booking.paid_ghs)}
+                              min="0"
+                              onChange={(event) =>
+                                setExtensionState((current) => ({
+                                  ...current,
+                                  [booking.id]: { ...extensionForm, paymentAmount: event.target.value }
+                                }))
+                              }
+                              placeholder="Amount collected now"
+                              step="0.01"
+                              type="number"
+                              value={extensionForm.paymentAmount}
+                            />
+                            <input
+                              className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta"
+                              onChange={(event) =>
+                                setExtensionState((current) => ({
+                                  ...current,
+                                  [booking.id]: { ...extensionForm, reference: event.target.value }
+                                }))
+                              }
+                              placeholder={needsReference(extensionForm.method) ? 'Reference required for this method' : 'Optional reference'}
+                              value={extensionForm.reference}
+                            />
+                          </div>
+                        </div>
+
+                        <button
+                          className="mt-4 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-60"
+                          disabled={isPending}
+                          onClick={() => openExtensionReview(booking)}
+                          type="button"
+                        >
+                          Review extension
+                        </button>
+                      </div>
+
                       <button
                         className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-60"
                         disabled={isPending}
@@ -598,6 +785,136 @@ export function ReceptionDeskClient({ accessPresentation, bookings, rooms }: Rec
           </article>
         </section>
       </div>
+
+      {extensionReviewBooking ? (
+        <div className="fixed inset-0 z-50 flex justify-end bg-ink/45 backdrop-blur-sm">
+          <button
+            aria-label="Close extension review"
+            className="flex-1 cursor-default"
+            onClick={() => setExtensionReviewBookingId(null)}
+            type="button"
+          />
+          <div className="h-full w-full max-w-xl overflow-y-auto border-l border-ink/10 bg-[#fcfaf6] p-6 shadow-2xl">
+            {(() => {
+              const form = getExtensionForm(extensionReviewBooking.id)
+              const nextDate = extendDates[extensionReviewBooking.id] ?? extensionReviewBooking.check_out_expected
+              const paymentAmountValue = form.paymentAmount ? Number(form.paymentAmount) : 0
+              const projectedTotal = (extensionReviewBooking.rooms?.rate_ghs ?? 0) * getNightCount(extensionReviewBooking.check_in, nextDate)
+              const additionalCharge = Math.max(0, projectedTotal - extensionReviewBooking.total_ghs)
+              const remainingBalance = Math.max(0, projectedTotal - (extensionReviewBooking.paid_ghs + paymentAmountValue))
+
+              return (
+                <div>
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-sm uppercase tracking-[0.24em] text-ink/45">Final review</p>
+                      <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl text-ink">Confirm stay extension</h2>
+                      <p className="mt-3 text-sm leading-6 text-ink/65">
+                        Review the full financial impact before changing the guest stay and access validity.
+                      </p>
+                    </div>
+                    <button
+                      className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment"
+                      onClick={() => setExtensionReviewBookingId(null)}
+                      type="button"
+                    >
+                      Close
+                    </button>
+                  </div>
+
+                  <div className="mt-6 rounded-[1.75rem] border border-ink/10 bg-white p-5">
+                    <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+                      <div>
+                        <p className="text-2xl font-semibold text-ink">{extensionReviewBooking.guest_name}</p>
+                        <p className="mt-1 text-sm text-ink/65">
+                          Room {extensionReviewBooking.rooms?.number ?? 'Unassigned'} · {formatDate(extensionReviewBooking.check_in)} to {formatDate(nextDate)}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl bg-parchment px-4 py-3 text-right">
+                        <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Added charge</p>
+                        <p className="text-2xl font-semibold text-ink">{formatGHS(additionalCharge)}</p>
+                      </div>
+                    </div>
+
+                    <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                      <div className="rounded-2xl bg-[#fcfaf6] p-4">
+                        <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Current checkout</p>
+                        <p className="mt-2 text-lg font-semibold text-ink">{formatDate(extensionReviewBooking.check_out_expected)}</p>
+                      </div>
+                      <div className="rounded-2xl bg-[#fcfaf6] p-4">
+                        <p className="text-xs uppercase tracking-[0.24em] text-ink/45">New checkout</p>
+                        <p className="mt-2 text-lg font-semibold text-ink">{formatDate(nextDate)}</p>
+                      </div>
+                      <div className="rounded-2xl bg-[#fcfaf6] p-4">
+                        <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Payment recorded now</p>
+                        <p className="mt-2 text-lg font-semibold text-ink">{formatGHS(paymentAmountValue)}</p>
+                      </div>
+                      <div className="rounded-2xl bg-[#fcfaf6] p-4">
+                        <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Remaining balance</p>
+                        <p className="mt-2 text-lg font-semibold text-ink">{formatGHS(remainingBalance)}</p>
+                      </div>
+                    </div>
+
+                    <div className="mt-5 rounded-2xl bg-parchment p-4">
+                      <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Reason recorded</p>
+                      <p className="mt-2 text-sm leading-6 text-ink/72">{form.reason.trim() || 'No reason provided.'}</p>
+                    </div>
+
+                    {additionalCharge > 0 && paymentAmountValue === 0 ? (
+                      <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                        No payment is being recorded for this extension. The booking balance will increase immediately.
+                      </div>
+                    ) : null}
+
+                    <div className="mt-5 rounded-2xl border border-dashed border-ink/10 bg-white p-4 text-sm text-ink/65">
+                      {currentRole === 'receptionist'
+                        ? 'After you confirm, the stay will extend immediately and appear as pending manager confirmation on Today.'
+                        : 'As an admin, confirming here finalizes the extension immediately and records your approval in the audit trail.'}
+                    </div>
+
+                    {currentRole === 'receptionist' ? (
+                      <label className="mt-5 flex items-start gap-3 rounded-2xl bg-ink px-4 py-4 text-sm text-white">
+                        <input
+                          checked={form.acknowledged}
+                          className="mt-1 h-4 w-4 rounded border-white/40 text-terracotta focus:ring-terracotta"
+                          onChange={(event) =>
+                            setExtensionState((current) => ({
+                              ...current,
+                              [extensionReviewBooking.id]: { ...form, acknowledged: event.target.checked }
+                            }))
+                          }
+                          type="checkbox"
+                        />
+                        <span>
+                          I confirm this extension is intentional, I accept responsibility for it, and I will notify the manager for review.
+                        </span>
+                      </label>
+                    ) : null}
+
+                    <div className="mt-6 flex flex-wrap gap-3">
+                      <button
+                        className="rounded-full border border-ink/12 px-5 py-3 text-sm font-semibold text-ink transition hover:bg-parchment"
+                        onClick={() => setExtensionReviewBookingId(null)}
+                        type="button"
+                      >
+                        Back
+                      </button>
+                      <button
+                        className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-60"
+                        disabled={isPending || (currentRole === 'receptionist' && !form.acknowledged)}
+                        onClick={() => handleExtend(extensionReviewBooking)}
+                        type="button"
+                      >
+                        {currentRole === 'receptionist' ? 'Extend stay and mark pending confirmation' : 'Extend stay now'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )
+            })()}
+          </div>
+        </div>
+      ) : null}
     </main>
   )
 }

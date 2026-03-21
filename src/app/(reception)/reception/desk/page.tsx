@@ -31,11 +31,11 @@ export default async function ReceptionDeskPage() {
   if (bookingsError) {
     throw new Error(bookingsError.message)
   }
-
   return (
     <ReceptionDeskClient
       accessPresentation={getBookingAccessPresentation()}
       bookings={(bookings ?? []) as BookingWithRoom[]}
+      currentRole={typeof user.user_metadata.role === 'string' ? user.user_metadata.role : null}
       rooms={(rooms ?? []) as RoomRow[]}
     />
   )

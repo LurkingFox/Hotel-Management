@@ -60,19 +60,19 @@ const categoryOptions: Array<{ label: string; value: ReportCategory }> = [
   { label: 'Front office', value: 'front_office' },
   { label: 'Payments', value: 'payments' },
   { label: 'Services', value: 'services' },
-  { label: 'Door access', value: 'access' },
+  { label: 'Access events', value: 'access' },
   { label: 'Staffing', value: 'staffing' }
 ]
 
 const categoryMeta: Record<ReportCategory, { accent: string; description: string; eyebrow: string }> = {
   access: {
     accent: 'from-[#1f3b52] via-[#2d5877] to-[#ebf1f5]',
-    description: 'Access control is isolated into a security sheet so granted entries, denials, and room patterns are readable without payment noise.',
+    description: 'Access control is isolated into a security sheet so granted entries, denials, credential activity, and room patterns are readable without payment noise.',
     eyebrow: 'Security sheet'
   },
   front_office: {
     accent: 'from-[#4d2f22] via-[#8c5b3f] to-[#f6ece2]',
-    description: 'Front office activity stays together as a guest-movement report covering reservations, arrivals, departures, extensions, and keycard lifecycle events.',
+    description: 'Front office activity stays together as a guest-movement report covering reservations, arrivals, departures, extensions, and access credential lifecycle events.',
     eyebrow: 'Guest movement sheet'
   },
   payments: {
@@ -292,13 +292,15 @@ function buildPageSummary(category: ReportCategory, operations: ReportOperation[
   const reservations = operations.filter((operation) => operation.status === 'reservation_created').length
   const arrivals = operations.filter((operation) => operation.status === 'booking_checked_in' || operation.status === 'walk_in_checked_in').length
   const departures = operations.filter((operation) => operation.status === 'booking_checked_out').length
-  const keycards = operations.filter((operation) => operation.status?.includes('keycard') || operation.status?.includes('master_key')).length
+  const credentials = operations.filter(
+    (operation) => operation.status?.includes('keycard') || operation.status?.includes('master_key') || operation.status?.includes('access_credential')
+  ).length
 
   return [
     { label: 'Front-office events', value: String(operations.length) },
     { label: 'Reservations created', value: String(reservations) },
     { label: 'Arrivals and departures', value: String(arrivals + departures) },
-    { label: 'Keycard actions', value: String(keycards) }
+    { label: 'Credential actions', value: String(credentials) }
   ]
 }
 

@@ -25,10 +25,13 @@ export function AdminDashboardRealtime() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'access_log' }, () => {
         startTransition(() => router.refresh())
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms' }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'booking_access_credentials' }, () => {
         startTransition(() => router.refresh())
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'door_controllers' }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'room_access_devices' }, () => {
+        startTransition(() => router.refresh())
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms' }, () => {
         startTransition(() => router.refresh())
       })
       .subscribe()

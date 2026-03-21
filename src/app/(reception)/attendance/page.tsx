@@ -55,7 +55,7 @@ async function resolveStaffRecord() {
     }
   }
 
-  const dashboardHref = role === 'admin' ? '/admin/dashboard' : isFrontDeskRole(role) ? '/reception/desk' : null
+  const dashboardHref = role === 'admin' ? '/admin/today' : isFrontDeskRole(role) ? '/reception/desk' : null
 
   if (!staff) {
     return {

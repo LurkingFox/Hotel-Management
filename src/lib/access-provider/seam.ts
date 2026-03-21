@@ -8,6 +8,10 @@ function getString(value: unknown) {
   return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null
 }
 
+function getArray(value: unknown) {
+  return Array.isArray(value) ? value : null
+}
+
 function readPath(source: unknown, path: string[]) {
   let current: unknown = source
 
@@ -56,6 +60,69 @@ export function getSeamWebhookResourceHint(payload: unknown) {
     readPath(payload, ['data', 'device', 'device_id']) ??
     readPath(payload, ['data', 'access_code', 'access_code_id'])
   )
+}
+
+export function getSeamWebhookOccurredAt(payload: unknown) {
+  return readPath(payload, ['occurred_at']) ?? readPath(payload, ['created_at']) ?? readPath(payload, ['data', 'occurred_at'])
+}
+
+export function getSeamWebhookDescription(payload: unknown) {
+  return (
+    readPath(payload, ['event_description']) ??
+    readPath(payload, ['description']) ??
+    readPath(payload, ['data', 'event_description'])
+  )
+}
+
+export function getSeamWebhookAccessCodeId(payload: unknown) {
+  return (
+    readPath(payload, ['access_code_id']) ??
+    readPath(payload, ['access_code', 'access_code_id']) ??
+    readPath(payload, ['data', 'access_code_id']) ??
+    readPath(payload, ['data', 'access_code', 'access_code_id'])
+  )
+}
+
+export function getSeamWebhookDeviceId(payload: unknown) {
+  return readPath(payload, ['device_id']) ?? readPath(payload, ['device', 'device_id']) ?? readPath(payload, ['data', 'device_id'])
+}
+
+export function getSeamWebhookErrorCode(payload: unknown) {
+  const root = getObject(payload)
+  const rootErrors = getArray(root?.errors)
+  const accessCodeErrors = getArray(getObject(root?.access_code)?.errors)
+  const dataErrors = getArray(getObject(root?.data)?.errors)
+  const candidates = [rootErrors, accessCodeErrors, dataErrors].filter(Boolean) as unknown[][]
+
+  for (const errorList of candidates) {
+    const firstError = getObject(errorList[0])
+    const errorCode = getString(firstError?.error_code) ?? getString(firstError?.warning_code) ?? getString(firstError?.code)
+
+    if (errorCode) {
+      return errorCode
+    }
+  }
+
+  return readPath(payload, ['error', 'type'])
+}
+
+export function getSeamWebhookErrorMessage(payload: unknown) {
+  const root = getObject(payload)
+  const rootErrors = getArray(root?.errors)
+  const accessCodeErrors = getArray(getObject(root?.access_code)?.errors)
+  const dataErrors = getArray(getObject(root?.data)?.errors)
+  const candidates = [rootErrors, accessCodeErrors, dataErrors].filter(Boolean) as unknown[][]
+
+  for (const errorList of candidates) {
+    const firstError = getObject(errorList[0])
+    const message = getString(firstError?.message)
+
+    if (message) {
+      return message
+    }
+  }
+
+  return readPath(payload, ['error', 'message'])
 }
 
 export function buildSeamWebhookMessage(payload: unknown) {

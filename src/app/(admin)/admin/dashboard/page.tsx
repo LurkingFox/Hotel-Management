@@ -1,7 +1,9 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { Seam } from 'seam'
 
 import { AdminDashboardRealtime } from '@/app/(admin)/admin/dashboard/admin-dashboard-realtime'
+import { getAccessMigrationState } from '@/lib/access-provider/config'
 import { createAuthenticatedServerSupabaseClient } from '@/lib/supabase/server'
 import type { Database } from '@/lib/supabase/types'
 import { formatGHS } from '@/lib/utils/format'
@@ -15,13 +17,31 @@ type NotificationSummary = Pick<Database['public']['Tables']['notifications']['R
 type AccessSummary = Pick<Database['public']['Tables']['access_log']['Row'], 'result' | 'note' | 'accessed_at'> & {
   rooms: Array<{ number: string }> | null
 }
-type DoorControllerSummary = Pick<
-  Database['public']['Tables']['door_controllers']['Row'],
-  'controller_id' | 'firmware_version' | 'heartbeat_status' | 'last_card_uid' | 'last_error' | 'last_note' | 'last_result' | 'last_seen_at'
+type RoomAccessDeviceMapping = Pick<
+  Database['public']['Tables']['room_access_devices']['Row'],
+  'display_name' | 'external_device_id' | 'updated_at'
 > & {
-  rooms: Array<{ number: string }> | null
+  rooms: Array<{ number: string; type: Database['public']['Enums']['room_type'] }> | null
 }
 type RoomSummary = Pick<Database['public']['Tables']['rooms']['Row'], 'status'>
+type AccessInfrastructureStatus = 'degraded' | 'offline' | 'online'
+type AccessInfrastructureSummary = {
+  degraded: number
+  offline: number
+  online: number
+}
+type AccessDeviceStatusCard = {
+  deviceId: string
+  displayName: string
+  errorMessage: string | null
+  manufacturer: string | null
+  model: string | null
+  onlineAccessCodesEnabled: boolean | null
+  roomNumber: string | null
+  status: AccessInfrastructureStatus
+  syncTime: string | null
+  warningMessage: string | null
+}
 
 const paymentLabels: Record<PayMethod, string> = {
   cash: 'Cash',
@@ -54,14 +74,103 @@ function buildAccessAlert(result: AccessResult, roomNumber: string | null, note:
   return `${action} for ${roomLabel} at ${formatDateTime(accessedAt)}${note ? `. ${note}` : '.'}`
 }
 
-function getControllerDisplayStatus(controller: DoorControllerSummary, staleBefore: number): 'degraded' | 'offline' | 'online' {
-  const lastSeen = controller.last_seen_at ? Date.parse(controller.last_seen_at) : 0
+function getObject(value: unknown) {
+  return value && typeof value === 'object' ? (value as Record<string, unknown>) : null
+}
 
-  if (!lastSeen || Number.isNaN(lastSeen) || lastSeen < staleBefore) {
-    return 'offline'
+function getString(value: unknown) {
+  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null
+}
+
+function getBoolean(value: unknown) {
+  return typeof value === 'boolean' ? value : null
+}
+
+function getNumber(value: unknown) {
+  return typeof value === 'number' && Number.isFinite(value) ? value : null
+}
+
+function getIssues(value: unknown) {
+  if (!Array.isArray(value)) {
+    return [] as string[]
   }
 
-  return controller.heartbeat_status === 'online' || controller.heartbeat_status === 'offline' ? controller.heartbeat_status : 'degraded'
+  return value
+    .map((issue) => {
+      const issueObject = getObject(issue)
+
+      return getString(issueObject?.message) ?? getString(issueObject?.warning_code) ?? getString(issueObject?.error_code) ?? null
+    })
+    .filter((issue): issue is string => Boolean(issue))
+}
+
+function summarizeAccessInfrastructure(devices: Array<{ status: AccessInfrastructureStatus }>): AccessInfrastructureSummary {
+  return devices.reduce<AccessInfrastructureSummary>(
+    (totals, device) => {
+      totals[device.status] += 1
+      return totals
+    },
+    { degraded: 0, offline: 0, online: 0 }
+  )
+}
+
+async function getSeamDeviceStatusCards(mappings: RoomAccessDeviceMapping[], apiKey: string) {
+  if (mappings.length === 0) {
+    return [] as AccessDeviceStatusCard[]
+  }
+
+  const seam = new Seam({ apiKey })
+
+  return Promise.all(
+    mappings.map(async (mapping) => {
+      try {
+        const device = (await seam.devices.get({ device_id: mapping.external_device_id })) as unknown
+        const deviceObject = getObject(device)
+        const properties = getObject(deviceObject?.properties)
+        const model = getString(getObject(properties?.model)?.display_name)
+        const manufacturer = getString(properties?.manufacturer)
+        const warnings = getIssues(deviceObject?.warnings)
+        const errors = getIssues(deviceObject?.errors)
+        const isOnline = getBoolean(properties?.online)
+        const onlineAccessCodesEnabled = getBoolean(properties?.online_access_codes_enabled)
+        const batteryLevel = getNumber(properties?.battery_level)
+        const batteryStatus = getString(getObject(properties?.battery)?.status)
+        const warningMessage = warnings[0] ?? batteryStatus ?? null
+        const errorMessage = errors[0] ?? null
+        const status: AccessInfrastructureStatus = !isOnline
+          ? 'offline'
+          : errorMessage || warningMessage || onlineAccessCodesEnabled === false
+            ? 'degraded'
+            : 'online'
+
+        return {
+          deviceId: mapping.external_device_id,
+          displayName: getString(deviceObject?.display_name) ?? mapping.display_name ?? mapping.external_device_id,
+          errorMessage,
+          manufacturer,
+          model: batteryLevel !== null && model ? `${model} · ${(batteryLevel * 100).toFixed(0)}% battery` : model,
+          onlineAccessCodesEnabled,
+          roomNumber: mapping.rooms?.[0]?.number ?? null,
+          status,
+          syncTime: new Date().toISOString(),
+          warningMessage,
+        }
+      } catch (error) {
+        return {
+          deviceId: mapping.external_device_id,
+          displayName: mapping.display_name ?? mapping.external_device_id,
+          errorMessage: error instanceof Error ? error.message : 'Unable to load Seam device state.',
+          manufacturer: null,
+          model: null,
+          onlineAccessCodesEnabled: null,
+          roomNumber: mapping.rooms?.[0]?.number ?? null,
+          status: 'offline' as const,
+          syncTime: mapping.updated_at,
+          warningMessage: null,
+        }
+      }
+    })
+  )
 }
 
 const commandLinks = [
@@ -69,7 +178,7 @@ const commandLinks = [
   { href: '/admin/payments', label: 'Review payments', detail: 'Track receipts, balances, and payment channels.' },
   { href: '/admin/reports', label: 'Generate reports', detail: 'Group operations by period, staff member, and export PDF packs.' },
   { href: '/admin/settings', label: 'Hotel settings', detail: 'Update hotel address, contacts, website, and brand logo.' },
-  { href: '/admin/keycards', label: 'Control keycards', detail: 'Revoke, extend, and audit room access cards.' },
+  { href: '/admin/guest-access', label: 'Control guest access', detail: 'Revoke, extend, and audit room credentials across providers.' },
   { href: '/admin/rooms', label: 'Run room board', detail: 'Change room readiness and occupancy states.' },
   { href: '/admin/staff', label: 'Manage staff', detail: 'Start and end shifts, review payroll load.' },
   { href: '/reception/desk', label: 'Open reception flow', detail: 'Use the same operational desk the front office sees.' }
@@ -77,6 +186,7 @@ const commandLinks = [
 
 export default async function AdminDashboardPage() {
   const { supabase, user } = await createAuthenticatedServerSupabaseClient()
+  const accessMigrationState = getAccessMigrationState()
 
   if (!user) {
     redirect('/login')
@@ -87,13 +197,17 @@ export default async function AdminDashboardPage() {
   monthStart.setHours(0, 0, 0, 0)
   const monthStartIso = monthStart.toISOString()
 
-  const [paymentsResult, bookingsResult, notificationsResult, accessResult, roomsResult, controllersResult] = await Promise.all([
+  const [paymentsResult, bookingsResult, notificationsResult, accessResult, roomsResult, seamMappingsResult] = await Promise.all([
     supabase.from('payments').select('amount_ghs, method, paid_at, reference').order('paid_at', { ascending: false }),
     supabase.from('bookings').select('id, status, balance_ghs, total_ghs, paid_ghs').order('check_in', { ascending: false }),
     supabase.from('notifications').select('id, message, read, type, created_at').order('created_at', { ascending: false }).limit(6),
     supabase.from('access_log').select('result, note, accessed_at, rooms(number)').order('accessed_at', { ascending: false }).limit(6),
     supabase.from('rooms').select('status').order('number'),
-    supabase.from('door_controllers').select('controller_id, firmware_version, heartbeat_status, last_card_uid, last_error, last_note, last_result, last_seen_at, rooms(number)').order('last_seen_at', { ascending: false })
+    supabase
+      .from('room_access_devices')
+      .select('display_name, external_device_id, updated_at, rooms(number, type)')
+      .eq('provider', 'seam')
+      .order('updated_at', { ascending: false })
   ])
 
   if (paymentsResult.error) {
@@ -116,17 +230,19 @@ export default async function AdminDashboardPage() {
     throw new Error(roomsResult.error.message)
   }
 
-  if (controllersResult.error) {
-    throw new Error(controllersResult.error.message)
+  if (seamMappingsResult.error) {
+    throw new Error(seamMappingsResult.error.message)
   }
 
   const payments = (paymentsResult.data ?? []) as PaymentSummary[]
   const bookings = (bookingsResult.data ?? []) as BookingSummary[]
   const notifications = (notificationsResult.data ?? []) as NotificationSummary[]
   const accessEvents = (accessResult.data ?? []) as AccessSummary[]
-  const controllers = (controllersResult.data ?? []) as DoorControllerSummary[]
+  const seamMappings = (seamMappingsResult.data ?? []) as RoomAccessDeviceMapping[]
   const rooms = (roomsResult.data ?? []) as RoomSummary[]
-  const staleBefore = Date.now() - 2 * 60 * 1000
+  const seamDeviceCards = accessMigrationState.seamApiKey
+    ? await getSeamDeviceStatusCards(seamMappings, accessMigrationState.seamApiKey)
+    : []
 
   const monthRevenue = payments.reduce((sum, payment) => {
     if (!payment.paid_at || payment.paid_at < monthStartIso) {
@@ -164,14 +280,7 @@ export default async function AdminDashboardPage() {
     { vacant: 0, occupied: 0, reserved: 0, cleaning: 0, maintenance: 0 }
   )
 
-  const controllerSummary = controllers.reduce(
-    (totals, controller) => {
-      const status = getControllerDisplayStatus(controller, staleBefore)
-      totals[status] += 1
-      return totals
-    },
-    { degraded: 0, offline: 0, online: 0 }
-  )
+  const accessInfrastructureSummary = summarizeAccessInfrastructure(seamDeviceCards)
 
   const alerts = [
     ...notifications.map((notification) => ({
@@ -319,12 +428,12 @@ export default async function AdminDashboardPage() {
 
         <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
           <article className="rounded-[2rem] border border-ink/10 bg-white p-7 shadow-card">
-            <p className="text-xs uppercase tracking-[0.26em] text-ink/45">Door controller watch</p>
+            <p className="text-xs uppercase tracking-[0.26em] text-ink/45">Access device watch</p>
             <div className="mt-5 grid gap-3 sm:grid-cols-3">
               {([
-                ['Online', controllerSummary.online],
-                ['Degraded', controllerSummary.degraded],
-                ['Offline', controllerSummary.offline]
+                ['Online', accessInfrastructureSummary.online],
+                ['Degraded', accessInfrastructureSummary.degraded],
+                ['Offline', accessInfrastructureSummary.offline]
               ] as const).map(([label, count]) => (
                 <div key={label} className="rounded-2xl bg-parchment p-4">
                   <p className="text-xs uppercase tracking-[0.2em] text-ink/45">{label}</p>
@@ -333,47 +442,48 @@ export default async function AdminDashboardPage() {
               ))}
             </div>
             <div className="mt-5 rounded-3xl bg-[#f8f5f0] p-5 text-sm text-ink/70">
-              Controllers are marked offline when no heartbeat has been seen for more than two minutes.
+              Seam-mapped devices are checked live on page load. Offline means Seam reported the device as unavailable or the device state could not be fetched.
             </div>
           </article>
 
           <article className="rounded-[2rem] border border-ink/10 bg-white p-7 shadow-card">
-            <p className="text-xs uppercase tracking-[0.26em] text-ink/45">Latest controller status</p>
+            <p className="text-xs uppercase tracking-[0.26em] text-ink/45">Latest access device status</p>
             <div className="mt-5 space-y-3">
-              {controllers.map((controller) => {
-                const status = getControllerDisplayStatus(controller, staleBefore)
-
-                return (
-                  <div key={controller.controller_id} className="rounded-2xl bg-parchment p-4 text-sm text-ink/80">
-                    <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-                      <div>
-                        <p className="font-semibold text-ink">{controller.rooms?.[0]?.number ? `Room ${controller.rooms[0].number}` : controller.controller_id}</p>
-                        <p className="mt-1 text-xs uppercase tracking-[0.2em] text-ink/45">{controller.controller_id}</p>
-                      </div>
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-semibold uppercase ${
-                          status === 'online'
-                            ? 'bg-green-50 text-green-800'
-                            : status === 'degraded'
-                              ? 'bg-amber-50 text-amber-800'
-                              : 'bg-red-50 text-red-800'
-                        }`}
-                      >
-                        {status}
-                      </span>
+              {seamDeviceCards.map((device) => (
+                <div key={device.deviceId} className="rounded-2xl bg-parchment p-4 text-sm text-ink/80">
+                  <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                      <p className="font-semibold text-ink">{device.roomNumber ? `Room ${device.roomNumber}` : device.displayName}</p>
+                      <p className="mt-1 text-xs uppercase tracking-[0.2em] text-ink/45">{device.displayName}</p>
+                      <p className="mt-1 text-xs uppercase tracking-[0.2em] text-ink/35">{device.deviceId}</p>
                     </div>
-                    <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                      <p>Last seen: <span className="font-semibold text-ink">{formatDateTime(controller.last_seen_at)}</span></p>
-                      <p>Firmware: <span className="font-semibold text-ink">{controller.firmware_version ?? 'Unknown'}</span></p>
-                      <p>Last card: <span className="font-semibold text-ink">{controller.last_card_uid ?? 'None'}</span></p>
-                      <p>Last result: <span className="font-semibold text-ink">{controller.last_result ?? 'Heartbeat only'}</span></p>
-                    </div>
-                    {controller.last_note ? <p className="mt-3 text-sm text-ink/70">{controller.last_note}</p> : null}
-                    {controller.last_error ? <p className="mt-2 text-sm text-red-700">{controller.last_error}</p> : null}
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-semibold uppercase ${
+                        device.status === 'online'
+                          ? 'bg-green-50 text-green-800'
+                          : device.status === 'degraded'
+                            ? 'bg-amber-50 text-amber-800'
+                            : 'bg-red-50 text-red-800'
+                      }`}
+                    >
+                      {device.status}
+                    </span>
                   </div>
-                )
-              })}
-              {controllers.length === 0 ? <div className="rounded-2xl bg-parchment p-4 text-sm text-ink/70">No controller heartbeats reported yet.</div> : null}
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                    <p>Synced: <span className="font-semibold text-ink">{formatDateTime(device.syncTime)}</span></p>
+                    <p>Model: <span className="font-semibold text-ink">{device.model ?? 'Unknown'}</span></p>
+                    <p>Manufacturer: <span className="font-semibold text-ink">{device.manufacturer ?? 'Unknown'}</span></p>
+                    <p>Online codes: <span className="font-semibold text-ink">{device.onlineAccessCodesEnabled === null ? 'Unknown' : device.onlineAccessCodesEnabled ? 'Enabled' : 'Unavailable'}</span></p>
+                  </div>
+                  {device.warningMessage ? <p className="mt-3 text-sm text-amber-800">{device.warningMessage}</p> : null}
+                  {device.errorMessage ? <p className="mt-2 text-sm text-red-700">{device.errorMessage}</p> : null}
+                </div>
+              ))}
+              {seamDeviceCards.length === 0 ? (
+                <div className="rounded-2xl bg-parchment p-4 text-sm text-ink/70">
+                  No Seam device mappings have been synced yet.
+                </div>
+              ) : null}
             </div>
           </article>
         </section>

@@ -97,8 +97,8 @@ export function LoginForm({ configError, inactiveError, nextPath }: LoginFormPro
               <p className="mt-3 text-2xl font-semibold">Check-in, checkout, services</p>
             </div>
             <div className="rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur">
-              <p className="text-xs uppercase tracking-[0.28em] text-white/60">RFID</p>
-              <p className="mt-3 text-2xl font-semibold">Keycards, access log, audit trail</p>
+              <p className="text-xs uppercase tracking-[0.28em] text-white/60">Access</p>
+              <p className="mt-3 text-2xl font-semibold">Access codes, entry log, audit trail</p>
             </div>
             <div className="rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur">
               <p className="text-xs uppercase tracking-[0.28em] text-white/60">Admin</p>

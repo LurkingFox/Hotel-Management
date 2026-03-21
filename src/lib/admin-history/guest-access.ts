@@ -2,24 +2,24 @@ import type { createServerSupabaseClient } from '@/lib/supabase/server'
 
 import { sanitizeSearchTerm, toExclusiveEndOfDayIso, toStartOfDayIso } from '@/lib/admin-history/shared'
 
-type KeycardsFilters = {
+type GuestAccessFilters = {
   fromDate: string
   query: string
   status: 'all' | 'active' | 'revoked'
   toDate: string
 }
 
-type SupabaseClient = ReturnType<typeof createServerSupabaseClient>
+type SupabaseClient = Awaited<ReturnType<typeof createServerSupabaseClient>>
 
 const VALID_STATUSES = new Set(['active', 'revoked'])
 
-export type { KeycardsFilters }
+export type { GuestAccessFilters }
 
-export function parseKeycardStatus(value: string): 'all' | 'active' | 'revoked' {
+export function parseGuestAccessStatus(value: string): 'all' | 'active' | 'revoked' {
   return VALID_STATUSES.has(value) ? (value as 'active' | 'revoked') : 'all'
 }
 
-export function buildKeycardsQueryString(filters: KeycardsFilters, page: number) {
+export function buildGuestAccessQueryString(filters: GuestAccessFilters, page: number) {
   const params = new URLSearchParams()
 
   if (filters.query) {
@@ -45,7 +45,7 @@ export function buildKeycardsQueryString(filters: KeycardsFilters, page: number)
   return params.toString()
 }
 
-export async function getMatchingKeycardRoomIds(supabase: SupabaseClient, query: string) {
+export async function getMatchingGuestAccessRoomIds(supabase: SupabaseClient, query: string) {
   if (!query) {
     return [] as string[]
   }
@@ -59,7 +59,7 @@ export async function getMatchingKeycardRoomIds(supabase: SupabaseClient, query:
   return (data ?? []).map((room) => room.id)
 }
 
-export async function getMatchingKeycardBookingIds(supabase: SupabaseClient, query: string, roomIds: string[]) {
+export async function getMatchingGuestAccessBookingIds(supabase: SupabaseClient, query: string, roomIds: string[]) {
   if (!query && roomIds.length === 0) {
     return [] as string[]
   }
@@ -83,15 +83,15 @@ export async function getMatchingKeycardBookingIds(supabase: SupabaseClient, que
   return (data ?? []).map((booking) => booking.id)
 }
 
-export function applyKeycardFilters(query: any, filters: KeycardsFilters, bookingIds: string[], roomIds: string[]) {
+export function applyGuestAccessFilters(query: any, filters: GuestAccessFilters, bookingIds: string[], roomIds: string[]) {
   let nextQuery = query
 
   if (filters.fromDate) {
-    nextQuery = nextQuery.gte('issued_at', toStartOfDayIso(filters.fromDate))
+    nextQuery = nextQuery.gte('created_at', toStartOfDayIso(filters.fromDate))
   }
 
   if (filters.toDate) {
-    nextQuery = nextQuery.lt('issued_at', toExclusiveEndOfDayIso(filters.toDate))
+    nextQuery = nextQuery.lt('created_at', toExclusiveEndOfDayIso(filters.toDate))
   }
 
   if (filters.status !== 'all') {
@@ -101,11 +101,16 @@ export function applyKeycardFilters(query: any, filters: KeycardsFilters, bookin
   if (filters.query) {
     const escapedQuery = sanitizeSearchTerm(filters.query)
     const orParts = [
-      `card_uid.ilike.%${escapedQuery}%`,
+      `credential_code.ilike.%${escapedQuery}%`,
       `issued_to.ilike.%${escapedQuery}%`,
       `issued_by.ilike.%${escapedQuery}%`,
+      `note.ilike.%${escapedQuery}%`,
+      `provider.ilike.%${escapedQuery}%`,
+      `provider_device_id.ilike.%${escapedQuery}%`,
+      `provider_reference.ilike.%${escapedQuery}%`,
+      `provider_status.ilike.%${escapedQuery}%`,
       `status.ilike.%${escapedQuery}%`,
-      `scope.ilike.%${escapedQuery}%`
+      `id.ilike.%${escapedQuery}%`
     ]
 
     if (bookingIds.length > 0) {

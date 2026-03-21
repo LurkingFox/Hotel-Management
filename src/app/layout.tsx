@@ -17,7 +17,7 @@ const bodyFont = Manrope({
 
 export const metadata: Metadata = {
   title: 'University Hotel HMS',
-  description: 'Hotel operations, bookings, payments, and RFID keycard management for University Hotel.'
+  description: 'Hotel operations, bookings, payments, and guest access management for University Hotel.'
 }
 
 export default function RootLayout({

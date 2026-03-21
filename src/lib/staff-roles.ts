@@ -12,7 +12,7 @@ export function isFrontDeskRole(role: string | null | undefined) {
 
 export function getDefaultPathForRole(role: string | null | undefined) {
   if (role === 'admin') {
-    return '/admin/dashboard'
+    return '/admin/today'
   }
 
   if (role === 'receptionist') {

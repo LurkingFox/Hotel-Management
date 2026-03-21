@@ -11,7 +11,7 @@ type AccessLogFilters = {
   toDate: string
 }
 
-type SupabaseClient = ReturnType<typeof createServerSupabaseClient>
+type SupabaseClient = Awaited<ReturnType<typeof createServerSupabaseClient>>
 
 const VALID_RESULTS = new Set<AccessResult>(['granted', 'denied', 'expired'])
 
@@ -79,7 +79,7 @@ export function applyAccessFilters(query: any, filters: AccessLogFilters, roomId
   if (filters.query) {
     const escapedQuery = sanitizeSearchTerm(filters.query)
     const orParts = [
-      `card_uid.ilike.%${escapedQuery}%`,
+      `credential_identifier.ilike.%${escapedQuery}%`,
       `guest_name.ilike.%${escapedQuery}%`,
       `issued_by.ilike.%${escapedQuery}%`,
       `note.ilike.%${escapedQuery}%`,
