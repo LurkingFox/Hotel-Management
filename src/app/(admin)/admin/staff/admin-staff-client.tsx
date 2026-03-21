@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState, useTransition } from 'react'
+import { useMemo, useState, useTransition } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 
 import { triggerHistoryExport } from '@/lib/admin-history/client'
@@ -168,12 +168,6 @@ export function AdminStaffClient({
   const [shiftSearchDraft, setShiftSearchDraft] = useState(historyFilters.query)
   const [shiftFromDateDraft, setShiftFromDateDraft] = useState(historyFilters.fromDate)
   const [shiftToDateDraft, setShiftToDateDraft] = useState(historyFilters.toDate)
-
-  useEffect(() => {
-    setShiftSearchDraft(historyFilters.query)
-    setShiftFromDateDraft(historyFilters.fromDate)
-    setShiftToDateDraft(historyFilters.toDate)
-  }, [historyFilters.fromDate, historyFilters.query, historyFilters.toDate])
 
   const filteredStaff = useMemo(() => {
     if (filter === 'inactive') {

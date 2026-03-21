@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState, useTransition } from 'react'
+import { useMemo, useState, useTransition } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 
 import { triggerHistoryExport } from '@/lib/admin-history/client'
@@ -119,12 +119,6 @@ export function AdminAccessLogClient({ currentPage, events, filters, latestDenie
   const [searchDraft, setSearchDraft] = useState(filters.query)
   const [fromDateDraft, setFromDateDraft] = useState(filters.fromDate)
   const [toDateDraft, setToDateDraft] = useState(filters.toDate)
-
-  useEffect(() => {
-    setSearchDraft(filters.query)
-    setFromDateDraft(filters.fromDate)
-    setToDateDraft(filters.toDate)
-  }, [filters.fromDate, filters.query, filters.toDate])
 
   const visibleRangeLabel = useMemo(() => {
     if (filters.fromDate && filters.toDate) {
