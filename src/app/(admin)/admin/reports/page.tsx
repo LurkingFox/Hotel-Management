@@ -1,12 +1,18 @@
 import { redirect } from 'next/navigation'
 
 import { AdminReportsClient } from '@/app/(admin)/admin/reports/admin-reports-client'
+import { buildDashboardIntelligence, type DashboardIntelligenceMetrics } from '@/lib/dashboard-intelligence'
 import { buildHotelProfile } from '@/lib/hotel-info'
 import { createAuthenticatedServerSupabaseClient } from '@/lib/supabase/server'
 import { defaultReportCategories, type ReportCategory, type ReportFilters, type ReportOperation, resolveDateRange, buildReportSummary } from '@/lib/reporting'
 import type { Database } from '@/lib/supabase/types'
 
 type SearchParams = Record<string, string | string[] | undefined>
+type ReportsWorkspaceMode = 'export' | 'outlook'
+
+type AdminReportsPageProps = {
+  searchParams?: SearchParams | Promise<SearchParams>
+}
 type StaffRow = Database['public']['Tables']['staff']['Row']
 type NotificationRow = Database['public']['Tables']['notifications']['Row']
 type PaymentRow = Database['public']['Tables']['payments']['Row']
@@ -16,6 +22,8 @@ type AccessLogRow = Database['public']['Tables']['access_log']['Row']
 type HotelProfileRow = Database['public']['Tables']['hotel_profile']['Row']
 type RoomRow = Database['public']['Tables']['rooms']['Row']
 type BookingRow = Database['public']['Tables']['bookings']['Row']
+type ServiceRequestRow = Database['public']['Tables']['service_requests']['Row']
+type ExtensionAuditRow = Database['public']['Tables']['booking_extension_audits']['Row']
 
 type NotificationWithRelations = NotificationRow & {
   bookings:
@@ -63,6 +71,10 @@ type ShiftWithStaff = ShiftRow & {
 type AccessWithRoom = AccessLogRow & {
   rooms: Pick<RoomRow, 'number' | 'type'> | Array<Pick<RoomRow, 'number' | 'type'>> | null
 }
+
+type IntelligenceBooking = Pick<BookingRow, 'balance_ghs' | 'check_in' | 'check_out_expected' | 'nights' | 'status' | 'total_ghs'>
+type IntelligenceRequest = Pick<ServiceRequestRow, 'assigned_staff_id' | 'completed_at' | 'created_at' | 'priority' | 'status'>
+type IntelligenceExtension = Pick<ExtensionAuditRow, 'id'>
 
 function readValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value
@@ -158,21 +170,28 @@ function matchesStaffFilter(operation: ReportOperation, staffId: string | null) 
   return operation.actorStaffId === staffId
 }
 
-export default async function AdminReportsPage({ searchParams }: { searchParams?: SearchParams }) {
+function normalizeWorkspaceMode(value: string | undefined): ReportsWorkspaceMode {
+  return value === 'export' ? 'export' : 'outlook'
+}
+
+export default async function AdminReportsPage({ searchParams }: AdminReportsPageProps) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined
   const { supabase, user } = await createAuthenticatedServerSupabaseClient()
 
   if (!user) {
     redirect('/login')
   }
 
-  const preset = (readValue(searchParams?.preset) as ReportFilters['preset']) ?? 'this-month'
-  const groupBy = (readValue(searchParams?.groupBy) as ReportFilters['groupBy']) ?? 'week'
-  const scope = (readValue(searchParams?.scope) as ReportFilters['scope']) ?? 'overview'
-  const staffId = readValue(searchParams?.staffId) ?? null
-  const selectedCategories = normalizeCategories(readValues(searchParams?.category))
-  const dateRange = resolveDateRange(preset, readValue(searchParams?.startDate), readValue(searchParams?.endDate))
+  const preset = (readValue(resolvedSearchParams?.preset) as ReportFilters['preset']) ?? 'this-month'
+  const groupBy = (readValue(resolvedSearchParams?.groupBy) as ReportFilters['groupBy']) ?? 'week'
+  const workspaceMode = normalizeWorkspaceMode(readValue(resolvedSearchParams?.mode))
+  const scope = (readValue(resolvedSearchParams?.scope) as ReportFilters['scope']) ?? 'overview'
+  const staffId = readValue(resolvedSearchParams?.staffId) ?? null
+  const selectedCategories = normalizeCategories(readValues(resolvedSearchParams?.category))
+  const dateRange = resolveDateRange(preset, readValue(resolvedSearchParams?.startDate), readValue(resolvedSearchParams?.endDate))
+  const endExclusiveDate = dateRange.endExclusiveIso.slice(0, 10)
 
-  const [hotelProfileResult, staffResult, notificationsResult, paymentsResult, servicesResult, accessResult, shiftsResult] = await Promise.all([
+  const [hotelProfileResult, staffResult, notificationsResult, paymentsResult, servicesResult, accessResult, shiftsResult, bookingsResult, requestsResult, extensionAuditsResult, roomsCountResult] = await Promise.all([
     supabase.from('hotel_profile').select('*').eq('id', true).maybeSingle(),
     supabase.from('staff').select('id, name, role, active').order('active', { ascending: false }).order('name'),
     supabase
@@ -204,7 +223,23 @@ export default async function AdminReportsPage({ searchParams }: { searchParams?
       .select('id, started_at, ended_at, staff_id, staff(id, name, role)')
       .gte('started_at', dateRange.startIso)
       .lt('started_at', dateRange.endExclusiveIso)
-      .order('started_at', { ascending: false })
+      .order('started_at', { ascending: false }),
+    supabase
+      .from('bookings')
+      .select('balance_ghs, check_in, check_out_expected, nights, status, total_ghs')
+      .lt('check_in', endExclusiveDate)
+      .gt('check_out_expected', dateRange.startDate),
+    supabase
+      .from('service_requests')
+      .select('assigned_staff_id, completed_at, created_at, priority, status')
+      .gte('created_at', dateRange.startIso)
+      .lt('created_at', dateRange.endExclusiveIso),
+    supabase
+      .from('booking_extension_audits')
+      .select('id')
+      .gte('created_at', dateRange.startIso)
+      .lt('created_at', dateRange.endExclusiveIso),
+    supabase.from('rooms').select('id', { count: 'exact', head: true })
   ])
 
   if (hotelProfileResult.error) {
@@ -233,6 +268,22 @@ export default async function AdminReportsPage({ searchParams }: { searchParams?
 
   if (shiftsResult.error) {
     throw new Error(shiftsResult.error.message)
+  }
+
+  if (bookingsResult.error) {
+    throw new Error(bookingsResult.error.message)
+  }
+
+  if (requestsResult.error) {
+    throw new Error(requestsResult.error.message)
+  }
+
+  if (extensionAuditsResult.error) {
+    throw new Error(extensionAuditsResult.error.message)
+  }
+
+  if (roomsCountResult.error) {
+    throw new Error(roomsCountResult.error.message)
   }
 
   const staff = (staffResult.data ?? []) as Array<Pick<StaffRow, 'id' | 'name' | 'role' | 'active'>>
@@ -379,14 +430,30 @@ export default async function AdminReportsPage({ searchParams }: { searchParams?
     : ((servicesResult.data ?? []) as unknown as ServiceChargeWithRelations[]).reduce((sum, charge) => sum + charge.amount_ghs, 0)
 
   const summary = buildReportSummary(filteredOperations, serviceChargesTotal)
+  const intelligence: DashboardIntelligenceMetrics | null = scope === 'overview'
+    ? buildDashboardIntelligence({
+        accessResults: (((accessResult.data ?? []) as unknown as AccessWithRoom[]).map((event) => event.result)),
+        bookings: (bookingsResult.data ?? []) as IntelligenceBooking[],
+        extensionAuditCount: ((extensionAuditsResult.data ?? []) as IntelligenceExtension[]).length,
+        openShiftCount: ((shiftsResult.data ?? []) as ShiftWithStaff[]).length,
+        payments: ((paymentsResult.data ?? []) as unknown as PaymentWithRelations[]).map((payment) => ({ amount_ghs: payment.amount_ghs, paid_at: payment.paid_at })),
+        rangeEndExclusive: new Date(dateRange.endExclusiveIso),
+        rangeStart: new Date(`${dateRange.startDate}T00:00:00`),
+        serviceRequests: (requestsResult.data ?? []) as IntelligenceRequest[],
+        totalRooms: roomsCountResult.count ?? 0,
+        trendDays: 7
+      })
+    : null
 
   return (
     <AdminReportsClient
       filters={filters}
       hotelProfile={hotelProfile}
+      intelligence={intelligence}
       operations={filteredOperations}
       staffOptions={staff}
       summary={summary}
+      workspaceMode={workspaceMode}
     />
   )
 }

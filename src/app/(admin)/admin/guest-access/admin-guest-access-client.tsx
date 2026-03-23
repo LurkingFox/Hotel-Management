@@ -280,16 +280,12 @@ export function AdminGuestAccessClient({ activeProvider, currentPage, filters, c
   }
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,_#11202f_0%,_#11202f_24%,_#f7f1e8_24%,_#f7f1e8_100%)] px-6 py-10 text-ink md:px-10">
+    <main className="min-h-screen bg-[linear-gradient(180deg,_#0f3d2e_0%,_#155d45_24%,_#f9fffc_24%,_#f9fffc_100%)] px-6 py-10 text-ink md:px-10" data-smoke-id="admin-guest-access">
+      <span className="sr-only">smoke:admin-guest-access</span>
       <div className="mx-auto max-w-7xl space-y-6">
-        <header className="flex flex-col gap-4 text-white lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm uppercase tracking-[0.28em] text-white/70">Admin Tower</p>
-            <h1 className="font-[family-name:var(--font-display)] text-5xl">Guest access registry</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-white/75">
-              Review live guest credentials, provider state, mapped room devices, and manual intervention history from one registry.
-            </p>
-          </div>
+        <header className="text-white">
+          <h1 className="font-[family-name:var(--font-display)] text-3xl md:text-[2.2rem]">Guest access</h1>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-white/75">Review live guest credentials, mapped devices, and manual access interventions.</p>
         </header>
 
         {errorMessage ? <div className="rounded-2xl bg-red-50 px-5 py-4 text-sm text-red-700">{errorMessage}</div> : null}
@@ -320,7 +316,7 @@ export function AdminGuestAccessClient({ activeProvider, currentPage, filters, c
 
         <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
           <article className="rounded-[2rem] border border-ink/10 bg-white p-6 shadow-card">
-            <div className="rounded-[1.5rem] bg-parchment p-5">
+            <div className="ui-panel-soft rounded-[1.5rem] p-5">
               <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
                 <div>
                   <p className="text-sm uppercase tracking-[0.24em] text-ink/45">Registry mode</p>
@@ -344,7 +340,7 @@ export function AdminGuestAccessClient({ activeProvider, currentPage, filters, c
               ] as const).map((statusOption) => (
                 <button
                   key={statusOption.value}
-                  className={`rounded-full px-5 py-3 text-sm font-semibold transition disabled:opacity-60 ${filters.status === statusOption.value ? 'bg-ink text-white' : 'bg-parchment text-ink hover:bg-[#eadfce]'}`}
+                  className={`${filters.status === statusOption.value ? 'ui-chip-active' : 'ui-chip'} disabled:opacity-60`}
                   disabled={isPending}
                   onClick={() => navigateRegistry({ page: undefined, status: statusOption.value === 'all' ? undefined : statusOption.value })}
                   type="button"
@@ -358,7 +354,7 @@ export function AdminGuestAccessClient({ activeProvider, currentPage, filters, c
               <label className="space-y-2 text-sm text-ink/65">
                 <span className="font-semibold text-ink">Search registry</span>
                 <input
-                  className="w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 outline-none transition focus:border-terracotta"
+                  className="ui-input w-full rounded-2xl px-4 py-3"
                   disabled={isPending}
                   onChange={(event) => setSearchDraft(event.target.value)}
                   placeholder="Search by code, guest, issuer, room, device id, provider, or provider status"
@@ -369,7 +365,7 @@ export function AdminGuestAccessClient({ activeProvider, currentPage, filters, c
                 <label className="space-y-2 text-sm text-ink/65">
                   <span className="font-semibold text-ink">Created from</span>
                   <input
-                    className="w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 outline-none transition focus:border-terracotta"
+                    className="ui-input w-full rounded-2xl px-4 py-3"
                     disabled={isPending}
                     onChange={(event) => setFromDateDraft(event.target.value)}
                     type="date"
@@ -379,7 +375,7 @@ export function AdminGuestAccessClient({ activeProvider, currentPage, filters, c
                 <label className="space-y-2 text-sm text-ink/65">
                   <span className="font-semibold text-ink">Created until</span>
                   <input
-                    className="w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 outline-none transition focus:border-terracotta"
+                    className="ui-input w-full rounded-2xl px-4 py-3"
                     disabled={isPending}
                     onChange={(event) => setToDateDraft(event.target.value)}
                     type="date"
@@ -389,7 +385,7 @@ export function AdminGuestAccessClient({ activeProvider, currentPage, filters, c
               </div>
               <div className="flex flex-wrap gap-3">
                 <button className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90 disabled:opacity-60" disabled={isPending} type="submit">Apply</button>
-                <button className="rounded-full border border-ink/12 px-5 py-3 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-60" disabled={isPending} onClick={handleClearFilters} type="button">Clear</button>
+                <button className="ui-button-secondary disabled:opacity-60" disabled={isPending} onClick={handleClearFilters} type="button">Clear</button>
               </div>
             </form>
 
@@ -401,7 +397,7 @@ export function AdminGuestAccessClient({ activeProvider, currentPage, filters, c
               ] as const).map((preset) => (
                 <button
                   key={preset.value}
-                  className={`rounded-full px-4 py-2 text-sm font-semibold transition disabled:opacity-60 ${activePreset === preset.value ? 'border border-ink bg-ink text-white' : 'border border-ink/12 text-ink hover:bg-parchment'}`}
+                  className={`${activePreset === preset.value ? 'ui-chip-active' : 'ui-chip'} disabled:opacity-60`}
                   disabled={isPending}
                   onClick={() => handlePreset(preset.value)}
                   type="button"
@@ -411,10 +407,10 @@ export function AdminGuestAccessClient({ activeProvider, currentPage, filters, c
               ))}
             </div>
 
-            <div className="mt-4 rounded-[1.5rem] bg-[#fcfaf6] px-4 py-4 text-sm text-ink/65">
+            <div className="ui-panel-soft mt-4 rounded-[1.5rem] px-4 py-4 text-sm text-ink/65">
               <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <span>Showing {credentials.length} of {totalCount} matching credentials · {visibleRangeLabel}</span>
-                <button className="rounded-full border border-ink/12 px-4 py-2 font-semibold text-ink transition hover:bg-parchment" onClick={handleExport} type="button">
+                <button className="ui-button-secondary px-4 py-2" onClick={handleExport} type="button">
                   Export CSV
                 </button>
               </div>
@@ -425,7 +421,7 @@ export function AdminGuestAccessClient({ activeProvider, currentPage, filters, c
                 const extendValue = extendDates[credential.id] ?? (credential.valid_until ? credential.valid_until.slice(0, 10) : '')
 
                 return (
-                  <article key={credential.id} className="rounded-[1.5rem] border border-ink/10 bg-[#fcfaf6] p-5">
+                  <article key={credential.id} className="ui-panel-soft rounded-[1.5rem] p-5">
                     <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                       <div className="space-y-3">
                         <div className="flex flex-wrap items-center gap-3">
@@ -475,7 +471,7 @@ export function AdminGuestAccessClient({ activeProvider, currentPage, filters, c
                       <label className="space-y-2">
                         <span className="text-sm font-semibold text-ink/75">Extend valid until</span>
                         <input
-                          className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta"
+                          className="ui-input w-full rounded-2xl px-4 py-3"
                           min={credential.valid_from ? credential.valid_from.slice(0, 10) : undefined}
                           onChange={(event) => setExtendDates((current) => ({ ...current, [credential.id]: event.target.value }))}
                           type="date"
@@ -508,7 +504,7 @@ export function AdminGuestAccessClient({ activeProvider, currentPage, filters, c
               })}
 
               {credentials.length === 0 ? (
-                <div className="rounded-[1.75rem] border border-dashed border-ink/15 bg-[#fcfaf6] px-6 py-10 text-center text-sm text-ink/55">
+                <div className="ui-panel-muted rounded-[1.75rem] border-dashed px-6 py-10 text-center text-sm text-ink/55">
                   No access credentials match the current registry filters.
                 </div>
               ) : null}
@@ -518,12 +514,12 @@ export function AdminGuestAccessClient({ activeProvider, currentPage, filters, c
               <div className="mt-4 flex items-center justify-between gap-4">
                 <p className="text-sm text-ink/60">Page {currentPage} of {totalPages}</p>
                 <div className="flex flex-wrap items-center gap-2">
-                  <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={isPending || currentPage === 1} onClick={() => navigateRegistry({ page: '1' })} type="button">First</button>
-                  <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={isPending || currentPage === 1} onClick={() => navigateRegistry({ page: String(Math.max(1, currentPage - 1)) })} type="button">Previous</button>
+                  <button className="ui-button-secondary px-4 py-2 text-sm disabled:opacity-50" disabled={isPending || currentPage === 1} onClick={() => navigateRegistry({ page: '1' })} type="button">First</button>
+                  <button className="ui-button-secondary px-4 py-2 text-sm disabled:opacity-50" disabled={isPending || currentPage === 1} onClick={() => navigateRegistry({ page: String(Math.max(1, currentPage - 1)) })} type="button">Previous</button>
                   {visiblePages.map((pageNumber) => (
                     <button
                       key={pageNumber}
-                      className={`min-w-10 rounded-full px-4 py-2 text-sm font-semibold transition disabled:opacity-50 ${pageNumber === currentPage ? 'bg-ink text-white' : 'border border-ink/12 text-ink hover:bg-parchment'}`}
+                      className={`min-w-10 px-4 py-2 text-sm disabled:opacity-50 ${pageNumber === currentPage ? 'ui-chip-active' : 'ui-chip'}`}
                       disabled={isPending || pageNumber === currentPage}
                       onClick={() => navigateRegistry({ page: String(pageNumber) })}
                       type="button"
@@ -531,8 +527,8 @@ export function AdminGuestAccessClient({ activeProvider, currentPage, filters, c
                       {pageNumber}
                     </button>
                   ))}
-                  <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={isPending || currentPage === totalPages} onClick={() => navigateRegistry({ page: String(Math.min(totalPages, currentPage + 1)) })} type="button">Next</button>
-                  <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={isPending || currentPage === totalPages} onClick={() => navigateRegistry({ page: String(totalPages) })} type="button">Last</button>
+                  <button className="ui-button-secondary px-4 py-2 text-sm disabled:opacity-50" disabled={isPending || currentPage === totalPages} onClick={() => navigateRegistry({ page: String(Math.min(totalPages, currentPage + 1)) })} type="button">Next</button>
+                  <button className="ui-button-secondary px-4 py-2 text-sm disabled:opacity-50" disabled={isPending || currentPage === totalPages} onClick={() => navigateRegistry({ page: String(totalPages) })} type="button">Last</button>
                 </div>
               </div>
             ) : null}
@@ -541,12 +537,12 @@ export function AdminGuestAccessClient({ activeProvider, currentPage, filters, c
           <article className="rounded-[2rem] border border-ink/10 bg-white p-6 shadow-card">
             <p className="text-sm uppercase tracking-[0.24em] text-ink/45">Room coverage</p>
             <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl">Access coverage</h2>
-            <div className="mt-4 rounded-2xl bg-[#f8f5f0] px-4 py-3 text-sm text-ink/70">
+            <div className="ui-panel-soft mt-4 rounded-2xl px-4 py-3 text-sm text-ink/70">
               {activeProvider === 'seam' ? 'Mapped Seam devices are shown alongside active credential counts per room.' : 'Legacy RFID coverage is shown from active booking credentials per room.'}
             </div>
             <div className="mt-6 space-y-3">
               {roomCoverage.map(({ room, activeCredentials, mappedDeviceId, mappedDeviceName }) => (
-                <div key={room.id} className="rounded-2xl bg-[#fcfaf6] p-4">
+                <div key={room.id} className="ui-panel-soft rounded-2xl p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="font-semibold text-ink">Room {room.number}</p>

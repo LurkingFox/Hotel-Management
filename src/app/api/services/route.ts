@@ -24,6 +24,34 @@ function getErrorResponse(error: unknown) {
   return NextResponse.json({ error: message }, { status: 500 })
 }
 
+async function createManagerApproval(
+  supabase: Awaited<ReturnType<typeof createAuthenticatedServerSupabaseClient>>['supabase'],
+  payload: Database['public']['Tables']['manager_approvals']['Insert']
+) {
+  const { error } = await supabase.from('manager_approvals').insert(payload)
+
+  if (error) {
+    throw new Error(error.message)
+  }
+}
+
+async function updateManagerApprovalByTarget(
+  supabase: Awaited<ReturnType<typeof createAuthenticatedServerSupabaseClient>>['supabase'],
+  values: Database['public']['Tables']['manager_approvals']['Update'],
+  chargeId: string
+) {
+  const { error } = await supabase
+    .from('manager_approvals')
+    .update(values)
+    .eq('target_id', chargeId)
+    .eq('target_table', 'service_charges')
+    .eq('status', 'pending')
+
+  if (error) {
+    throw new Error(error.message)
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { supabase, session } = await createAuthenticatedServerSupabaseClient()
@@ -196,6 +224,22 @@ export async function PATCH(request: NextRequest) {
         return NextResponse.json({ error: notificationError.message }, { status: 500 })
       }
 
+      await createManagerApproval(supabase, {
+        approval_type: 'service_receipt_confirmation',
+        booking_id: data.booking_id,
+        detail: `${data.type.replaceAll('_', ' ')} service receipt for GHS ${data.amount_ghs.toLocaleString('en-GH')} awaits manager confirmation.`,
+        metadata: {
+          amount_ghs: data.amount_ghs,
+          charge_type: data.type,
+          service_charge_id: data.id
+        },
+        requested_by: actor,
+        requested_by_role: role,
+        target_id: data.id,
+        target_table: 'service_charges',
+        title: `Service receipt review for GHS ${data.amount_ghs.toLocaleString('en-GH')}`
+      })
+
       return NextResponse.json(data)
     }
 
@@ -264,6 +308,13 @@ export async function PATCH(request: NextRequest) {
     if (notificationError) {
       return NextResponse.json({ error: notificationError.message }, { status: 500 })
     }
+
+    await updateManagerApprovalByTarget(supabase, {
+      review_note: `Receipt approved using ${body.method.replaceAll('_', ' ')}.`,
+      reviewed_at: new Date().toISOString(),
+      reviewed_by: actor,
+      status: 'approved'
+    }, charge.id)
 
     return NextResponse.json(data)
   } catch (error) {

@@ -41,21 +41,26 @@ type PaymentsSearchParams = {
   to?: string | string[]
 }
 
+type AdminPaymentsPageProps = {
+  searchParams?: PaymentsSearchParams | Promise<PaymentsSearchParams>
+}
+
 const PAGE_SIZE = 12
 
-export default async function AdminPaymentsPage({ searchParams }: { searchParams?: PaymentsSearchParams }) {
+export default async function AdminPaymentsPage({ searchParams }: AdminPaymentsPageProps) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined
   const { supabase, user } = await createAuthenticatedServerSupabaseClient()
 
   if (!user) {
     redirect('/login')
   }
 
-  const query = getSingleParam(searchParams?.query).trim()
-  const methodParam = getSingleParam(searchParams?.method)
-  const fromDate = getSingleParam(searchParams?.from)
-  const toDate = getSingleParam(searchParams?.to)
-  const requestedPaymentsPage = getPage(searchParams?.ppage)
-  const requestedServicePage = getPage(searchParams?.spage)
+  const query = getSingleParam(resolvedSearchParams?.query).trim()
+  const methodParam = getSingleParam(resolvedSearchParams?.method)
+  const fromDate = getSingleParam(resolvedSearchParams?.from)
+  const toDate = getSingleParam(resolvedSearchParams?.to)
+  const requestedPaymentsPage = getPage(resolvedSearchParams?.ppage)
+  const requestedServicePage = getPage(resolvedSearchParams?.spage)
   const method: 'all' | PayMethod = parsePaymentMethod(methodParam)
 
   const filters: PaymentsFilters = {

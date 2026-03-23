@@ -483,13 +483,12 @@ export function AdminStaffClient({
   }
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,_#11202f_0%,_#11202f_24%,_#f7f1e8_24%,_#f7f1e8_100%)] px-6 py-10 text-ink md:px-10">
+    <main className="min-h-screen bg-[linear-gradient(180deg,_#11202f_0%,_#11202f_24%,_#f7f1e8_24%,_#f7f1e8_100%)] px-6 py-10 text-ink md:px-10" data-smoke-id="admin-staff">
+      <span className="sr-only">smoke:admin-staff</span>
       <div className="mx-auto max-w-7xl space-y-6">
-        <header className="flex flex-col gap-4 text-white lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm uppercase tracking-[0.28em] text-white/70">Admin Tower</p>
-            <h1 className="font-[family-name:var(--font-display)] text-5xl">Staff</h1>
-          </div>
+        <header className="text-white">
+          <h1 className="font-[family-name:var(--font-display)] text-3xl md:text-[2.2rem]">Team</h1>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-white/72">Manage staffing, shifts, payroll exposure, and staff access identities.</p>
         </header>
 
         {errorMessage ? <div className="rounded-2xl bg-red-50 px-5 py-4 text-sm text-red-700">{errorMessage}</div> : null}
@@ -530,11 +529,11 @@ export function AdminStaffClient({
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
               <label className="space-y-2 text-sm text-ink/65">
                 <span className="font-semibold text-ink">Full name</span>
-                <input className="w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 outline-none transition focus:border-terracotta" onChange={(event) => setNewStaff((current) => ({ ...current, name: event.target.value }))} value={newStaff.name} />
+                <input className="ui-input w-full rounded-2xl px-4 py-3" onChange={(event) => setNewStaff((current) => ({ ...current, name: event.target.value }))} value={newStaff.name} />
               </label>
               <label className="space-y-2 text-sm text-ink/65">
                 <span className="font-semibold text-ink">Role</span>
-                <select className="w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 outline-none transition focus:border-terracotta" onChange={(event) => setNewStaff((current) => ({ ...current, role: event.target.value as StaffRole }))} value={newStaff.role}>
+                <select className="ui-input w-full rounded-2xl px-4 py-3" onChange={(event) => setNewStaff((current) => ({ ...current, role: event.target.value as StaffRole }))} value={newStaff.role}>
                   {STAFF_ROLE_OPTIONS.map((role) => (
                     <option key={role} disabled={role === 'admin' && !canManageAdminAccounts} value={role}>
                       {getRoleLabel(role)}
@@ -544,21 +543,21 @@ export function AdminStaffClient({
               </label>
               <label className="space-y-2 text-sm text-ink/65">
                 <span className="font-semibold text-ink">Daily rate</span>
-                <input className="w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 outline-none transition focus:border-terracotta" inputMode="decimal" onChange={(event) => setNewStaff((current) => ({ ...current, dailyRateGhs: event.target.value }))} value={newStaff.dailyRateGhs} />
+                <input className="ui-input w-full rounded-2xl px-4 py-3" inputMode="decimal" onChange={(event) => setNewStaff((current) => ({ ...current, dailyRateGhs: event.target.value }))} value={newStaff.dailyRateGhs} />
               </label>
               <label className="space-y-2 text-sm text-ink/65">
                 <span className="font-semibold text-ink">Login email</span>
-                <input className="w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 outline-none transition focus:border-terracotta" onChange={(event) => setNewStaff((current) => ({ ...current, email: event.target.value }))} value={newStaff.email} />
+                <input className="ui-input w-full rounded-2xl px-4 py-3" onChange={(event) => setNewStaff((current) => ({ ...current, email: event.target.value }))} value={newStaff.email} />
               </label>
               <label className="space-y-2 text-sm text-ink/65">
                 <span className="font-semibold text-ink">Temporary password</span>
-                <input className="w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 outline-none transition focus:border-terracotta" onChange={(event) => setNewStaff((current) => ({ ...current, password: event.target.value }))} type="password" value={newStaff.password} />
+                <input className="ui-input w-full rounded-2xl px-4 py-3" onChange={(event) => setNewStaff((current) => ({ ...current, password: event.target.value }))} type="password" value={newStaff.password} />
               </label>
             </div>
           </div>
 
           <div className="mt-5 flex justify-end">
-            <button className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90 disabled:opacity-60" disabled={isPending} onClick={createStaffMember} type="button">
+            <button className="ui-button-primary disabled:opacity-60" disabled={isPending} onClick={createStaffMember} type="button">
               Add staff member
             </button>
           </div>
@@ -580,7 +579,7 @@ export function AdminStaffClient({
                 ] as const).map(([value, label]) => (
                   <button
                     key={value}
-                    className={`rounded-full px-5 py-3 text-sm font-semibold transition ${filter === value ? 'bg-ink text-white' : 'bg-parchment text-ink hover:bg-[#eadfce]'}`}
+                    className={filter === value ? 'ui-chip-active' : 'ui-chip'}
                     onClick={() => setFilter(value)}
                     type="button"
                   >
@@ -595,7 +594,7 @@ export function AdminStaffClient({
                 const latestShift = latestShiftByStaff.get(member.id)
 
                 return (
-                  <article key={member.id} className="rounded-[1.75rem] border border-ink/10 bg-[#fcfaf6] p-5">
+                  <article key={member.id} className="ui-panel-soft rounded-[1.75rem] p-5">
                     {(() => {
                       const account = staffAccountByStaffId.get(member.id)
                       const draft = identityDrafts[member.id]
@@ -628,12 +627,12 @@ export function AdminStaffClient({
                     <div className="mt-5 grid gap-3">
                       <label className="space-y-2 text-sm text-ink/65">
                         <span className="font-semibold text-ink">Staff name</span>
-                        <input className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta" onChange={(event) => updateIdentityDraft(member.id, { name: event.target.value })} value={draft?.name ?? member.name} />
+                        <input className="ui-input w-full rounded-2xl px-4 py-3" onChange={(event) => updateIdentityDraft(member.id, { name: event.target.value })} value={draft?.name ?? member.name} />
                       </label>
                       <div className="grid gap-3 md:grid-cols-2">
                         <label className="space-y-2 text-sm text-ink/65">
                           <span className="font-semibold text-ink">Role</span>
-                          <select className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta" onChange={(event) => updateIdentityDraft(member.id, { role: event.target.value as StaffRole })} value={draft?.role ?? 'receptionist'}>
+                          <select className="ui-input w-full rounded-2xl px-4 py-3" onChange={(event) => updateIdentityDraft(member.id, { role: event.target.value as StaffRole })} value={draft?.role ?? 'receptionist'}>
                             {STAFF_ROLE_OPTIONS.map((role) => (
                               <option key={role} disabled={role === 'admin' && !canManageAdminAccounts} value={role}>
                                 {getRoleLabel(role)}
@@ -643,16 +642,16 @@ export function AdminStaffClient({
                         </label>
                         <label className="space-y-2 text-sm text-ink/65">
                           <span className="font-semibold text-ink">Daily rate</span>
-                          <input className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta" inputMode="decimal" onChange={(event) => updateIdentityDraft(member.id, { dailyRateGhs: event.target.value })} value={draft?.dailyRateGhs ?? String(member.daily_rate_ghs)} />
+                          <input className="ui-input w-full rounded-2xl px-4 py-3" inputMode="decimal" onChange={(event) => updateIdentityDraft(member.id, { dailyRateGhs: event.target.value })} value={draft?.dailyRateGhs ?? String(member.daily_rate_ghs)} />
                         </label>
                       </div>
                       <label className="space-y-2 text-sm text-ink/65">
                         <span className="font-semibold text-ink">Login email</span>
-                        <input className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta" onChange={(event) => updateIdentityDraft(member.id, { email: event.target.value })} value={draft?.email ?? account?.email ?? ''} />
+                        <input className="ui-input w-full rounded-2xl px-4 py-3" onChange={(event) => updateIdentityDraft(member.id, { email: event.target.value })} value={draft?.email ?? account?.email ?? ''} />
                       </label>
                       <label className="space-y-2 text-sm text-ink/65">
                         <span className="font-semibold text-ink">Reset password</span>
-                        <input className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta" onChange={(event) => updateIdentityDraft(member.id, { password: event.target.value })} placeholder="Leave blank to keep current password" type="password" value={draft?.password ?? ''} />
+                        <input className="ui-input w-full rounded-2xl px-4 py-3" onChange={(event) => updateIdentityDraft(member.id, { password: event.target.value })} placeholder="Leave blank to keep current password" type="password" value={draft?.password ?? ''} />
                       </label>
                     </div>
 
@@ -665,7 +664,7 @@ export function AdminStaffClient({
                       >
                         {member.on_shift ? 'End shift' : 'Start shift'}
                       </button>
-                      <button className="rounded-full bg-[#27435a] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#1f3647] disabled:opacity-60" disabled={isPending || !account} onClick={() => saveIdentity(member)} type="button">
+                      <button className="ui-button-secondary disabled:opacity-60" disabled={isPending || !account} onClick={() => saveIdentity(member)} type="button">
                         Save identity
                       </button>
                       <button className={`rounded-full px-5 py-3 text-sm font-semibold transition disabled:opacity-60 ${member.active === false ? 'bg-green-100 text-green-800 hover:bg-green-200' : 'bg-red-100 text-red-700 hover:bg-red-200'}`} disabled={isPending || !account} onClick={() => toggleStaffArchive(member)} type="button">
@@ -680,7 +679,7 @@ export function AdminStaffClient({
               })}
 
               {filteredStaff.length === 0 ? (
-                <div className="col-span-full rounded-[1.75rem] border border-dashed border-ink/15 bg-[#fcfaf6] px-6 py-10 text-center text-sm text-ink/55">
+                <div className="ui-panel-muted col-span-full rounded-[1.75rem] border-dashed px-6 py-10 text-center text-sm text-ink/55">
                   No staff members match this filter.
                 </div>
               ) : null}
@@ -699,7 +698,7 @@ export function AdminStaffClient({
               ] as const).map((statusOption) => (
                 <button
                   key={statusOption.value}
-                  className={`rounded-full px-4 py-2 text-sm font-semibold transition disabled:opacity-60 ${historyFilters.status === statusOption.value ? 'bg-ink text-white' : 'border border-ink/12 text-ink hover:bg-parchment'}`}
+                  className={`${historyFilters.status === statusOption.value ? 'ui-chip-active' : 'ui-chip'} disabled:opacity-60`}
                   disabled={isPending}
                   onClick={() => navigateShiftHistory({ shiftPage: undefined, shiftStatus: statusOption.value === 'all' ? undefined : statusOption.value })}
                   type="button"
@@ -712,21 +711,21 @@ export function AdminStaffClient({
             <form className="mt-4 grid gap-4" onSubmit={handleApplyShiftFilters}>
               <label className="space-y-2 text-sm text-ink/65">
                 <span className="font-semibold text-ink">Search staff history</span>
-                <input className="w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 outline-none transition focus:border-terracotta" disabled={isPending} onChange={(event) => setShiftSearchDraft(event.target.value)} placeholder="Search by staff name or role" value={shiftSearchDraft} />
+                <input className="ui-input w-full rounded-2xl px-4 py-3" disabled={isPending} onChange={(event) => setShiftSearchDraft(event.target.value)} placeholder="Search by staff name or role" value={shiftSearchDraft} />
               </label>
               <div className="grid gap-3 md:grid-cols-2">
                 <label className="space-y-2 text-sm text-ink/65">
                   <span className="font-semibold text-ink">From</span>
-                  <input className="w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 outline-none transition focus:border-terracotta" disabled={isPending} onChange={(event) => setShiftFromDateDraft(event.target.value)} type="date" value={shiftFromDateDraft} />
+                  <input className="ui-input w-full rounded-2xl px-4 py-3" disabled={isPending} onChange={(event) => setShiftFromDateDraft(event.target.value)} type="date" value={shiftFromDateDraft} />
                 </label>
                 <label className="space-y-2 text-sm text-ink/65">
                   <span className="font-semibold text-ink">To</span>
-                  <input className="w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 outline-none transition focus:border-terracotta" disabled={isPending} onChange={(event) => setShiftToDateDraft(event.target.value)} type="date" value={shiftToDateDraft} />
+                  <input className="ui-input w-full rounded-2xl px-4 py-3" disabled={isPending} onChange={(event) => setShiftToDateDraft(event.target.value)} type="date" value={shiftToDateDraft} />
                 </label>
               </div>
               <div className="flex flex-wrap gap-3">
-                <button className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90 disabled:opacity-60" disabled={isPending} type="submit">Apply</button>
-                <button className="rounded-full border border-ink/12 px-5 py-3 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-60" disabled={isPending} onClick={handleClearShiftFilters} type="button">Clear</button>
+                <button className="ui-button-primary disabled:opacity-60" disabled={isPending} type="submit">Apply</button>
+                <button className="ui-button-secondary disabled:opacity-60" disabled={isPending} onClick={handleClearShiftFilters} type="button">Clear</button>
               </div>
             </form>
 
@@ -738,7 +737,7 @@ export function AdminStaffClient({
               ] as const).map((preset) => (
                 <button
                   key={preset.value}
-                  className={`rounded-full px-4 py-2 text-sm font-semibold transition disabled:opacity-60 ${activePreset === preset.value ? 'border border-ink bg-ink text-white' : 'border border-ink/12 text-ink hover:bg-parchment'}`}
+                  className={`${activePreset === preset.value ? 'ui-chip-active' : 'ui-chip'} disabled:opacity-60`}
                   disabled={isPending}
                   onClick={() => handleShiftPreset(preset.value)}
                   type="button"
@@ -748,10 +747,10 @@ export function AdminStaffClient({
               ))}
             </div>
 
-            <div className="mt-4 rounded-[1.5rem] bg-[#fcfaf6] px-4 py-4 text-sm text-ink/65">
+            <div className="ui-panel-soft mt-4 rounded-[1.5rem] px-4 py-4 text-sm text-ink/65">
               <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <span>Showing {historyShifts.length} of {totalShiftCount} matching shifts · {visibleRangeLabel}</span>
-                <button className="rounded-full border border-ink/12 px-4 py-2 font-semibold text-ink transition hover:bg-parchment" onClick={handleExportShiftHistory} type="button">
+                <button className="ui-button-secondary px-4 py-2" onClick={handleExportShiftHistory} type="button">
                   Export CSV
                 </button>
               </div>
@@ -762,7 +761,7 @@ export function AdminStaffClient({
                 const member = shift.staff
 
                 return (
-                  <div key={shift.id} className="rounded-2xl bg-[#fcfaf6] p-4">
+                  <div key={shift.id} className="ui-panel-soft rounded-2xl p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="font-semibold text-ink">{member?.name ?? 'Unknown staff member'}</p>
@@ -780,19 +779,19 @@ export function AdminStaffClient({
                 )
               })}
 
-              {historyShifts.length === 0 ? <div className="rounded-2xl bg-[#fcfaf6] px-4 py-6 text-sm text-ink/55">No shifts match the current historical filters.</div> : null}
+              {historyShifts.length === 0 ? <div className="ui-panel-soft rounded-2xl px-4 py-6 text-sm text-ink/55">No shifts match the current historical filters.</div> : null}
             </div>
 
             {totalShiftPages > 1 ? (
               <div className="mt-4 flex items-center justify-between gap-4">
                 <p className="text-sm text-ink/60">Page {currentShiftPage} of {totalShiftPages}</p>
                 <div className="flex flex-wrap items-center gap-2">
-                  <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={isPending || currentShiftPage === 1} onClick={() => navigateShiftHistory({ shiftPage: '1' })} type="button">First</button>
-                  <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={isPending || currentShiftPage === 1} onClick={() => navigateShiftHistory({ shiftPage: String(Math.max(1, currentShiftPage - 1)) })} type="button">Previous</button>
+                  <button className="ui-button-secondary px-4 py-2 text-sm disabled:opacity-50" disabled={isPending || currentShiftPage === 1} onClick={() => navigateShiftHistory({ shiftPage: '1' })} type="button">First</button>
+                  <button className="ui-button-secondary px-4 py-2 text-sm disabled:opacity-50" disabled={isPending || currentShiftPage === 1} onClick={() => navigateShiftHistory({ shiftPage: String(Math.max(1, currentShiftPage - 1)) })} type="button">Previous</button>
                   {visibleShiftPages.map((pageNumber) => (
                     <button
                       key={pageNumber}
-                      className={`min-w-10 rounded-full px-4 py-2 text-sm font-semibold transition disabled:opacity-50 ${pageNumber === currentShiftPage ? 'bg-ink text-white' : 'border border-ink/12 text-ink hover:bg-parchment'}`}
+                      className={`min-w-10 px-4 py-2 text-sm disabled:opacity-50 ${pageNumber === currentShiftPage ? 'ui-chip-active' : 'ui-chip'}`}
                       disabled={isPending || pageNumber === currentShiftPage}
                       onClick={() => navigateShiftHistory({ shiftPage: String(pageNumber) })}
                       type="button"
@@ -800,8 +799,8 @@ export function AdminStaffClient({
                       {pageNumber}
                     </button>
                   ))}
-                  <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={isPending || currentShiftPage === totalShiftPages} onClick={() => navigateShiftHistory({ shiftPage: String(Math.min(totalShiftPages, currentShiftPage + 1)) })} type="button">Next</button>
-                  <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={isPending || currentShiftPage === totalShiftPages} onClick={() => navigateShiftHistory({ shiftPage: String(totalShiftPages) })} type="button">Last</button>
+                  <button className="ui-button-secondary px-4 py-2 text-sm disabled:opacity-50" disabled={isPending || currentShiftPage === totalShiftPages} onClick={() => navigateShiftHistory({ shiftPage: String(Math.min(totalShiftPages, currentShiftPage + 1)) })} type="button">Next</button>
+                  <button className="ui-button-secondary px-4 py-2 text-sm disabled:opacity-50" disabled={isPending || currentShiftPage === totalShiftPages} onClick={() => navigateShiftHistory({ shiftPage: String(totalShiftPages) })} type="button">Last</button>
                 </div>
               </div>
             ) : null}

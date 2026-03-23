@@ -76,10 +76,10 @@ export function LoginForm({ configError, inactiveError, nextPath }: LoginFormPro
   }
 
   return (
-    <main className="relative overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(169,124,80,0.24),_transparent_45%),linear-gradient(135deg,_#11202f_0%,_#21384f_46%,_#f7f1e8_46%,_#f7f1e8_100%)] px-6 py-12 text-white md:px-10">
+    <main className="relative overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(123,200,164,0.24),_transparent_45%),linear-gradient(135deg,_#0f3d2e_0%,_#1f6b52_46%,_#f9fffc_46%,_#f9fffc_100%)] px-6 py-12 text-white md:px-10">
       <div className="mx-auto grid min-h-[calc(100vh-6rem)] max-w-7xl gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
         <section className="space-y-8">
-          <span className="inline-flex rounded-full border border-white/20 px-4 py-1 text-xs uppercase tracking-[0.32em] text-white/75">
+          <span className="inline-flex rounded-full border border-white/20 bg-white/6 px-4 py-1.5 text-xs uppercase tracking-[0.32em] text-white/78 backdrop-blur">
             University Hotel
           </span>
           <div className="space-y-4">
@@ -92,26 +92,26 @@ export function LoginForm({ configError, inactiveError, nextPath }: LoginFormPro
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className="rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur">
+            <div className="rounded-3xl border border-white/15 bg-white/10 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur">
               <p className="text-xs uppercase tracking-[0.28em] text-white/60">Reception</p>
               <p className="mt-3 text-2xl font-semibold">Check-in, checkout, services</p>
             </div>
-            <div className="rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur">
+            <div className="rounded-3xl border border-white/15 bg-white/10 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur">
               <p className="text-xs uppercase tracking-[0.28em] text-white/60">Access</p>
               <p className="mt-3 text-2xl font-semibold">Access codes, entry log, audit trail</p>
             </div>
-            <div className="rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur">
+            <div className="rounded-3xl border border-white/15 bg-white/10 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur">
               <p className="text-xs uppercase tracking-[0.28em] text-white/60">Admin</p>
               <p className="mt-3 text-2xl font-semibold">Rooms, finance, staff control</p>
             </div>
           </div>
         </section>
 
-        <section className="rounded-[2rem] bg-parchment p-8 text-ink shadow-card">
-          <p className="text-sm uppercase tracking-[0.24em] text-terracotta">Supabase Auth</p>
+        <section className="ui-panel p-8 text-ink shadow-[0_32px_80px_-34px_rgba(15,61,46,0.42)]">
+          <p className="text-sm uppercase tracking-[0.24em] text-accent">Supabase Auth</p>
           <h2 className="mt-3 font-[family-name:var(--font-display)] text-4xl leading-tight">Login</h2>
           {continueMessage ? (
-            <div className="mt-4 rounded-2xl bg-green-50 px-4 py-3 text-sm text-green-800">
+            <div className="mt-4 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
               {continueMessage}
             </div>
           ) : null}
@@ -119,7 +119,7 @@ export function LoginForm({ configError, inactiveError, nextPath }: LoginFormPro
             <label className="block space-y-2">
               <span className="text-sm font-semibold text-ink/75">Email</span>
               <input
-                className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 text-base outline-none transition focus:border-terracotta"
+                className="ui-input w-full rounded-2xl px-4 py-3 text-base"
                 type="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
@@ -130,7 +130,7 @@ export function LoginForm({ configError, inactiveError, nextPath }: LoginFormPro
             <label className="block space-y-2">
               <span className="text-sm font-semibold text-ink/75">Password</span>
               <input
-                className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 text-base outline-none transition focus:border-terracotta"
+                className="ui-input w-full rounded-2xl px-4 py-3 text-base"
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
@@ -156,7 +156,7 @@ export function LoginForm({ configError, inactiveError, nextPath }: LoginFormPro
             ) : null}
 
             <button
-              className="w-full rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white transition hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-60"
+              className="ui-button-primary w-full disabled:cursor-not-allowed disabled:opacity-60"
               type="submit"
               disabled={isPending}
             >
@@ -165,12 +165,12 @@ export function LoginForm({ configError, inactiveError, nextPath }: LoginFormPro
           </form>
 
           <div className="mt-8 space-y-4">
-            <Link className="flex items-center justify-between rounded-2xl border border-ink/10 bg-white p-4 text-sm font-semibold text-ink transition hover:border-terracotta hover:text-terracotta" href="/attendance">
+            <Link className="ui-link-card flex items-center justify-between rounded-2xl p-4 text-sm font-semibold" href="/attendance">
               <span>Staff attendance portal</span>
               <span>Open</span>
             </Link>
             {checkpoints.map((item) => (
-              <div key={item} className="flex gap-4 rounded-2xl border border-ink/10 bg-white p-4">
+              <div key={item} className="ui-panel flex gap-4 rounded-2xl p-4">
                 <div className="mt-1 h-3 w-3 rounded-full bg-pine" />
                 <p className="text-sm text-ink/80">{item}</p>
               </div>

@@ -201,16 +201,12 @@ export function ReceptionServicesClient({ activeBookings, serviceCharges }: Rece
   }
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,_#11202f_0%,_#11202f_24%,_#f7f1e8_24%,_#f7f1e8_100%)] px-6 py-10 text-ink md:px-10">
+    <main className="min-h-screen bg-[linear-gradient(180deg,_#0f3d2e_0%,_#155d45_24%,_#f9fffc_24%,_#f9fffc_100%)] px-6 py-10 text-ink md:px-10" data-smoke-id="reception-services">
+      <span className="sr-only">smoke:reception-services</span>
       <div className="mx-auto max-w-7xl space-y-6">
-        <header className="flex flex-col gap-4 text-white lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm uppercase tracking-[0.28em] text-white/65">Reception Desk</p>
-            <h1 className="font-[family-name:var(--font-display)] text-5xl">Live service charges</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-white/72">
-              Reception can log and complete services, but finance closure now stays under admin review so money cannot be silently cleared from the desk.
-            </p>
-          </div>
+        <header className="text-white">
+          <h1 className="font-[family-name:var(--font-display)] text-3xl md:text-[2.2rem]">Service charges</h1>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-white/72">Log service charges at the desk while finance confirmation stays under admin review.</p>
         </header>
 
         {errorMessage ? <div className="rounded-2xl bg-red-50 px-5 py-4 text-sm text-red-700">{errorMessage}</div> : null}
@@ -225,9 +221,9 @@ export function ReceptionServicesClient({ activeBookings, serviceCharges }: Rece
             <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Open requests</p>
             <p className="mt-3 text-4xl font-semibold text-ink">{unresolvedCharges.length}</p>
           </article>
-          <article className="rounded-[1.75rem] border border-[#d6c1a0] bg-[#fff6ea] p-5 shadow-card">
+          <article className="rounded-[1.75rem] border border-status-warning/25 bg-status-warning-soft p-5 shadow-card">
             <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Awaiting admin receipt</p>
-            <p className="mt-3 text-4xl font-semibold text-terracotta">{awaitingConfirmationCharges.length}</p>
+            <p className="mt-3 text-4xl font-semibold text-accent">{awaitingConfirmationCharges.length}</p>
           </article>
           <article className="rounded-[1.75rem] border border-white/40 bg-white/85 p-5 shadow-card backdrop-blur">
             <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Pending value</p>
@@ -235,8 +231,8 @@ export function ReceptionServicesClient({ activeBookings, serviceCharges }: Rece
           </article>
         </section>
 
-        <section className="rounded-[2rem] border border-[#d6c1a0] bg-[#fff8ef] p-6 shadow-card">
-          <p className="text-sm uppercase tracking-[0.24em] text-terracotta">Cash control</p>
+        <section className="rounded-[2rem] border border-status-warning/25 bg-status-warning-soft p-6 shadow-card">
+          <p className="text-sm uppercase tracking-[0.24em] text-accent">Cash control</p>
           <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl text-ink">Service completion is no longer receipt confirmation</h2>
           <p className="mt-3 max-w-4xl text-sm leading-6 text-ink/70">
             Marking a request as complete now only says the guest received the service. The money side stays visible to admin until receipt is reviewed and a matching payment entry is posted on the finance board.
@@ -251,7 +247,7 @@ export function ReceptionServicesClient({ activeBookings, serviceCharges }: Rece
                 <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl">Add to an active stay</h2>
               </div>
               {selectedBooking ? (
-                <div className="rounded-2xl bg-parchment px-4 py-3 text-right">
+                <div className="ui-panel-soft px-4 py-3 text-right">
                   <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Selected stay</p>
                   <p className="text-sm font-semibold text-ink">Room {selectedBooking.rooms?.number ?? 'N/A'}</p>
                   <p className="text-sm text-ink/65">{selectedBooking.guest_name}</p>
@@ -263,7 +259,7 @@ export function ReceptionServicesClient({ activeBookings, serviceCharges }: Rece
               <label className="space-y-2">
                 <span className="text-sm font-semibold text-ink/75">Active booking</span>
                 <select
-                  className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta"
+                  className="ui-input"
                   onChange={(event) => setSelectedBookingId(event.target.value)}
                   value={selectedBookingId}
                 >
@@ -299,7 +295,7 @@ export function ReceptionServicesClient({ activeBookings, serviceCharges }: Rece
                 <label className="space-y-2">
                   <span className="text-sm font-semibold text-ink/75">Amount (GHS)</span>
                   <input
-                    className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta"
+                    className="ui-input"
                     inputMode="decimal"
                     onChange={(event) => setAmountGhs(event.target.value)}
                     placeholder="120"
@@ -309,7 +305,7 @@ export function ReceptionServicesClient({ activeBookings, serviceCharges }: Rece
                 <label className="space-y-2">
                   <span className="text-sm font-semibold text-ink/75">Description</span>
                   <input
-                    className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta"
+                    className="ui-input"
                     onChange={(event) => setDescription(event.target.value)}
                     placeholder="Two shirts and one trouser for same-day delivery"
                     value={description}
@@ -317,7 +313,7 @@ export function ReceptionServicesClient({ activeBookings, serviceCharges }: Rece
                 </label>
               </div>
 
-              <button className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#1e2735] disabled:opacity-60" disabled={isPending || activeBookings.length === 0} type="submit">
+              <button className="ui-button-primary disabled:opacity-60" disabled={isPending || activeBookings.length === 0} type="submit">
                 Add service charge
               </button>
             </form>
@@ -329,7 +325,7 @@ export function ReceptionServicesClient({ activeBookings, serviceCharges }: Rece
                 <p className="text-sm uppercase tracking-[0.24em] text-ink/45">Open service ledger</p>
                 <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl">Complete active requests</h2>
               </div>
-              <div className="rounded-2xl bg-[#f8f5f0] px-4 py-3 text-right">
+              <div className="ui-panel-soft px-4 py-3 text-right">
                 <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Open value</p>
                 <p className="text-2xl font-semibold text-ink">{formatGHS(pendingValue)}</p>
               </div>
@@ -339,7 +335,7 @@ export function ReceptionServicesClient({ activeBookings, serviceCharges }: Rece
               <label className="block lg:max-w-md lg:flex-1">
                 <span className="text-sm font-semibold text-ink/75">Search service ledger</span>
                 <input
-                  className="mt-2 w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 text-sm outline-none transition focus:border-terracotta"
+                  className="ui-input mt-2 bg-surface-sunken text-sm"
                   onChange={(event) => {
                     setSearchQuery(event.target.value)
                     setOpenPage(1)
@@ -349,12 +345,12 @@ export function ReceptionServicesClient({ activeBookings, serviceCharges }: Rece
                   value={searchQuery}
                 />
               </label>
-              <div className="rounded-2xl bg-[#fcfaf6] px-4 py-3 text-sm text-ink/65">Showing {openPageData.items.length} of {unresolvedCharges.length} open requests</div>
+              <div className="ui-panel-soft px-4 py-3 text-sm text-ink/65">Showing {openPageData.items.length} of {unresolvedCharges.length} open requests</div>
             </div>
 
             <div className="mt-6 space-y-4">
               {openPageData.items.map((charge) => (
-                <article key={charge.id} className="rounded-[1.5rem] border border-ink/10 bg-[#fcfaf6] p-5">
+                <article key={charge.id} className="ui-panel p-5 bg-surface-sunken">
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                     <div className="space-y-2">
                       <div className="flex flex-wrap items-center gap-3">
@@ -381,7 +377,7 @@ export function ReceptionServicesClient({ activeBookings, serviceCharges }: Rece
               ))}
 
               {openPageData.items.length === 0 ? (
-                <div className="rounded-[1.5rem] border border-dashed border-ink/15 bg-[#fcfaf6] px-6 py-10 text-center text-sm text-ink/55">
+                <div className="ui-panel-muted px-6 py-10 text-center text-sm text-ink/55">
                   No open service requests match the current search.
                 </div>
               ) : null}
@@ -391,8 +387,8 @@ export function ReceptionServicesClient({ activeBookings, serviceCharges }: Rece
               <div className="mt-4 flex items-center justify-between gap-4">
                 <p className="text-sm text-ink/60">Page {openPageData.page} of {openPageData.totalPages}</p>
                 <div className="flex gap-3">
-                  <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={openPageData.page === 1} onClick={() => setOpenPage((current) => Math.max(1, current - 1))} type="button">Previous</button>
-                  <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={openPageData.page === openPageData.totalPages} onClick={() => setOpenPage((current) => Math.min(openPageData.totalPages, current + 1))} type="button">Next</button>
+                  <button className="ui-button-secondary px-4 py-2 disabled:opacity-50" disabled={openPageData.page === 1} onClick={() => setOpenPage((current) => Math.max(1, current - 1))} type="button">Previous</button>
+                  <button className="ui-button-secondary px-4 py-2 disabled:opacity-50" disabled={openPageData.page === openPageData.totalPages} onClick={() => setOpenPage((current) => Math.min(openPageData.totalPages, current + 1))} type="button">Next</button>
                 </div>
               </div>
             ) : null}
@@ -405,15 +401,15 @@ export function ReceptionServicesClient({ activeBookings, serviceCharges }: Rece
               <p className="text-sm uppercase tracking-[0.24em] text-ink/45">Service history</p>
               <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl">Awaiting review and confirmed receipts</h2>
             </div>
-            <div className="rounded-2xl bg-[#f8f5f0] px-4 py-3 text-right">
+            <div className="ui-panel-soft rounded-2xl px-4 py-3 text-right">
               <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Awaiting admin</p>
-              <p className="text-2xl font-semibold text-terracotta">{awaitingConfirmationCharges.length}</p>
+              <p className="text-2xl font-semibold text-accent">{awaitingConfirmationCharges.length}</p>
             </div>
           </div>
 
           <div className="mt-6 grid gap-4 lg:grid-cols-2">
             {historyPageData.items.map((charge) => (
-              <article key={charge.id} className="rounded-[1.5rem] bg-parchment p-5">
+              <article key={charge.id} className="ui-panel-soft p-5">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="text-sm font-semibold uppercase tracking-[0.18em] text-ink/60">{charge.type}</p>
@@ -432,7 +428,7 @@ export function ReceptionServicesClient({ activeBookings, serviceCharges }: Rece
             ))}
 
             {historyPageData.items.length === 0 ? (
-              <div className="rounded-[1.5rem] border border-dashed border-ink/15 bg-[#fcfaf6] px-6 py-10 text-center text-sm text-ink/55">
+              <div className="ui-panel-muted px-6 py-10 text-center text-sm text-ink/55">
                 No service history matches the current search.
               </div>
             ) : null}
@@ -442,8 +438,8 @@ export function ReceptionServicesClient({ activeBookings, serviceCharges }: Rece
             <div className="mt-4 flex items-center justify-between gap-4">
               <p className="text-sm text-ink/60">Page {historyPageData.page} of {historyPageData.totalPages}</p>
               <div className="flex gap-3">
-                <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={historyPageData.page === 1} onClick={() => setHistoryPage((current) => Math.max(1, current - 1))} type="button">Previous</button>
-                <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={historyPageData.page === historyPageData.totalPages} onClick={() => setHistoryPage((current) => Math.min(historyPageData.totalPages, current + 1))} type="button">Next</button>
+                <button className="ui-button-secondary px-4 py-2 disabled:opacity-50" disabled={historyPageData.page === 1} onClick={() => setHistoryPage((current) => Math.max(1, current - 1))} type="button">Previous</button>
+                <button className="ui-button-secondary px-4 py-2 disabled:opacity-50" disabled={historyPageData.page === historyPageData.totalPages} onClick={() => setHistoryPage((current) => Math.min(historyPageData.totalPages, current + 1))} type="button">Next</button>
               </div>
             </div>
           ) : null}

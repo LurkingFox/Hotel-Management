@@ -4,16 +4,24 @@ import Link from 'next/link'
 import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 
+import { GuestPortalHandoffCard } from '@/components/guest-portal-handoff-card'
 import type { BookingAccessPresentation } from '@/lib/access-provider/types'
 import { formatDate, formatGHS } from '@/lib/utils/format'
 import type { Database } from '@/lib/supabase/types'
 
 type RoomRow = Database['public']['Tables']['rooms']['Row']
 type BookingRow = Database['public']['Tables']['bookings']['Row']
+type GuestProfileRow = Database['public']['Tables']['guest_profiles']['Row']
+type AccessCredentialRow = Database['public']['Tables']['booking_access_credentials']['Row']
 type BookingStatus = Database['public']['Enums']['booking_status']
 type PayMethod = Database['public']['Enums']['pay_method']
+type GuestKycStatus = Database['public']['Enums']['guest_kyc_status']
 
 type BookingWithRoom = BookingRow & {
+  guest_profiles:
+    | Pick<GuestProfileRow, 'id' | 'full_name' | 'phone' | 'email' | 'kyc_status' | 'nationality'>
+    | Array<Pick<GuestProfileRow, 'id' | 'full_name' | 'phone' | 'email' | 'kyc_status' | 'nationality'>>
+    | null
   rooms: Pick<RoomRow, 'id' | 'number' | 'type' | 'rate_ghs' | 'status'> | null
 }
 
@@ -24,7 +32,9 @@ type PendingExtensionAudit = Pick<
 
 type AdminBookingsClientProps = {
   accessPresentation: BookingAccessPresentation
+  accessCredentials: Array<Pick<AccessCredentialRow, 'booking_id' | 'credential_code' | 'status' | 'valid_until'>>
   bookings: BookingWithRoom[]
+  guestPortalLinks: Map<string, string>
   pendingExtensionAudits: PendingExtensionAudit[]
   rooms: RoomRow[]
 }
@@ -61,6 +71,13 @@ const statusStyles: Record<BookingStatus, string> = {
   cancelled: 'bg-red-50 border-red-200 text-red-800'
 }
 
+const kycStyles: Record<GuestKycStatus, string> = {
+  not_started: 'bg-stone-100 border-stone-200 text-stone-700',
+  pending: 'bg-amber-50 border-amber-200 text-amber-800',
+  verified: 'bg-green-50 border-green-200 text-green-800',
+  rejected: 'bg-red-50 border-red-200 text-red-700'
+}
+
 const paymentMethods: Array<{ label: string; tone: string; value: PayMethod }> = [
   { label: 'Cash', value: 'cash', tone: 'bg-green-100 text-green-800' },
   { label: 'MoMo', value: 'momo', tone: 'bg-blue-100 text-blue-800' },
@@ -77,7 +94,15 @@ function getNightCount(checkIn: string, checkOut: string) {
   return Math.max(1, Math.ceil(difference / 86400000))
 }
 
-export function AdminBookingsClient({ accessPresentation, bookings, pendingExtensionAudits, rooms }: AdminBookingsClientProps) {
+function getGuestProfile(profile: BookingWithRoom['guest_profiles']) {
+  return Array.isArray(profile) ? profile[0] ?? null : profile
+}
+
+function formatLabel(value: string) {
+  return value.replace(/_/g, ' ')
+}
+
+export function AdminBookingsClient({ accessPresentation, accessCredentials, bookings, guestPortalLinks, pendingExtensionAudits, rooms }: AdminBookingsClientProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [activeFilter, setActiveFilter] = useState<'all' | BookingStatus | 'pending_confirmation'>('all')
@@ -90,6 +115,10 @@ export function AdminBookingsClient({ accessPresentation, bookings, pendingExten
   const pendingAuditByBookingId = useMemo(
     () => new Map(pendingExtensionAudits.map((audit) => [audit.booking_id, audit])),
     [pendingExtensionAudits]
+  )
+  const activeCredentialByBookingId = useMemo(
+    () => new Map(accessCredentials.filter((credential) => credential.credential_code).map((credential) => [credential.booking_id, credential])),
+    [accessCredentials]
   )
 
   const filteredBookings = useMemo(() => {
@@ -122,6 +151,10 @@ export function AdminBookingsClient({ accessPresentation, bookings, pendingExten
   function refreshWithMessage(message: string) {
     setSuccessMessage(message)
     router.refresh()
+  }
+
+  function getGuestPortalHref(bookingId: string) {
+    return guestPortalLinks.get(bookingId) ?? null
   }
 
   function runAction(body: Record<string, unknown>, successText: string) {
@@ -220,17 +253,12 @@ export function AdminBookingsClient({ accessPresentation, bookings, pendingExten
   }
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,_#11202f_0%,_#11202f_24%,_#f7f1e8_24%,_#f7f1e8_100%)] px-6 py-10 text-ink md:px-10">
+    <main className="min-h-screen bg-[linear-gradient(180deg,_#0f3d2e_0%,_#155d45_24%,_#f9fffc_24%,_#f9fffc_100%)] px-6 py-10 text-ink md:px-10" data-smoke-id="admin-bookings">
+      <span className="sr-only">smoke:admin-bookings</span>
       <div className="mx-auto max-w-7xl space-y-6">
-        <header className="flex flex-col gap-4 text-white lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm uppercase tracking-[0.28em] text-white/70">Admin Tower</p>
-            <h1 className="font-[family-name:var(--font-display)] text-5xl">Live bookings command board</h1>
-            <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-white/75">
-              <span className="rounded-full border border-white/20 px-3 py-1 font-semibold">{accessPresentation.providerLabel}</span>
-            </div>
-            {accessPresentation.statusNote ? <p className="mt-3 max-w-3xl text-sm leading-6 text-white/72">{accessPresentation.statusNote}</p> : null}
-          </div>
+        <header className="text-white">
+          <h1 className="font-[family-name:var(--font-display)] text-3xl md:text-[2.2rem]">Guest stays</h1>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-white/72">Manage arrivals, in-house stays, extensions, cancellations, and checkout progress.</p>
         </header>
 
         {errorMessage ? <div className="rounded-2xl bg-red-50 px-5 py-4 text-sm text-red-700">{errorMessage}</div> : null}
@@ -269,7 +297,7 @@ export function AdminBookingsClient({ accessPresentation, bookings, pendingExten
               {(['all', 'pending_confirmation', 'reserved', 'active', 'checked_out', 'cancelled'] as const).map((filter) => (
                 <button
                   key={filter}
-                  className={`rounded-full px-5 py-3 text-sm font-semibold transition ${activeFilter === filter ? 'bg-ink text-white' : 'bg-parchment text-ink hover:bg-[#eadfce]'}`}
+                  className={activeFilter === filter ? 'ui-chip-active' : 'ui-chip'}
                   onClick={() => setActiveFilter(filter)}
                   type="button"
                 >
@@ -291,15 +319,21 @@ export function AdminBookingsClient({ accessPresentation, bookings, pendingExten
               const extensionRate = booking.rooms?.rate_ghs ?? rooms.find((room) => room.id === booking.room_id)?.rate_ghs ?? 0
               const extensionTotal = extensionRate * getNightCount(booking.check_in, extensionDate)
               const extensionIncrease = Math.max(0, extensionTotal - booking.total_ghs)
+              const guestProfile = getGuestProfile(booking.guest_profiles)
+              const credential = activeCredentialByBookingId.get(booking.id)
+              const guestPortalHref = getGuestPortalHref(booking.id)
 
               return (
-                <article key={booking.id} className="rounded-[1.75rem] border border-ink/10 bg-[#fcfaf6] p-5">
+                <article key={booking.id} className="ui-panel-soft rounded-[1.75rem] p-5">
                   <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                     <div className="space-y-3">
                       <div className="flex flex-wrap items-center gap-3">
                         <h3 className="text-2xl font-semibold text-ink">{booking.guest_name}</h3>
                         <span className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase ${statusStyles[booking.status]}`}>
                           {booking.status.replace('_', ' ')}
+                        </span>
+                        <span className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase ${guestProfile ? kycStyles[guestProfile.kyc_status] : 'bg-stone-100 border-stone-200 text-stone-700'}`}>
+                          {guestProfile ? formatLabel(guestProfile.kyc_status) : 'profile linked'}
                         </span>
                         {pendingAudit ? (
                           <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold uppercase text-amber-800">
@@ -332,8 +366,12 @@ export function AdminBookingsClient({ accessPresentation, bookings, pendingExten
                     </div>
 
                     <div className="rounded-2xl bg-white px-4 py-3 text-sm text-ink/70">
-                      <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Phone</p>
-                      <p className="mt-1 font-semibold text-ink">{booking.guest_phone || 'Not provided'}</p>
+                      <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Guest profile</p>
+                      <p className="mt-1 font-semibold text-ink">{guestProfile?.email || booking.guest_phone || 'No contact captured'}</p>
+                      <p className="mt-1 text-xs text-ink/55">{guestProfile?.nationality || 'Nationality not captured'}</p>
+                      <Link className="mt-2 inline-flex font-semibold text-ink underline-offset-4 hover:underline" href="/admin/guests">
+                        Open guest workspace
+                      </Link>
                     </div>
                   </div>
 
@@ -371,7 +409,7 @@ export function AdminBookingsClient({ accessPresentation, bookings, pendingExten
                         <label className="space-y-2">
                           <span className="text-sm font-semibold text-ink/75">Cancel note</span>
                           <input
-                            className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta"
+                            className="ui-input w-full rounded-2xl px-4 py-3"
                             onChange={(event) => setCancelNotes((current) => ({ ...current, [booking.id]: event.target.value }))}
                             placeholder="Optional reason"
                             value={cancelNotes[booking.id] ?? ''}
@@ -380,7 +418,7 @@ export function AdminBookingsClient({ accessPresentation, bookings, pendingExten
                       </div>
                       <div className="flex flex-wrap items-end gap-3 xl:justify-end">
                         <button
-                          className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90 disabled:opacity-60"
+                          className="ui-button-primary disabled:opacity-60"
                           disabled={isPending}
                           onClick={() => handleCheckIn(booking)}
                           type="button"
@@ -407,7 +445,7 @@ export function AdminBookingsClient({ accessPresentation, bookings, pendingExten
                           <label className="space-y-2">
                             <span className="text-sm font-semibold text-ink/75">New checkout date</span>
                             <input
-                              className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta"
+                              className="ui-input w-full rounded-2xl px-4 py-3"
                               min={booking.check_out_expected}
                               onChange={(event) => setExtendDates((current) => ({ ...current, [booking.id]: event.target.value }))}
                               type="date"
@@ -416,7 +454,7 @@ export function AdminBookingsClient({ accessPresentation, bookings, pendingExten
                           </label>
                           <div className="flex items-end">
                             <button
-                              className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90 disabled:opacity-60"
+                              className="ui-button-primary disabled:opacity-60"
                               disabled={isPending}
                               onClick={() => handleExtend(booking)}
                               type="button"
@@ -450,7 +488,7 @@ export function AdminBookingsClient({ accessPresentation, bookings, pendingExten
                           <label className="space-y-2">
                             <span className="text-sm font-semibold text-ink/75">Settlement amount (GHS)</span>
                             <input
-                              className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta"
+                              className="ui-input w-full rounded-2xl px-4 py-3"
                               min="0"
                               onChange={(event) =>
                                 setCheckoutSettlement((current) => ({
@@ -466,7 +504,7 @@ export function AdminBookingsClient({ accessPresentation, bookings, pendingExten
                           <label className="space-y-2">
                             <span className="text-sm font-semibold text-ink/75">Reference</span>
                             <input
-                              className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta"
+                              className="ui-input w-full rounded-2xl px-4 py-3"
                               onChange={(event) =>
                                 setCheckoutSettlement((current) => ({
                                   ...current,
@@ -479,7 +517,7 @@ export function AdminBookingsClient({ accessPresentation, bookings, pendingExten
                           </label>
                         </div>
                         <button
-                          className="mt-4 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink/90 disabled:opacity-60"
+                          className="ui-button-primary mt-4 disabled:opacity-60"
                           disabled={isPending}
                           onClick={() => handleCheckout(booking)}
                           type="button"
@@ -487,6 +525,35 @@ export function AdminBookingsClient({ accessPresentation, bookings, pendingExten
                           Checkout guest
                         </button>
                       </div>
+
+                      {credential && guestPortalHref ? (
+                        <div className="space-y-4 rounded-[1.5rem] bg-white p-5">
+                          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                            <div>
+                              <p className="text-sm uppercase tracking-[0.24em] text-ink/45">Guest portal handoff</p>
+                              <h4 className="mt-2 text-xl font-semibold text-ink">Share balance and request access from admin</h4>
+                              <p className="mt-2 text-sm leading-6 text-ink/65">
+                                Open the guest portal directly, or hand the guest a scannable slip without sending them back to reception.
+                              </p>
+                            </div>
+                            <Link
+                              className="ui-button-primary inline-flex"
+                              href={guestPortalHref}
+                              rel="noreferrer"
+                              target="_blank"
+                            >
+                              Open guest portal
+                            </Link>
+                          </div>
+
+                          <GuestPortalHandoffCard
+                            guestName={booking.guest_name}
+                            portalHref={guestPortalHref}
+                            roomLabel={booking.rooms ? `Room ${booking.rooms.number}` : 'Current stay'}
+                            validUntil={credential.valid_until}
+                          />
+                        </div>
+                      ) : null}
                     </div>
                   ) : null}
                 </article>
@@ -494,7 +561,7 @@ export function AdminBookingsClient({ accessPresentation, bookings, pendingExten
             })}
 
             {filteredBookings.length === 0 ? (
-              <div className="rounded-[1.75rem] border border-dashed border-ink/15 bg-[#fcfaf6] px-6 py-10 text-center text-sm text-ink/55">
+              <div className="ui-panel-muted rounded-[1.75rem] border-dashed px-6 py-10 text-center text-sm text-ink/55">
                 No bookings match this filter.
               </div>
             ) : null}

@@ -77,7 +77,8 @@ export function AttendanceClient({ dashboardHref, role, shifts, staff }: Attenda
   }
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,_#11202f_0%,_#11202f_24%,_#f7f1e8_24%,_#f7f1e8_100%)] px-6 py-10 text-white md:px-10">
+    <main className="min-h-screen bg-[linear-gradient(180deg,_#0f3d2e_0%,_#155d45_24%,_#f9fffc_24%,_#f9fffc_100%)] px-6 py-10 text-white md:px-10" data-smoke-id="reception-attendance">
+      <span className="sr-only">smoke:reception-attendance</span>
       <div className="mx-auto max-w-6xl space-y-6">
         <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>

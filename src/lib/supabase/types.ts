@@ -89,6 +89,7 @@ export type Database = {
           check_out_expected: string
           created_at: string | null
           guest_name: string
+          guest_profile_id: string | null
           guest_phone: string | null
           id: string
           nights: number
@@ -105,6 +106,7 @@ export type Database = {
           check_out_expected: string
           created_at?: string | null
           guest_name: string
+          guest_profile_id?: string | null
           guest_phone?: string | null
           id?: string
           nights: number
@@ -121,6 +123,7 @@ export type Database = {
           check_out_expected?: string
           created_at?: string | null
           guest_name?: string
+          guest_profile_id?: string | null
           guest_phone?: string | null
           id?: string
           nights?: number
@@ -130,6 +133,13 @@ export type Database = {
           total_ghs?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "bookings_guest_profile_id_fkey"
+            columns: ["guest_profile_id"]
+            isOneToOne: false
+            referencedRelation: "guest_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "bookings_room_id_fkey"
             columns: ["room_id"]
@@ -351,6 +361,328 @@ export type Database = {
         }
         Relationships: []
       }
+      guest_identity_documents: {
+        Row: {
+          created_at: string
+          document_number: string
+          document_type: Database["public"]["Enums"]["identity_document_type"]
+          expires_on: string | null
+          guest_profile_id: string
+          id: string
+          issued_on: string | null
+          issuing_country: string | null
+          status: Database["public"]["Enums"]["identity_document_status"]
+          updated_at: string
+          verification_notes: string | null
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          document_number: string
+          document_type: Database["public"]["Enums"]["identity_document_type"]
+          expires_on?: string | null
+          guest_profile_id: string
+          id?: string
+          issued_on?: string | null
+          issuing_country?: string | null
+          status?: Database["public"]["Enums"]["identity_document_status"]
+          updated_at?: string
+          verification_notes?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          document_number?: string
+          document_type?: Database["public"]["Enums"]["identity_document_type"]
+          expires_on?: string | null
+          guest_profile_id?: string
+          id?: string
+          issued_on?: string | null
+          issuing_country?: string | null
+          status?: Database["public"]["Enums"]["identity_document_status"]
+          updated_at?: string
+          verification_notes?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guest_identity_documents_guest_profile_id_fkey"
+            columns: ["guest_profile_id"]
+            isOneToOne: false
+            referencedRelation: "guest_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guest_profiles: {
+        Row: {
+          city: string | null
+          created_at: string
+          date_of_birth: string | null
+          email: string | null
+          full_name: string
+          id: string
+          kyc_notes: string | null
+          kyc_status: Database["public"]["Enums"]["guest_kyc_status"]
+          last_stayed_at: string | null
+          nationality: string | null
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          kyc_notes?: string | null
+          kyc_status?: Database["public"]["Enums"]["guest_kyc_status"]
+          last_stayed_at?: string | null
+          nationality?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          kyc_notes?: string | null
+          kyc_status?: Database["public"]["Enums"]["guest_kyc_status"]
+          last_stayed_at?: string | null
+          nationality?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      operational_handoff_items: {
+        Row: {
+          booking_id: string | null
+          created_at: string
+          detail: string | null
+          due_at: string | null
+          handoff_id: string
+          id: string
+          item_type: Database["public"]["Enums"]["operational_handoff_item_type"]
+          owner_role: string | null
+          priority: Database["public"]["Enums"]["operational_handoff_priority"]
+          resolved: boolean
+          resolved_at: string | null
+          resolved_by: string | null
+          room_id: string | null
+          service_request_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string
+          detail?: string | null
+          due_at?: string | null
+          handoff_id: string
+          id?: string
+          item_type: Database["public"]["Enums"]["operational_handoff_item_type"]
+          owner_role?: string | null
+          priority?: Database["public"]["Enums"]["operational_handoff_priority"]
+          resolved?: boolean
+          resolved_at?: string | null
+          resolved_by?: string | null
+          room_id?: string | null
+          service_request_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string
+          detail?: string | null
+          due_at?: string | null
+          handoff_id?: string
+          id?: string
+          item_type?: Database["public"]["Enums"]["operational_handoff_item_type"]
+          owner_role?: string | null
+          priority?: Database["public"]["Enums"]["operational_handoff_priority"]
+          resolved?: boolean
+          resolved_at?: string | null
+          resolved_by?: string | null
+          room_id?: string | null
+          service_request_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operational_handoff_items_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operational_handoff_items_handoff_id_fkey"
+            columns: ["handoff_id"]
+            isOneToOne: false
+            referencedRelation: "operational_handoffs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operational_handoff_items_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operational_handoff_items_service_request_id_fkey"
+            columns: ["service_request_id"]
+            isOneToOne: false
+            referencedRelation: "service_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      operational_handoffs: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          acknowledged_by_staff_id: string | null
+          closed_at: string | null
+          created_at: string
+          created_by_name: string
+          created_by_role: string | null
+          created_by_staff_id: string | null
+          handoff_scope: string
+          id: string
+          shift_id: string | null
+          status: Database["public"]["Enums"]["operational_handoff_status"]
+          summary: string | null
+          updated_at: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          acknowledged_by_staff_id?: string | null
+          closed_at?: string | null
+          created_at?: string
+          created_by_name: string
+          created_by_role?: string | null
+          created_by_staff_id?: string | null
+          handoff_scope?: string
+          id?: string
+          shift_id?: string | null
+          status?: Database["public"]["Enums"]["operational_handoff_status"]
+          summary?: string | null
+          updated_at?: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          acknowledged_by_staff_id?: string | null
+          closed_at?: string | null
+          created_at?: string
+          created_by_name?: string
+          created_by_role?: string | null
+          created_by_staff_id?: string | null
+          handoff_scope?: string
+          id?: string
+          shift_id?: string | null
+          status?: Database["public"]["Enums"]["operational_handoff_status"]
+          summary?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operational_handoffs_acknowledged_by_staff_id_fkey"
+            columns: ["acknowledged_by_staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operational_handoffs_created_by_staff_id_fkey"
+            columns: ["created_by_staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operational_handoffs_shift_id_fkey"
+            columns: ["shift_id"]
+            isOneToOne: false
+            referencedRelation: "shifts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      manager_approvals: {
+        Row: {
+          approval_type: Database["public"]["Enums"]["manager_approval_type"]
+          booking_id: string | null
+          detail: string | null
+          id: string
+          metadata: Json
+          requested_at: string
+          requested_by: string
+          requested_by_role: string | null
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["manager_approval_status"]
+          target_id: string | null
+          target_table: string | null
+          title: string
+        }
+        Insert: {
+          approval_type: Database["public"]["Enums"]["manager_approval_type"]
+          booking_id?: string | null
+          detail?: string | null
+          id?: string
+          metadata?: Json
+          requested_at?: string
+          requested_by: string
+          requested_by_role?: string | null
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["manager_approval_status"]
+          target_id?: string | null
+          target_table?: string | null
+          title: string
+        }
+        Update: {
+          approval_type?: Database["public"]["Enums"]["manager_approval_type"]
+          booking_id?: string | null
+          detail?: string | null
+          id?: string
+          metadata?: Json
+          requested_at?: string
+          requested_by?: string
+          requested_by_role?: string | null
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["manager_approval_status"]
+          target_id?: string | null
+          target_table?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manager_approvals_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           booking_id: string | null
@@ -558,6 +890,151 @@ export type Database = {
           },
         ]
       }
+      service_request_events: {
+        Row: {
+          actor_name: string | null
+          actor_role: string | null
+          created_at: string
+          event_type: string
+          id: string
+          message: string
+          metadata: Json
+          service_request_id: string
+        }
+        Insert: {
+          actor_name?: string | null
+          actor_role?: string | null
+          created_at?: string
+          event_type: string
+          id?: string
+          message: string
+          metadata?: Json
+          service_request_id: string
+        }
+        Update: {
+          actor_name?: string | null
+          actor_role?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          message?: string
+          metadata?: Json
+          service_request_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_request_events_service_request_id_fkey"
+            columns: ["service_request_id"]
+            isOneToOne: false
+            referencedRelation: "service_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_requests: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          assigned_staff_id: string | null
+          booking_id: string | null
+          category: Database["public"]["Enums"]["service_request_category"]
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          description: string | null
+          due_at: string | null
+          guest_name: string | null
+          id: string
+          priority: Database["public"]["Enums"]["service_request_priority"]
+          requested_by: string
+          requested_by_role: string | null
+          resolution_note: string | null
+          room_id: string | null
+          service_charge_id: string | null
+          source: Database["public"]["Enums"]["service_request_source"]
+          status: Database["public"]["Enums"]["service_request_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          assigned_staff_id?: string | null
+          booking_id?: string | null
+          category: Database["public"]["Enums"]["service_request_category"]
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          description?: string | null
+          due_at?: string | null
+          guest_name?: string | null
+          id?: string
+          priority?: Database["public"]["Enums"]["service_request_priority"]
+          requested_by: string
+          requested_by_role?: string | null
+          resolution_note?: string | null
+          room_id?: string | null
+          service_charge_id?: string | null
+          source?: Database["public"]["Enums"]["service_request_source"]
+          status?: Database["public"]["Enums"]["service_request_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          assigned_staff_id?: string | null
+          booking_id?: string | null
+          category?: Database["public"]["Enums"]["service_request_category"]
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          description?: string | null
+          due_at?: string | null
+          guest_name?: string | null
+          id?: string
+          priority?: Database["public"]["Enums"]["service_request_priority"]
+          requested_by?: string
+          requested_by_role?: string | null
+          resolution_note?: string | null
+          room_id?: string | null
+          service_charge_id?: string | null
+          source?: Database["public"]["Enums"]["service_request_source"]
+          status?: Database["public"]["Enums"]["service_request_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_requests_assigned_staff_id_fkey"
+            columns: ["assigned_staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_requests_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_requests_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_requests_service_charge_id_fkey"
+            columns: ["service_charge_id"]
+            isOneToOne: false
+            referencedRelation: "service_charges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shifts: {
         Row: {
           ended_at: string | null
@@ -631,7 +1108,38 @@ export type Database = {
       access_result: "granted" | "denied" | "expired"
       booking_status: "active" | "reserved" | "checked_out" | "cancelled"
       charge_type: "laundry" | "food" | "minibar" | "other"
+      guest_kyc_status: "not_started" | "pending" | "verified" | "rejected"
+      identity_document_status: "pending" | "verified" | "rejected" | "expired"
+      identity_document_type: "ghana_card" | "passport" | "drivers_license" | "voter_id" | "other"
+      manager_approval_status: "pending" | "approved" | "rejected"
+      manager_approval_type: "booking_extension" | "service_receipt_confirmation" | "guest_kyc_review"
+      operational_handoff_item_type:
+        | "carryover_guest"
+        | "unresolved_request"
+        | "payment_risk"
+        | "vip_arrival"
+        | "room_issue"
+        | "general"
+      operational_handoff_priority: "normal" | "high" | "urgent"
+      operational_handoff_status: "open" | "acknowledged" | "closed"
       pay_method: "cash" | "momo" | "bank_transfer" | "cheque"
+      service_request_category:
+        | "housekeeping"
+        | "maintenance"
+        | "laundry"
+        | "food"
+        | "minibar"
+        | "billing"
+        | "other"
+      service_request_priority: "low" | "normal" | "high" | "urgent"
+      service_request_source: "guest_portal" | "manager" | "reception"
+      service_request_status:
+        | "new"
+        | "acknowledged"
+        | "assigned"
+        | "in_progress"
+        | "completed"
+        | "cancelled"
       room_status:
         | "vacant"
         | "occupied"
@@ -772,7 +1280,28 @@ export const Constants = {
       access_result: ["granted", "denied", "expired"],
       booking_status: ["active", "reserved", "checked_out", "cancelled"],
       charge_type: ["laundry", "food", "minibar", "other"],
+      manager_approval_status: ["pending", "approved", "rejected"],
+      manager_approval_type: ["booking_extension", "service_receipt_confirmation", "guest_kyc_review"],
       pay_method: ["cash", "momo", "bank_transfer", "cheque"],
+      service_request_category: [
+        "housekeeping",
+        "maintenance",
+        "laundry",
+        "food",
+        "minibar",
+        "billing",
+        "other",
+      ],
+      service_request_priority: ["low", "normal", "high", "urgent"],
+      service_request_source: ["guest_portal", "manager", "reception"],
+      service_request_status: [
+        "new",
+        "acknowledged",
+        "assigned",
+        "in_progress",
+        "completed",
+        "cancelled",
+      ],
       room_status: [
         "vacant",
         "occupied",

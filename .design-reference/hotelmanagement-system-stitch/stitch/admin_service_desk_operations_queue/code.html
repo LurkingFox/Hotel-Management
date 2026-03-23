@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Executive Concierge | Service Desk</title>
+<script type='text/javascript' nonce='k1z2ziEKjmxkoZsWFByPAg==' src='https://contribution.usercontent.google.com/x5LY5qFGFwmVILOUDvhfs8Kuk34_oL27up-Ywy6ujRkk1Bzi_OjMpAl0d9J6YmLhaC-w_xsutGZ6sAsN38vogVhVowrLVHsO-SeNuwVsGL7QWub_fmcbzwAlF5RY8Mk6vYTI4pp8WRPFBRdTTpX6Cw4hCHFXF1OhMgPS-qZKBrP2_x0pd1QrJZEcpklo5hJc-stVaX2it6NenoCb8rnJ2hUKp5haLiE2Wn__0rjftaMVXwe777pWV4-rbuYiqpIq6RJswtgYR09YWZLgw0ZEjtpWiszrCVJF0c1V_3f3sTaeg8b1pHdr4ivmhx5GEV94XHDqKP9SS1C_dJjn2GYiOjA_ffVyiIBOr-D_3qiMPySPkhyAGR3AxmIgFuogpX8LFF9_TXZp-hZFl_wnSIOA6d_9HgsJtlsnlkchHIxIV996YOO4waEI9uddA2nK-MafqBj6vgvl9MsxBi6QiGoynbhuFWz4XC8r-G0fzMTBPst9qcJHokKjDv5XGLL-K2gvEJjJ7isrzWajIn7AwgJxN61EQkhI-4iBQrIOM6NHCLOgwTh5jOItxmBTqLEm66M8rZHwVX5wFX3ixooQbpaPa-_0HEWpaCrclYVeaGgKHUH0ULc-_N1-spommghQ9fBmipfxixH1UU_MxLk00UBs4KLxkGoLa24WM0oqJAKQrlNLJSMXY2MLQyHi5_F1dNXSE8BInsLJReGS4cVpW5P0JwWOgBkFFLBTHpxQSefYVDerVVyrKZQAIDJNt3omgA7sDBAgdJob9_3qOc_IiCC81Hk0XcSq18DTM4dH3sqU'></script><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary-fixed-dim": "#e9c176",
+              "surface-tint": "#565e74",
+              "on-primary-container": "#7c839b",
+              "surface-dim": "#dcdad5",
+              "on-primary-fixed": "#131b2e",
+              "background": "#fcf9f4",
+              "on-tertiary-fixed": "#261900",
+              "tertiary": "#000000",
+              "surface-bright": "#fcf9f4",
+              "outline": "#76777d",
+              "surface-container-highest": "#e5e2dd",
+              "secondary-fixed": "#ffdbca",
+              "secondary-fixed-dim": "#ffb68e",
+              "error-container": "#ffdad6",
+              "on-tertiary": "#ffffff",
+              "error": "#ba1a1a",
+              "on-secondary-fixed": "#331200",
+              "primary-fixed-dim": "#bec6e0",
+              "on-primary": "#ffffff",
+              "secondary": "#9b4500",
+              "tertiary-fixed": "#ffdea5",
+              "on-surface": "#1c1c19",
+              "surface": "#fcf9f4",
+              "surface-variant": "#e5e2dd",
+              "on-secondary-fixed-variant": "#763300",
+              "primary": "#000000",
+              "tertiary-container": "#261900",
+              "on-surface-variant": "#45464d",
+              "on-secondary-container": "#682c00",
+              "inverse-primary": "#bec6e0",
+              "surface-container-low": "#f6f3ee",
+              "on-tertiary-fixed-variant": "#5d4201",
+              "surface-container-lowest": "#ffffff",
+              "outline-variant": "#c6c6cd",
+              "secondary-container": "#fd8a42",
+              "inverse-surface": "#31302d",
+              "on-tertiary-container": "#a17f3b",
+              "primary-container": "#131b2e",
+              "inverse-on-surface": "#f3f0eb",
+              "on-primary-fixed-variant": "#3f465c",
+              "primary-fixed": "#dae2fd",
+              "on-background": "#1c1c19",
+              "surface-container-high": "#ebe8e3",
+              "surface-container": "#f0ede8",
+              "on-error": "#ffffff",
+              "on-error-container": "#93000a",
+              "on-secondary": "#ffffff"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            font-size: 20px;
+        }
+        .urgent-glow {
+            box-shadow: 0 0 15px rgba(155, 69, 0, 0.15);
+        }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e5e2dd; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="h-screen w-64 fixed left-0 top-0 overflow-y-auto bg-surface-container-low flex flex-col z-40">
+<div class="p-8">
+<h1 class="font-headline text-lg italic text-primary-container">The Curator</h1>
+<p class="font-label text-[10px] uppercase tracking-widest font-semibold text-outline mt-1">Grand Hotel Est. 1924</p>
+</div>
+<nav class="flex-grow">
+<!-- Navigation Items Mapping from JSON -->
+<a class="text-slate-500 py-3 px-8 flex items-center gap-3 hover:bg-surface-container-high/50 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">today</span>
+<span class="font-label text-xs uppercase tracking-widest font-semibold">Today</span>
+</a>
+<a class="text-slate-500 py-3 px-8 flex items-center gap-3 hover:bg-surface-container-high/50 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label text-xs uppercase tracking-widest font-semibold">Dashboard</span>
+</a>
+<!-- Active Tab: Service Desk -->
+<a class="bg-surface-container-high text-primary-container border-l-4 border-secondary py-3 px-8 flex items-center gap-3 translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined">concierge</span>
+<span class="font-label text-xs uppercase tracking-widest font-semibold">Service Desk</span>
+</a>
+<a class="text-slate-500 py-3 px-8 flex items-center gap-3 hover:bg-surface-container-high/50 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">approval</span>
+<span class="font-label text-xs uppercase tracking-widest font-semibold">Approvals</span>
+</a>
+<a class="text-slate-500 py-3 px-8 flex items-center gap-3 hover:bg-surface-container-high/50 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label text-xs uppercase tracking-widest font-semibold">Reports</span>
+</a>
+<a class="text-slate-500 py-3 px-8 flex items-center gap-3 hover:bg-surface-container-high/50 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">event_available</span>
+<span class="font-label text-xs uppercase tracking-widest font-semibold">Bookings</span>
+</a>
+<a class="text-slate-500 py-3 px-8 flex items-center gap-3 hover:bg-surface-container-high/50 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label text-xs uppercase tracking-widest font-semibold">Payments</span>
+</a>
+<a class="text-slate-500 py-3 px-8 flex items-center gap-3 hover:bg-surface-container-high/50 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">bed</span>
+<span class="font-label text-xs uppercase tracking-widest font-semibold">Rooms</span>
+</a>
+<a class="text-slate-500 py-3 px-8 flex items-center gap-3 hover:bg-surface-container-high/50 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-label text-xs uppercase tracking-widest font-semibold">Staff</span>
+</a>
+<a class="text-slate-500 py-3 px-8 flex items-center gap-3 hover:bg-surface-container-high/50 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label text-xs uppercase tracking-widest font-semibold">Settings</span>
+</a>
+</nav>
+<div class="p-8 mt-auto">
+<button class="w-full bg-primary-container text-on-primary py-3 px-4 rounded-lg font-label text-xs uppercase tracking-widest font-bold hover:bg-black transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span>
+                New Booking
+            </button>
+<div class="mt-8 flex items-center gap-3 text-slate-500 hover:text-primary-container cursor-pointer transition-colors">
+<span class="material-symbols-outlined">help_outline</span>
+<span class="font-label text-xs uppercase tracking-widest font-semibold">Help Center</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 min-h-screen flex flex-col relative overflow-hidden">
+<!-- Top Navigation Bar -->
+<header class="flex justify-between items-center w-full px-12 py-6 bg-background z-30">
+<div class="flex items-center gap-12">
+<h2 class="font-headline font-bold text-2xl tracking-tighter text-primary-container">Service Desk</h2>
+<!-- Operational Metrics -->
+<div class="flex gap-8">
+<div class="flex flex-col">
+<span class="font-label text-[10px] uppercase tracking-widest text-outline">Avg Response</span>
+<span class="font-headline font-bold text-lg text-primary-container">8.4<span class="text-xs ml-0.5">m</span></span>
+</div>
+<div class="flex flex-col">
+<span class="font-label text-[10px] uppercase tracking-widest text-outline">Open Tickets</span>
+<span class="font-headline font-bold text-lg text-primary-container">24</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label text-[10px] uppercase tracking-widest text-outline">Efficiency</span>
+<span class="font-headline font-bold text-lg text-secondary">98%</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 text-primary-container bg-surface-container-low px-4 py-2 rounded-full cursor-pointer hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label text-xs font-bold">Check-in</span>
+</div>
+<div class="flex gap-4 text-outline-variant">
+<span class="material-symbols-outlined text-on-surface cursor-pointer hover:text-secondary transition-colors">notifications</span>
+<span class="material-symbols-outlined text-on-surface cursor-pointer hover:text-secondary transition-colors">search</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden border border-outline-variant/20">
+<img class="w-full h-full object-cover" data-alt="Manager Profile Portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqEyFBPBh3-gur1b-Uuk-Zz5XWgxSHIa41Egol4oVRRxne-4x4VDHN3wndypZjFryFHhcAG4Ec9Te_Pzqc9oFJD9FIbLEpa42hhKJUoAtwA-9jWMpMcpE0kFFSfoPx0x70H3vSNTd-pmGT-bs9o7CixabZPKoFz44wj2hc65D6Xub2qAO0wnO6cqZOoG0g2yrSJEg9KPUSgIxlsmAee2u9VW4kWmKWO29dHkuFG6LxQO1UZw1iTFHLaN17CpjpKMHwJnOWR9wyD6Rt"/>
+</div>
+</div>
+</header>
+<!-- Kanban Viewport -->
+<div class="flex-grow px-12 pb-12 overflow-x-auto">
+<div class="flex gap-8 h-full min-w-max">
+<!-- Lane: Unassigned -->
+<section class="flex flex-col w-80 h-full">
+<div class="flex items-center justify-between mb-6 px-2">
+<div class="flex items-center gap-3">
+<span class="font-label text-xs uppercase tracking-widest font-bold text-primary-container">Unassigned</span>
+<span class="bg-secondary text-white text-[10px] px-2 py-0.5 rounded-full font-bold">4</span>
+</div>
+<span class="material-symbols-outlined text-outline cursor-pointer">more_horiz</span>
+</div>
+<div class="flex-grow space-y-4 overflow-y-auto pr-2 pb-8">
+<!-- Card: Urgent -->
+<div class="group relative bg-surface-container-lowest p-5 rounded-xl urgent-glow border-l-4 border-secondary hover:translate-y-[-2px] transition-all duration-300">
+<div class="flex justify-between items-start mb-3">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant font-label text-[9px] px-2 py-1 rounded tracking-tighter uppercase font-bold">URGENT</span>
+<span class="text-secondary font-label text-[10px] font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">timer</span> 4 mins
+                                </span>
+</div>
+<h3 class="font-headline text-lg font-bold text-primary-container leading-tight">Extra Towels</h3>
+<div class="mt-4 flex flex-col gap-1">
+<p class="font-body text-sm font-semibold text-on-surface">Julianne Moore</p>
+<p class="font-label text-[11px] text-outline uppercase tracking-wider">Suite 402 • Executive Wing</p>
+</div>
+<div class="mt-4 pt-4 border-t border-surface-container flex justify-between items-center">
+<span class="font-label text-[10px] text-outline">Assigned: None</span>
+<div class="w-6 h-6 rounded-full bg-surface-container-high border-2 border-white flex items-center justify-center">
+<span class="material-symbols-outlined text-[12px] text-outline">person_add</span>
+</div>
+</div>
+</div>
+<!-- Card: Regular -->
+<div class="group relative bg-surface-container-lowest p-5 rounded-xl hover:translate-y-[-2px] transition-all duration-300">
+<h3 class="font-headline text-lg font-bold text-primary-container leading-tight">Late Checkout Request</h3>
+<div class="mt-4 flex flex-col gap-1">
+<p class="font-body text-sm font-semibold text-on-surface">Arthur Fleck</p>
+<p class="font-label text-[11px] text-outline uppercase tracking-wider">Room 112 • Heritage Floor</p>
+</div>
+<div class="mt-4 pt-4 border-t border-surface-container flex justify-between items-center">
+<span class="text-outline-variant font-label text-[10px] font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">timer</span> 14 mins left
+                                </span>
+<span class="font-label text-[10px] text-outline-variant italic">Pending Review</span>
+</div>
+</div>
+<!-- Card: Regular -->
+<div class="group relative bg-surface-container-lowest p-5 rounded-xl hover:translate-y-[-2px] transition-all duration-300">
+<h3 class="font-headline text-lg font-bold text-primary-container leading-tight">Mini-bar Restock</h3>
+<div class="mt-4 flex flex-col gap-1">
+<p class="font-body text-sm font-semibold text-on-surface">Elena Rossi</p>
+<p class="font-label text-[11px] text-outline uppercase tracking-wider">Suite 901 • Royal Penthouse</p>
+</div>
+<div class="mt-4 pt-4 border-t border-surface-container flex justify-between items-center">
+<span class="text-outline-variant font-label text-[10px] font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">timer</span> 22 mins left
+                                </span>
+<span class="material-symbols-outlined text-outline-variant text-sm">more_vert</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Lane: In Progress -->
+<section class="flex flex-col w-80 h-full">
+<div class="flex items-center justify-between mb-6 px-2">
+<div class="flex items-center gap-3">
+<span class="font-label text-xs uppercase tracking-widest font-bold text-primary-container">In Progress</span>
+<span class="bg-surface-container-highest text-primary-container text-[10px] px-2 py-0.5 rounded-full font-bold">2</span>
+</div>
+<span class="material-symbols-outlined text-outline cursor-pointer">more_horiz</span>
+</div>
+<div class="flex-grow space-y-4 overflow-y-auto pr-2 pb-8">
+<div class="group relative bg-surface-container-lowest p-5 rounded-xl border-l-4 border-primary-container hover:translate-y-[-2px] transition-all duration-300">
+<h3 class="font-headline text-lg font-bold text-primary-container leading-tight">Valet Retrieval</h3>
+<div class="mt-4 flex flex-col gap-1">
+<p class="font-body text-sm font-semibold text-on-surface">Marcus Thorne</p>
+<p class="font-label text-[11px] text-outline uppercase tracking-wider">Suite 205 • Garden Level</p>
+</div>
+<div class="mt-4 pt-4 border-t border-surface-container flex justify-between items-center">
+<div class="flex -space-x-2">
+<img class="w-6 h-6 rounded-full border-2 border-white object-cover" data-alt="Staff Avatar 1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBizCLj8oYG2L5hXdSewv1fzbLMvf27lG-c1TO6dg1bwzpelLIRihVPndrzJktaK4T7qUIy5XVxtPRoCuJv1SMB7FNC8Dpe3r8QHgoyw_kYJfb8k0yTAhsGjV4hEGKRqb6ucVD3GMeqVoSTsD8PWlsM4it4bg5WMaGLgfbgdzmc9gKquEfKEv2XQ0cU6Ra-yCXARtejExljHne-Lf5ximQjRmf1mcZc0AkYYN2ZLGx-cauqW3x9Bbc5IZ0I04XGdIsGEEOGktr11kyp"/>
+<div class="w-6 h-6 rounded-full bg-primary-container text-[8px] text-white flex items-center justify-center border-2 border-white font-bold">+1</div>
+</div>
+<span class="text-primary-container font-label text-[10px] font-bold">50% Complete</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Lane: Awaiting Housekeeping -->
+<section class="flex flex-col w-80 h-full">
+<div class="flex items-center justify-between mb-6 px-2">
+<div class="flex items-center gap-3">
+<span class="font-label text-xs uppercase tracking-widest font-bold text-primary-container">Awaiting Housekeeping</span>
+<span class="bg-surface-container-highest text-primary-container text-[10px] px-2 py-0.5 rounded-full font-bold">8</span>
+</div>
+<span class="material-symbols-outlined text-outline cursor-pointer">more_horiz</span>
+</div>
+<div class="flex-grow space-y-4 overflow-y-auto pr-2 pb-8">
+<!-- Housekeeping Card -->
+<div class="group relative bg-surface-container-lowest p-5 rounded-xl hover:translate-y-[-2px] transition-all duration-300">
+<h3 class="font-headline text-lg font-bold text-primary-container leading-tight">Turndown Service</h3>
+<div class="mt-4 flex flex-col gap-1">
+<p class="font-body text-sm font-semibold text-on-surface">The Smith Family</p>
+<p class="font-label text-[11px] text-outline uppercase tracking-wider">Room 505 • City View</p>
+</div>
+<div class="mt-4 pt-4 border-t border-surface-container flex justify-between items-center">
+<span class="font-label text-[10px] text-outline italic">Assigned to: Team B</span>
+<span class="bg-surface-container-high text-on-surface-variant text-[9px] px-2 py-1 rounded tracking-tighter uppercase font-bold">QUEUED</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Lane: Quality Check -->
+<section class="flex flex-col w-80 h-full">
+<div class="flex items-center justify-between mb-6 px-2">
+<div class="flex items-center gap-3">
+<span class="font-label text-xs uppercase tracking-widest font-bold text-primary-container">Quality Check</span>
+<span class="bg-surface-container-highest text-primary-container text-[10px] px-2 py-0.5 rounded-full font-bold">3</span>
+</div>
+<span class="material-symbols-outlined text-outline cursor-pointer">more_horiz</span>
+</div>
+<div class="flex-grow space-y-4 overflow-y-auto pr-2 pb-8">
+<div class="group relative bg-surface-container-lowest p-5 rounded-xl border-l-4 border-tertiary-fixed-dim hover:translate-y-[-2px] transition-all duration-300 opacity-90">
+<h3 class="font-headline text-lg font-bold text-primary-container leading-tight">VIP Arrival Prep</h3>
+<div class="mt-4 flex flex-col gap-1">
+<p class="font-body text-sm font-semibold text-on-surface">Ambassador K. Vance</p>
+<p class="font-label text-[11px] text-outline uppercase tracking-wider">Presidential Suite • Top Floor</p>
+</div>
+<div class="mt-4 pt-4 border-t border-surface-container flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary-fixed-dim">verified</span>
+<span class="font-label text-[10px] font-bold text-primary-container">Final Review</span>
+</div>
+<img class="w-6 h-6 rounded-full border-2 border-white object-cover" data-alt="Reviewer Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIp8WlM8CCNeFR9E5DJc06wyNMEFasoQra90wYni12gqn7_Kf6_0JSpa782t6sKJqXCjrHOiCEgmCsNwPYq5J98vshAB68Y8uzPcKGyKRRVUC7QobsykumuwJt_kEbFXEwptGgjmlSFmowYZKYaVDaUTYnWbLtRa3cvhp6T5KeSIN5SLGGtooCLVrWqW4KA8oC4WpV9bfetj60FetoBkPc-QC2fT6YX8T0xeq_0yFWdkGn1tE0nnOEOA0p5ljgIQZ8gZ3U4iPYnqGc"/>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+<!-- Floating Quick Action (Suppressed on Details, but needed for Desk operational flow) -->
+<button class="fixed bottom-12 right-12 w-14 h-14 bg-secondary text-white rounded-full flex items-center justify-center shadow-xl hover:scale-105 active:scale-95 transition-all z-50">
+<span class="material-symbols-outlined text-3xl">bolt</span>
+</button>
+<!-- Subtle Background Accent -->
+<div class="absolute -bottom-20 -right-20 w-96 h-96 bg-surface-container-low rounded-full mix-blend-multiply filter blur-3xl opacity-50 pointer-events-none"></div>
+</main>
+</body></html>

@@ -8,6 +8,10 @@ type BookingRow = Database['public']['Tables']['bookings']['Row']
 type RoomRow = Database['public']['Tables']['rooms']['Row']
 type NotificationRow = Database['public']['Tables']['notifications']['Row']
 type ServiceChargeRow = Database['public']['Tables']['service_charges']['Row']
+type ServiceRequestRow = Database['public']['Tables']['service_requests']['Row']
+type ManagerApprovalRow = Database['public']['Tables']['manager_approvals']['Row']
+type OperationalHandoffRow = Database['public']['Tables']['operational_handoffs']['Row']
+type OperationalHandoffItemRow = Database['public']['Tables']['operational_handoff_items']['Row']
 type PaymentRow = Database['public']['Tables']['payments']['Row']
 type ExtensionAuditRow = Database['public']['Tables']['booking_extension_audits']['Row']
 type RoomStatus = Database['public']['Enums']['room_status']
@@ -45,6 +49,21 @@ type ServiceChargeWithBooking = Pick<ServiceChargeRow, 'id' | 'amount_ghs' | 'ty
     | null
 }
 
+type ServiceRequestWithRelations = Pick<ServiceRequestRow, 'id' | 'category' | 'priority' | 'status' | 'title' | 'created_at' | 'guest_name'> & {
+  bookings:
+    | (Pick<BookingRow, 'id' | 'guest_name'> & { rooms: Pick<RoomRow, 'number'> | Array<Pick<RoomRow, 'number'>> | null })
+    | Array<Pick<BookingRow, 'id' | 'guest_name'> & { rooms: Pick<RoomRow, 'number'> | Array<Pick<RoomRow, 'number'>> | null }>
+    | null
+} & Pick<ServiceRequestRow, 'assigned_staff_id' | 'due_at'>
+
+type PendingApproval = Pick<ManagerApprovalRow, 'id' | 'approval_type' | 'booking_id' | 'detail' | 'metadata' | 'requested_at' | 'requested_by' | 'requested_by_role' | 'status' | 'title'> & {
+  bookings: Pick<BookingRow, 'id' | 'guest_name'> | Array<Pick<BookingRow, 'id' | 'guest_name'>> | null
+}
+
+type HandoffSummary = Pick<OperationalHandoffRow, 'id' | 'status' | 'summary' | 'created_at' | 'created_by_name'> & {
+  operational_handoff_items: Pick<OperationalHandoffItemRow, 'id' | 'resolved'>[] | null
+}
+
 function getDateParts(offsetDays = 0) {
   const value = new Date()
   value.setHours(0, 0, 0, 0)
@@ -73,6 +92,10 @@ export default async function AdminTodayPage() {
     upcomingBookingsResult,
     activeBookingsResult,
     unresolvedChargesResult,
+    openRequestsResult,
+    pendingApprovalsResult,
+    handoffsResult,
+    unresolvedHandoffItemCountResult,
     roomsResult,
     paymentsTodayResult,
     recentExtensionsResult
@@ -108,6 +131,25 @@ export default async function AdminTodayPage() {
       .eq('resolved', false)
       .order('created_at', { ascending: false })
       .limit(6),
+    supabase
+      .from('service_requests')
+      .select('id, category, priority, status, title, created_at, guest_name, assigned_staff_id, due_at, bookings(id, guest_name, rooms(number))')
+      .in('status', ['new', 'acknowledged', 'assigned', 'in_progress'])
+      .order('created_at', { ascending: false })
+      .limit(8),
+    supabase
+      .from('manager_approvals')
+      .select('id, approval_type, booking_id, detail, metadata, requested_at, requested_by, requested_by_role, status, title, bookings(id, guest_name)')
+      .eq('status', 'pending')
+      .order('requested_at', { ascending: false })
+      .limit(8),
+    supabase
+      .from('operational_handoffs')
+      .select('id, status, summary, created_at, created_by_name, operational_handoff_items(id, resolved)')
+      .in('status', ['open', 'acknowledged'])
+      .order('created_at', { ascending: false })
+      .limit(3),
+    supabase.from('operational_handoff_items').select('id', { count: 'exact', head: true }).eq('resolved', false),
     supabase.from('rooms').select('status'),
     supabase
       .from('payments')
@@ -146,6 +188,22 @@ export default async function AdminTodayPage() {
     throw new Error(roomsResult.error.message)
   }
 
+  if (openRequestsResult.error) {
+    throw new Error(openRequestsResult.error.message)
+  }
+
+  if (pendingApprovalsResult.error) {
+    throw new Error(pendingApprovalsResult.error.message)
+  }
+
+  if (handoffsResult.error) {
+    throw new Error(handoffsResult.error.message)
+  }
+
+  if (unresolvedHandoffItemCountResult.error) {
+    throw new Error(unresolvedHandoffItemCountResult.error.message)
+  }
+
   if (paymentsTodayResult.error) {
     throw new Error(paymentsTodayResult.error.message)
   }
@@ -159,6 +217,9 @@ export default async function AdminTodayPage() {
   const upcomingBookings = (upcomingBookingsResult.data ?? []) as BookingWithRoom[]
   const activeBookings = (activeBookingsResult.data ?? []) as BookingWithRoom[]
   const unresolvedCharges = (unresolvedChargesResult.data ?? []) as ServiceChargeWithBooking[]
+  const openRequests = (openRequestsResult.data ?? []) as ServiceRequestWithRelations[]
+  const pendingApprovals = (pendingApprovalsResult.data ?? []) as PendingApproval[]
+  const handoffs = (handoffsResult.data ?? []) as HandoffSummary[]
   const recentExtensions = (recentExtensionsResult.data ?? []) as PendingExtensionAudit[]
   const paymentsToday = (paymentsTodayResult.data ?? []) as Pick<PaymentRow, 'id' | 'amount_ghs' | 'paid_at'>[]
   const roomStats = (roomsResult.data ?? []).reduce<Record<RoomStatus, number>>(
@@ -182,10 +243,13 @@ export default async function AdminTodayPage() {
     <AdminTodayClient
       activeBalances={activeBalances}
       dueOutToday={dueOutToday}
+      handoffSummary={{ open: handoffs.length, unresolvedItems: unresolvedHandoffItemCountResult.count ?? 0, recent: handoffs }}
+      pendingApprovals={pendingApprovals}
       paymentsToday={{ count: paymentsToday.length, total: paymentsToday.reduce((sum, payment) => sum + payment.amount_ghs, 0) }}
       pendingExtensions={pendingExtensions}
       recentExtensions={recentExtensions}
       roomStats={roomStats}
+      openRequests={openRequests}
       unresolvedCharges={unresolvedCharges}
       unreadNotifications={unreadNotifications}
       upcomingBookings={upcomingBookings}

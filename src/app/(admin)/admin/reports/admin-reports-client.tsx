@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 
+import type { DashboardIntelligenceMetrics, DashboardTrendPoint } from '@/lib/dashboard-intelligence'
 import { getHotelAddressLines, getHotelContactLines, type HotelProfile } from '@/lib/hotel-info'
 import {
   buildReportTitle,
@@ -31,9 +32,11 @@ type StaffOption = {
 type AdminReportsClientProps = {
   filters: ReportFilters
   hotelProfile: HotelProfile
+  intelligence: DashboardIntelligenceMetrics | null
   operations: ReportOperation[]
   staffOptions: StaffOption[]
   summary: ReportSummary
+  workspaceMode: ReportsWorkspaceMode
 }
 
 type InsightRow = {
@@ -56,6 +59,8 @@ type CategoryPageModel = {
   staffRows: InsightRow[]
 }
 
+type ReportsWorkspaceMode = 'export' | 'outlook'
+
 const categoryOptions: Array<{ label: string; value: ReportCategory }> = [
   { label: 'Front office', value: 'front_office' },
   { label: 'Payments', value: 'payments' },
@@ -66,27 +71,27 @@ const categoryOptions: Array<{ label: string; value: ReportCategory }> = [
 
 const categoryMeta: Record<ReportCategory, { accent: string; description: string; eyebrow: string }> = {
   access: {
-    accent: 'from-[#1f3b52] via-[#2d5877] to-[#ebf1f5]',
+    accent: 'from-[#1f5a59] via-[#3d8477] to-[#edf8f5]',
     description: 'Access control is isolated into a security sheet so granted entries, denials, credential activity, and room patterns are readable without payment noise.',
     eyebrow: 'Security sheet'
   },
   front_office: {
-    accent: 'from-[#4d2f22] via-[#8c5b3f] to-[#f6ece2]',
+    accent: 'from-[#1f5f50] via-[#4f8d78] to-[#edf8f2]',
     description: 'Front office activity stays together as a guest-movement report covering reservations, arrivals, departures, extensions, and access credential lifecycle events.',
     eyebrow: 'Guest movement sheet'
   },
   payments: {
-    accent: 'from-[#274336] via-[#52785e] to-[#edf5ef]',
+    accent: 'from-[#245d46] via-[#4a8e6f] to-[#edf7f0]',
     description: 'Payments are broken out as their own report page with collection totals, method mix, staff handling, and receipt flow by period.',
     eyebrow: 'Finance sheet'
   },
   services: {
-    accent: 'from-[#59491f] via-[#93783f] to-[#f7f0de]',
+    accent: 'from-[#49652a] via-[#7b9950] to-[#f3f8e8]',
     description: 'Service revenue gets a dedicated view for posted value, open versus resolved items, staff touchpoints, and room concentration.',
     eyebrow: 'Revenue sheet'
   },
   staffing: {
-    accent: 'from-[#342c59] via-[#5f5491] to-[#f0eef9]',
+    accent: 'from-[#2d5860] via-[#5a8790] to-[#edf5f6]',
     description: 'Staffing is separated into an operations sheet that shows shift coverage, open shifts, and who is carrying the reporting load.',
     eyebrow: 'Workforce sheet'
   }
@@ -330,7 +335,88 @@ function renderInsightRows(rows: InsightRow[]) {
   ))
 }
 
-export function AdminReportsClient({ filters, hotelProfile, operations, staffOptions, summary }: AdminReportsClientProps) {
+function formatPercent(value: number) {
+  return `${Math.round(value)}%`
+}
+
+function formatMetric(value: number, maximumFractionDigits = 1) {
+  return new Intl.NumberFormat('en-GH', {
+    maximumFractionDigits,
+    minimumFractionDigits: maximumFractionDigits
+  }).format(value)
+}
+
+function buildSparklinePath(points: DashboardTrendPoint[], width = 200, height = 56, padding = 8) {
+  if (points.length === 0) {
+    return ''
+  }
+
+  const values = points.map((point) => point.value)
+  const minimum = Math.min(...values)
+  const maximum = Math.max(...values)
+  const range = maximum - minimum || 1
+  const step = points.length === 1 ? 0 : (width - padding * 2) / (points.length - 1)
+
+  return points
+    .map((point, index) => {
+      const x = padding + step * index
+      const normalized = (point.value - minimum) / range
+      const y = height - padding - normalized * (height - padding * 2)
+      return `${index === 0 ? 'M' : 'L'} ${x} ${y}`
+    })
+    .join(' ')
+}
+
+function ReportsTrendCard({
+  accentClassName,
+  description,
+  lineClassName,
+  points,
+  title,
+  value
+}: {
+  accentClassName: string
+  description: string
+  lineClassName: string
+  points: DashboardTrendPoint[]
+  title: string
+  value: string
+}) {
+  const path = buildSparklinePath(points)
+
+  return (
+    <div className="ui-panel rounded-[1.5rem] p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-xs uppercase tracking-[0.2em] text-ink/45">{title}</p>
+          <p className="mt-2 text-2xl font-semibold text-ink">{value}</p>
+        </div>
+        <div className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase ${accentClassName}`}>signal</div>
+      </div>
+      <div className="ui-panel-soft mt-4 rounded-[1.2rem] px-3 py-3">
+        <svg aria-hidden="true" className="h-[56px] w-full" preserveAspectRatio="none" viewBox="0 0 200 56">
+          <path
+            className={lineClassName}
+            d={path}
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="3"
+          />
+        </svg>
+        <div className="mt-2 flex items-center justify-between text-[10px] uppercase tracking-[0.14em] text-ink/38">
+          {points.map((point) => (
+            <span key={point.label}>{point.label}</span>
+          ))}
+        </div>
+      </div>
+      <p className="mt-3 text-sm text-ink/60">{description}</p>
+    </div>
+  )
+}
+
+export function AdminReportsClient({ filters, hotelProfile, intelligence, operations, staffOptions, summary, workspaceMode }: AdminReportsClientProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [isExporting, setIsExporting] = useState(false)
@@ -387,28 +473,210 @@ export function AdminReportsClient({ filters, hotelProfile, operations, staffOpt
     [summary]
   )
 
+  const overviewGroups = useMemo(() => groupOperations(operations, filters.groupBy), [filters.groupBy, operations])
+
+  const categorySignals = useMemo(() => {
+    return filters.categories.map((category) => {
+      const categoryOperations = operations.filter((operation) => operation.category === category)
+      const amountTotal = sumAmounts(categoryOperations)
+      const openCount = categoryOperations.filter((operation) => {
+        const status = operation.status ?? ''
+        return ['open', 'new', 'acknowledged', 'assigned', 'in_progress', 'pending'].includes(status)
+      }).length
+      const deniedCount = categoryOperations.filter((operation) => operation.status !== 'granted').length
+      const grantedCount = categoryOperations.filter((operation) => operation.status === 'granted').length
+      const reservations = categoryOperations.filter((operation) => operation.status === 'reservation_created').length
+      const arrivals = categoryOperations.filter(
+        (operation) => operation.status === 'booking_checked_in' || operation.status === 'walk_in_checked_in'
+      ).length
+      const departures = categoryOperations.filter((operation) => operation.status === 'booking_checked_out').length
+
+      if (category === 'payments') {
+        return {
+          category,
+          description: 'Collections logged inside the active report window.',
+          eyebrow: 'Collections signal',
+          headline: formatGHS(amountTotal),
+          support: `${categoryOperations.length} receipts recorded`,
+          tone: 'bg-[#eef5ef] text-[#274336]',
+          valueLabel: 'Collected'
+        }
+      }
+
+      if (category === 'services') {
+        return {
+          category,
+          description: 'Service work and value still moving through the hotel.',
+          eyebrow: 'Service pressure',
+          headline: String(openCount),
+          support: `${formatGHS(amountTotal)} posted value`,
+          tone: 'bg-[#f7f0de] text-[#59491f]',
+          valueLabel: 'Open or unresolved'
+        }
+      }
+
+      if (category === 'access') {
+        return {
+          category,
+          description: 'Security friction and successful entry activity.',
+          eyebrow: 'Access control',
+          headline: String(deniedCount),
+          support: `${grantedCount} granted entries`,
+          tone: 'bg-[#e5eef5] text-[#1f3b52]',
+          valueLabel: 'Exceptions'
+        }
+      }
+
+      if (category === 'staffing') {
+        return {
+          category,
+          description: 'Shift logging and workforce handling inside the range.',
+          eyebrow: 'Coverage signal',
+          headline: String(categoryOperations.length),
+          support: `${openCount} open shifts still visible`,
+          tone: 'bg-[#f0eef9] text-[#342c59]',
+          valueLabel: 'Shift records'
+        }
+      }
+
+      return {
+        category,
+        description: 'Guest movement, arrivals, departures, and booking changes.',
+        eyebrow: 'Guest movement',
+        headline: String(categoryOperations.length),
+        support: `${reservations} reservations · ${arrivals + departures} arrivals and departures`,
+        tone: 'bg-[#f6ece2] text-[#4d2f22]',
+        valueLabel: 'Front-office events'
+      }
+    })
+  }, [filters.categories, operations])
+
+  const activityLeaders = useMemo(
+    () => ({
+      rooms: topRows(
+        operations.map((operation) => ({ amount: operation.amountGhs, key: operation.roomLabel })),
+        'No room-linked activity',
+        'event',
+        4
+      ),
+      staff: topRows(
+        operations.map((operation) => ({ amount: operation.amountGhs, key: operation.actorName })),
+        'No staff attribution',
+        'event',
+        4
+      )
+    }),
+    [operations]
+  )
+
+  const watchlistRows = useMemo<InsightRow[]>(() => {
+    if (!intelligence) {
+      return [
+        { label: 'Access exceptions', value: String(summary.accessDeniedCount) },
+        { label: 'Recorded operations', value: String(summary.operationsCount) },
+        { label: 'Staff represented', value: String(summary.staffInvolvedCount) }
+      ]
+    }
+
+    return [
+      {
+        label: 'Aged balances',
+        meta: `${intelligence.agedBalanceBookings} bookings aging beyond 7 days`,
+        value: formatGHS(intelligence.agedBalanceAmount)
+      },
+      {
+        label: 'Urgent unassigned requests',
+        meta: `${intelligence.openRequests} open requests in the period`,
+        value: String(intelligence.urgentUnassignedRequests)
+      },
+      {
+        label: 'Access failure rate',
+        meta: 'Door access denials and expired attempts in range',
+        value: formatPercent(intelligence.accessFailureRate)
+      },
+      {
+        label: 'Average request resolution',
+        meta: `${formatPercent(intelligence.requestCompletionRate)} completed in range`,
+        value: `${formatMetric(intelligence.avgResolutionHours)} hrs`
+      }
+    ]
+  }, [intelligence, summary.accessDeniedCount, summary.operationsCount, summary.staffInvolvedCount])
+
+  const isOutlookMode = workspaceMode === 'outlook'
+  const workspaceHeroTitle = isOutlookMode ? 'Reports' : 'Export studio'
+  const workspaceHeroDescription = isOutlookMode
+    ? 'Live operational review across finance, service, guest movement, access, and staffing.'
+    : 'Print setup and preview for the management PDF pack.'
+  const workspaceFilterLabel = isOutlookMode ? 'Outlook filters' : 'Export filters'
+  const workspaceCategoryLabel = isOutlookMode ? 'Included lanes' : 'Included sheets'
+  const applyFiltersLabel = isPending ? (isOutlookMode ? 'Refreshing outlook...' : 'Refreshing export pack...') : isOutlookMode ? 'Apply outlook filters' : 'Apply export filters'
+
+  function buildReportParams(values?: {
+    categories?: ReportCategory[]
+    endDate?: string
+    groupBy?: ReportFilters['groupBy']
+    mode?: ReportsWorkspaceMode
+    preset?: ReportFilters['preset']
+    scope?: ReportFilters['scope']
+    staffId?: string
+    startDate?: string
+  }) {
+    const nextPreset = values?.preset ?? filters.preset
+    const nextGroupBy = values?.groupBy ?? filters.groupBy
+    const nextScope = values?.scope ?? filters.scope
+    const nextMode = values?.mode ?? workspaceMode
+    const nextCategories = values?.categories ?? filters.categories
+    const nextStaffId = values?.staffId ?? filters.staffId ?? ''
+    const nextStartDate = values?.startDate ?? filters.startDate
+    const nextEndDate = values?.endDate ?? filters.endDate
+    const params = new URLSearchParams()
+
+    params.set('mode', nextMode)
+    params.set('preset', nextPreset)
+    params.set('groupBy', nextGroupBy)
+    params.set('scope', nextScope)
+
+    if (nextPreset === 'custom') {
+      params.set('startDate', nextStartDate)
+      params.set('endDate', nextEndDate)
+    }
+
+    if (nextScope === 'staff' && nextStaffId) {
+      params.set('staffId', nextStaffId)
+    }
+
+    for (const category of nextCategories) {
+      params.append('category', category)
+    }
+
+    return params
+  }
+
+  function switchWorkspaceMode(nextMode: ReportsWorkspaceMode) {
+    if (nextMode === workspaceMode) {
+      return
+    }
+
+    startTransition(() => {
+      router.push(`/admin/reports?${buildReportParams({ mode: nextMode }).toString()}`)
+    })
+  }
+
   function toggleCategory(value: ReportCategory) {
     setDraftCategories((current) => (current.includes(value) ? current.filter((item) => item !== value) : [...current, value]))
   }
 
   function applyFilters() {
-    const params = new URLSearchParams()
-    params.set('preset', draftPreset)
-    params.set('groupBy', draftGroupBy)
-    params.set('scope', draftScope)
-
-    if (draftPreset === 'custom') {
-      params.set('startDate', draftStartDate)
-      params.set('endDate', draftEndDate)
-    }
-
-    if (draftScope === 'staff' && draftStaffId) {
-      params.set('staffId', draftStaffId)
-    }
-
-    for (const category of draftCategories) {
-      params.append('category', category)
-    }
+    const params = buildReportParams({
+      categories: draftCategories,
+      endDate: draftEndDate,
+      groupBy: draftGroupBy,
+      mode: workspaceMode,
+      preset: draftPreset,
+      scope: draftScope,
+      staffId: draftStaffId,
+      startDate: draftStartDate
+    })
 
     startTransition(() => {
       router.push(`/admin/reports?${params.toString()}`)
@@ -556,85 +824,149 @@ export function AdminReportsClient({ filters, hotelProfile, operations, staffOpt
       }
 
       cursorY -= 10
-      drawText('Pack notes', margin, cursorY, 12, ink, titleFont)
+      drawText('Export notes', margin, cursorY, 12, ink, titleFont)
       cursorY -= 20
       drawWrappedParagraph(
-        'Each sheet in this export starts a new report page so finance, services, guest movement, security, and staffing can be reviewed independently while keeping dense detail inside each section.',
+        'This export mirrors the new operations outlook: a summary cover, decision-support metrics, category signals, and one unified activity ledger instead of repeating dense sheets in the working view.',
         margin,
         90,
         10
       )
 
-      for (const categoryPage of categoryPages) {
-        addNewPage()
+      const decisionRows = intelligence
+        ? [
+            { label: 'Occupancy', value: formatPercent(intelligence.occupancyRate) },
+            { label: 'ADR', value: formatGHS(intelligence.adr) },
+            { label: 'RevPAR', value: formatGHS(intelligence.revpar) },
+            { label: 'Average stay', value: `${formatMetric(intelligence.avgStayLength)} nights` },
+            { label: 'Extension rate', value: formatPercent(intelligence.extensionRate) },
+            { label: 'Cancellation rate', value: formatPercent(intelligence.cancellationRate) }
+          ]
+        : executiveCards
 
-        page.drawRectangle({ color: ink, height: 92, width: pageWidth, x: 0, y: pageHeight - 92 })
-        drawText(categoryPage.eyebrow, margin, pageHeight - 34, 10, rgb(0.88, 0.86, 0.82), bodyFont)
-        drawText(getCategoryLabel(categoryPage.category), margin, pageHeight - 60, 22, white, titleFont)
-        drawText(`${categoryPage.operations.length} items in range`, pageWidth - margin - 110, pageHeight - 58, 10, white, bodyFont)
+      cursorY -= 12
+      ensureSpace(208)
+      drawText('Decision support', margin, cursorY, 12, ink, titleFont)
+      cursorY -= 16
 
-        cursorY = pageHeight - 122
-        drawWrappedParagraph(categoryPage.description, margin, 90, 10)
-        cursorY -= 10
+      const metricCardWidth = (pageWidth - margin * 2 - 12) / 2
+      for (let index = 0; index < Math.min(decisionRows.length, 6); index += 1) {
+        const card = decisionRows[index]
+        const row = Math.floor(index / 2)
+        const column = index % 2
+        const x = margin + column * (metricCardWidth + 12)
+        const y = cursorY - row * 76
 
-        const sectionCardWidth = (pageWidth - margin * 2 - 24) / 4
-        for (let index = 0; index < Math.min(categoryPage.pageSummary.length, 4); index += 1) {
-          const card = categoryPage.pageSummary[index]
-          const x = margin + index * (sectionCardWidth + 8)
-          page.drawRectangle({ borderColor: gold, borderWidth: 1, color: palePaper, height: 60, width: sectionCardWidth, x, y: cursorY - 60 })
-          drawText(card.label.slice(0, 24), x + 10, cursorY - 18, 8, muted, bodyFont)
-          drawText(card.value.slice(0, 18), x + 10, cursorY - 40, 12, ink, titleFont)
+        page.drawRectangle({ borderColor: gold, borderWidth: 1, color: palePaper, height: 60, width: metricCardWidth, x, y: y - 52 })
+        drawText(card.label.slice(0, 28), x + 12, y - 18, 8.5, muted, bodyFont)
+        drawText(card.value.slice(0, 26), x + 12, y - 40, 14, ink, titleFont)
+      }
+
+      cursorY -= Math.ceil(Math.min(decisionRows.length, 6) / 2) * 76
+      cursorY -= 8
+
+      const summaryTableWidth = (pageWidth - margin * 2 - 12) / 2
+      ensureSpace(172)
+      drawMiniTable('Pressure watch', watchlistRows, margin, summaryTableWidth, cursorY)
+      drawMiniTable('Activity concentration', activityLeaders.rooms, margin + summaryTableWidth + 12, summaryTableWidth, cursorY)
+      cursorY -= 172
+
+      addNewPage()
+      page.drawRectangle({ color: ink, height: 92, width: pageWidth, x: 0, y: pageHeight - 92 })
+      drawText('Export studio', margin, pageHeight - 34, 10, rgb(0.88, 0.86, 0.82), bodyFont)
+      drawText('Category outlook', margin, pageHeight - 60, 22, white, titleFont)
+      drawText(`${categorySignals.length} lanes selected`, pageWidth - margin - 95, pageHeight - 58, 10, white, bodyFont)
+
+      cursorY = pageHeight - 122
+      drawWrappedParagraph('Each selected lane is summarized once so the reader can understand where work clusters before scanning the detailed activity ledger.', margin, 90, 10)
+      cursorY -= 10
+
+      const signalCardWidth = (pageWidth - margin * 2 - 12) / 2
+      for (let index = 0; index < categorySignals.length; index += 1) {
+        const signal = categorySignals[index]
+        const row = Math.floor(index / 2)
+        const column = index % 2
+        const requiredHeight = 116
+        const projectedBottom = cursorY - row * (requiredHeight + 12) - requiredHeight
+
+        if (projectedBottom <= margin) {
+          addNewPage()
+          page.drawRectangle({ color: ink, height: 92, width: pageWidth, x: 0, y: pageHeight - 92 })
+          drawText('Export studio', margin, pageHeight - 34, 10, rgb(0.88, 0.86, 0.82), bodyFont)
+          drawText('Category outlook', margin, pageHeight - 60, 22, white, titleFont)
+          cursorY = pageHeight - 122
         }
 
-        cursorY -= 78
-        const tableWidth = (pageWidth - margin * 2 - 16) / 3
-        drawMiniTable('Period flow', categoryPage.periodRows, margin, tableWidth, cursorY)
-        drawMiniTable('Status mix', categoryPage.mixRows, margin + tableWidth + 8, tableWidth, cursorY)
-        drawMiniTable('Staff or room leaders', categoryPage.staffRows[0]?.label === 'No staff attribution' ? categoryPage.roomRows : categoryPage.staffRows, margin + (tableWidth + 8) * 2, tableWidth, cursorY)
-        cursorY -= 168
+        const baseY = cursorY - row * (requiredHeight + 12)
+        const x = margin + column * (signalCardWidth + 12)
+        page.drawRectangle({ borderColor: gold, borderWidth: 1, color: palePaper, height: requiredHeight, width: signalCardWidth, x, y: baseY - requiredHeight })
+        drawText(signal.eyebrow.slice(0, 28), x + 12, baseY - 18, 8, muted, bodyFont)
+        drawText(getCategoryLabel(signal.category).slice(0, 26), x + 12, baseY - 38, 14, ink, titleFont)
+        drawText(signal.headline.slice(0, 20), x + 12, baseY - 60, 18, ink, titleFont)
+        drawText(signal.support.slice(0, 36), x + 12, baseY - 78, 8.5, muted, bodyFont)
 
-        if (categoryPage.operations.length === 0) {
-          drawText('No activity matched this sheet in the selected range.', margin, cursorY, 12, muted, bodyFont)
-          continue
+        const detailLines = wrapText(signal.description, 38)
+        let detailY = baseY - 94
+        for (const line of detailLines.slice(0, 2)) {
+          drawText(line, x + 12, detailY, 8, muted, bodyFont)
+          detailY -= 10
         }
 
-        for (const group of categoryPage.groupedOperations) {
-          ensureSpace(42)
-          drawText(group.label, margin, cursorY, 12, ink, titleFont)
-          drawText(`${group.operations.length} items`, pageWidth - margin - 60, cursorY, 9, muted, bodyFont)
-          cursorY -= 14
-          page.drawLine({ color: gold, start: { x: margin, y: cursorY }, end: { x: pageWidth - margin, y: cursorY }, thickness: 1 })
-          cursorY -= 16
+        if (column === 1 || index === categorySignals.length - 1) {
+          cursorY = baseY - requiredHeight - 12
+        }
+      }
 
-          for (const operation of group.operations) {
-            const detailLines = wrapText(operation.detail, 76)
-            const requiredHeight = 44 + detailLines.length * 12
-            ensureSpace(requiredHeight)
-            page.drawRectangle({ color: palePaper, height: requiredHeight - 6, width: pageWidth - margin * 2, x: margin, y: cursorY - requiredHeight + 8 })
+      addNewPage()
+      page.drawRectangle({ color: ink, height: 92, width: pageWidth, x: 0, y: pageHeight - 92 })
+      drawText('Unified ledger', margin, pageHeight - 34, 10, rgb(0.88, 0.86, 0.82), bodyFont)
+      drawText('Operations timeline', margin, pageHeight - 60, 22, white, titleFont)
+      drawText(`${overviewGroups.length} grouped periods`, pageWidth - margin - 110, pageHeight - 58, 10, white, bodyFont)
 
-            drawText(operation.title.slice(0, 58), margin + 12, cursorY - 16, 11, ink, titleFont)
-            drawText(formatDateTimeLabel(operation.occurredAt), margin + 12, cursorY - 30, 8, muted, bodyFont)
+      cursorY = pageHeight - 122
+      drawWrappedParagraph('Activity is grouped by the selected reporting interval and ordered newest first inside each period, regardless of category.', margin, 90, 10)
+      cursorY -= 8
 
-            if (operation.amountGhs) {
-              const amount = formatGHS(operation.amountGhs)
-              drawText(amount, pageWidth - margin - 12 - Math.min(amount.length * 5.2, 90), cursorY - 18, 10, ink, titleFont)
-            }
+      if (overviewGroups.length === 0) {
+        drawText('No activity matched the selected filters.', margin, cursorY, 12, muted, bodyFont)
+      }
 
-            let detailY = cursorY - 44
-            for (const line of detailLines) {
-              drawText(line, margin + 12, detailY, 8.5, ink, bodyFont)
-              detailY -= 11
-            }
+      for (const group of overviewGroups) {
+        ensureSpace(44)
+        drawText(group.label, margin, cursorY, 12, ink, titleFont)
+        drawText(`${group.operations.length} items`, pageWidth - margin - 60, cursorY, 9, muted, bodyFont)
+        cursorY -= 14
+        page.drawLine({ color: gold, start: { x: margin, y: cursorY }, end: { x: pageWidth - margin, y: cursorY }, thickness: 1 })
+        cursorY -= 16
 
-            const footer = [operation.actorName ? `Handled by ${operation.actorName}` : null, operation.roomLabel, formatStatusLabel(operation.status)]
-              .filter(Boolean)
-              .join(' · ')
-            drawText(footer.slice(0, 90), margin + 12, detailY - 2, 8, muted, bodyFont)
-            cursorY -= requiredHeight + 4
+        for (const operation of group.operations) {
+          const detailLines = wrapText(operation.detail, 76)
+          const requiredHeight = 48 + detailLines.length * 12
+          ensureSpace(requiredHeight)
+          page.drawRectangle({ color: palePaper, height: requiredHeight - 6, width: pageWidth - margin * 2, x: margin, y: cursorY - requiredHeight + 8 })
+
+          drawText(operation.title.slice(0, 58), margin + 12, cursorY - 16, 11, ink, titleFont)
+          drawText(`${getCategoryLabel(operation.category)} · ${formatDateTimeLabel(operation.occurredAt)}`.slice(0, 88), margin + 12, cursorY - 30, 8, muted, bodyFont)
+
+          if (operation.amountGhs) {
+            const amount = formatGHS(operation.amountGhs)
+            drawText(amount, pageWidth - margin - 12 - Math.min(amount.length * 5.2, 90), cursorY - 18, 10, ink, titleFont)
           }
 
-          cursorY -= 8
+          let detailY = cursorY - 46
+          for (const line of detailLines) {
+            drawText(line, margin + 12, detailY, 8.5, ink, bodyFont)
+            detailY -= 11
+          }
+
+          const footer = [operation.actorName ? `Handled by ${operation.actorName}` : null, operation.roomLabel, formatStatusLabel(operation.status)]
+            .filter(Boolean)
+            .join(' · ')
+          drawText(footer.slice(0, 90), margin + 12, detailY - 1, 8, muted, bodyFont)
+          cursorY -= requiredHeight + 4
         }
+
+        cursorY -= 8
       }
 
       const bytes = await pdf.save()
@@ -645,93 +977,252 @@ export function AdminReportsClient({ filters, hotelProfile, operations, staffOpt
   }
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,_#11202f_0%,_#11202f_24%,_#f7f1e8_24%,_#f7f1e8_100%)] px-6 py-10 text-ink md:px-10">
+    <main className="min-h-screen bg-[linear-gradient(180deg,_#eaf6ef_0%,_#f9fffc_22%,_#f9fffc_100%)] px-6 py-10 text-ink md:px-10">
+      <span className="sr-only">smoke:admin-reports</span>
+      <span className="sr-only">{workspaceMode === 'outlook' ? 'smoke:admin-reports-outlook' : 'smoke:admin-reports-export'}</span>
       <div className="mx-auto max-w-7xl space-y-8">
-        <header className="overflow-hidden rounded-[2.4rem] border border-ink/10 bg-white/82 shadow-card backdrop-blur">
-          <div className="grid gap-0 xl:grid-cols-[1.2fr_0.8fr]">
-            <div className="bg-[linear-gradient(135deg,_rgba(30,45,57,0.98)_0%,_rgba(48,71,88,0.95)_52%,_rgba(244,236,225,0.15)_100%)] px-7 py-8 text-white md:px-8">
-              <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
-                <div className="space-y-4">
-                  <p className="text-xs uppercase tracking-[0.3em] text-white/60">University Hotel reporting</p>
-                  <div className="space-y-3">
-                    <h1 className="max-w-3xl font-[family-name:var(--font-display)] text-5xl leading-none">Operational report pack</h1>
-                    <p className="max-w-3xl text-sm leading-6 text-white/78">
-                      This page now reads like a report book instead of one long activity dump. Finance, services, guest movement, security, and staffing each get their own sheet while still showing several data views per page.
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap gap-2 text-xs uppercase tracking-[0.22em] text-white/62">
-                    <span>{filterSummary}</span>
-                    <span>•</span>
-                    <span>{getRangeDescription(filters)}</span>
-                    <span>•</span>
-                    <span>{selectedCategoryLabels}</span>
-                  </div>
-                </div>
-                <div className="flex flex-col items-start gap-3 xl:items-end">
-                  <button
-                    className="rounded-full border border-white/20 bg-white px-5 py-3 text-sm font-semibold text-ink transition hover:bg-[#f5ecde] disabled:cursor-not-allowed disabled:opacity-60"
-                    disabled={isExporting || operations.length === 0}
-                    onClick={exportPdf}
-                    type="button"
-                  >
-                    {isExporting ? 'Generating PDF pack...' : 'Download PDF pack'}
-                  </button>
-                </div>
-              </div>
+        <header className="rounded-[2rem] border border-ink/10 bg-white p-5 shadow-card">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+            <div className="space-y-2">
+              <h1 className="font-[family-name:var(--font-display)] text-3xl md:text-[2.2rem]">{workspaceHeroTitle}</h1>
+              <p className="max-w-3xl text-sm leading-6 text-ink/68">{workspaceHeroDescription}</p>
             </div>
-
-            <div className="space-y-4 px-7 py-8 md:px-8">
-              <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Executive board</p>
-              <h2 className="font-[family-name:var(--font-display)] text-3xl">At-a-glance totals</h2>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {executiveCards.map((card) => (
-                  <div key={card.label} className="rounded-[1.4rem] border border-ink/10 bg-[#fbf7f1] p-4">
-                    <p className="text-xs uppercase tracking-[0.2em] text-ink/45">{card.label}</p>
-                    <p className="mt-3 text-2xl font-semibold text-ink">{card.value}</p>
-                  </div>
-                ))}
-              </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${workspaceMode === 'outlook' ? 'border-emerald-700 bg-emerald-700 text-white shadow-[0_16px_30px_-24px_rgba(15,95,70,0.6)]' : 'border-emerald-900/10 bg-white text-ink hover:border-emerald-200 hover:bg-emerald-50'}`}
+                onClick={() => switchWorkspaceMode('outlook')}
+                type="button"
+              >
+                Outlook
+              </button>
+              <button
+                className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${workspaceMode === 'export' ? 'border-emerald-700 bg-emerald-700 text-white shadow-[0_16px_30px_-24px_rgba(15,95,70,0.6)]' : 'border-emerald-900/10 bg-white text-ink hover:border-emerald-200 hover:bg-emerald-50'}`}
+                onClick={() => switchWorkspaceMode('export')}
+                type="button"
+              >
+                Export studio
+              </button>
+              {workspaceMode === 'export' ? (
+                <button
+                  className="rounded-full border border-emerald-900/10 bg-white px-5 py-2 text-sm font-semibold text-ink transition hover:border-emerald-200 hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-60"
+                  disabled={isExporting || operations.length === 0}
+                  onClick={exportPdf}
+                  type="button"
+                >
+                  {isExporting ? 'Generating PDF pack...' : 'Download PDF pack'}
+                </button>
+              ) : null}
             </div>
           </div>
         </header>
 
-        <section className="grid gap-4 xl:grid-cols-[0.74fr_0.26fr]">
-          <article className="rounded-[2.1rem] border border-ink/10 bg-white p-6 shadow-card">
-            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Report composition</p>
-                <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl">Separated sheets, denser pages</h2>
-              </div>
-              <div className="rounded-full bg-parchment px-4 py-2 text-sm font-semibold text-ink">{categoryPages.length} report pages</div>
-            </div>
-
-            <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {categoryPages.map((page) => (
-                <div key={page.category} className="overflow-hidden rounded-[1.6rem] border border-ink/10 bg-[#fcfaf6]">
-                  <div className={`bg-gradient-to-r ${page.accent} px-5 py-5`}>
-                    <p className="text-xs uppercase tracking-[0.22em] text-white/70">{page.eyebrow}</p>
-                    <h3 className="mt-2 text-2xl font-semibold text-white">{getCategoryLabel(page.category)}</h3>
-                    <p className="mt-3 max-w-sm text-sm leading-6 text-white/82">{page.description}</p>
+        {workspaceMode === 'outlook' ? (
+          <section className="grid gap-4 xl:grid-cols-[0.74fr_0.26fr]">
+            <div className="space-y-4">
+                {intelligence ? (
+              <section className="grid gap-4 xl:grid-cols-[1.08fr_0.92fr]">
+                <article className="rounded-[2.1rem] border border-ink/10 bg-white p-6 shadow-card">
+                  <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Decision support</p>
+                      <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl">Manager outlook for the selected range</h2>
+                    </div>
+                    <div className="ui-pill px-4 py-2 text-sm font-semibold">Shared with dashboard intelligence</div>
                   </div>
-                  <div className="grid gap-3 p-5">
-                    {page.pageSummary.slice(0, 3).map((item) => (
-                      <div key={item.label} className="rounded-[1.1rem] bg-white p-4">
-                        <p className="text-xs uppercase tracking-[0.2em] text-ink/45">{item.label}</p>
-                        <p className="mt-3 text-xl font-semibold text-ink">{item.value}</p>
+
+                  <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    <div className="ui-panel-soft rounded-[1.4rem] p-4">
+                      <p className="text-xs uppercase tracking-[0.18em] text-ink/45">Occupancy</p>
+                      <p className="mt-3 text-3xl font-semibold text-ink">{formatPercent(intelligence.occupancyRate)}</p>
+                    </div>
+                    <div className="ui-panel-soft rounded-[1.4rem] p-4">
+                      <p className="text-xs uppercase tracking-[0.18em] text-ink/45">ADR</p>
+                      <p className="mt-3 text-3xl font-semibold text-ink">{formatGHS(intelligence.adr)}</p>
+                    </div>
+                    <div className="ui-panel-soft rounded-[1.4rem] p-4">
+                      <p className="text-xs uppercase tracking-[0.18em] text-ink/45">RevPAR</p>
+                      <p className="mt-3 text-3xl font-semibold text-ink">{formatGHS(intelligence.revpar)}</p>
+                    </div>
+                    <div className="ui-panel-soft rounded-[1.4rem] p-4">
+                      <p className="text-xs uppercase tracking-[0.18em] text-ink/45">Average stay</p>
+                      <p className="mt-3 text-3xl font-semibold text-ink">{formatMetric(intelligence.avgStayLength)} nights</p>
+                    </div>
+                    <div className="ui-panel-soft rounded-[1.4rem] p-4">
+                      <p className="text-xs uppercase tracking-[0.18em] text-ink/45">Extension rate</p>
+                      <p className="mt-3 text-3xl font-semibold text-ink">{formatPercent(intelligence.extensionRate)}</p>
+                    </div>
+                    <div className="ui-panel-soft rounded-[1.4rem] p-4">
+                      <p className="text-xs uppercase tracking-[0.18em] text-ink/45">Cancellation rate</p>
+                      <p className="mt-3 text-3xl font-semibold text-ink">{formatPercent(intelligence.cancellationRate)}</p>
+                    </div>
+                  </div>
+                </article>
+
+                <article className="rounded-[2.1rem] border border-ink/10 bg-white p-6 shadow-card">
+                  <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Pressure watch</p>
+                  <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl">Where operations can slip</h2>
+                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                    {watchlistRows.map((row) => (
+                      <div key={row.label} className="ui-panel-soft rounded-[1.4rem] p-4">
+                        <p className="text-xs uppercase tracking-[0.18em] text-ink/45">{row.label}</p>
+                        <p className="mt-3 text-2xl font-semibold text-ink">{row.value}</p>
+                        {row.meta ? <p className="mt-2 text-sm text-ink/60">{row.meta}</p> : null}
                       </div>
                     ))}
                   </div>
+                </article>
+              </section>
+                ) : (
+              <article className="rounded-[2.1rem] border border-ink/10 bg-white p-6 shadow-card">
+                <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Operations outlook</p>
+                <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl">Summary before drilling into activity</h2>
+                <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                  {watchlistRows.map((row) => (
+                    <div key={row.label} className="ui-panel-soft rounded-[1.4rem] p-4">
+                      <p className="text-xs uppercase tracking-[0.18em] text-ink/45">{row.label}</p>
+                      <p className="mt-3 text-2xl font-semibold text-ink">{row.value}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </article>
+              </article>
+            )}
+            
 
-          <div className="space-y-4">
-            <article className="rounded-[2.1rem] border border-ink/10 bg-ink p-6 text-white shadow-card">
-              <p className="text-xs uppercase tracking-[0.24em] text-white/55">Filter builder</p>
+            {intelligence ? (
+              <section className="grid gap-4 xl:grid-cols-3">
+                <ReportsTrendCard
+                  accentClassName="bg-[#ddeee7] text-[#1f5e4b]"
+                  description="Occupancy movement inside the selected reporting range."
+                  lineClassName="text-[#1f5e4b]"
+                  points={intelligence.occupancyTrend}
+                  title="Occupancy signal"
+                  value={formatPercent(intelligence.latestOccupancy)}
+                />
+                <ReportsTrendCard
+                  accentClassName="bg-[#e8f5ed] text-[#1f6a4c]"
+                  description="Payments posted each day across the active report window."
+                  lineClassName="text-[#1f6a4c]"
+                  points={intelligence.revenueTrend}
+                  title="Payment signal"
+                  value={formatGHS(intelligence.latestRevenue)}
+                />
+                <ReportsTrendCard
+                  accentClassName="bg-[#eef4df] text-[#53672b]"
+                  description="New request creation volume across the same range."
+                  lineClassName="text-[#53672b]"
+                  points={intelligence.requestTrend}
+                  title="Request signal"
+                  value={`${intelligence.latestRequestVolume} new`}
+                />
+              </section>
+            ) : null}
+
+                <article className="rounded-[2.1rem] border border-ink/10 bg-white p-6 shadow-card">
+              <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Category signals</p>
+                  <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl">Separate lanes, one readable outlook</h2>
+                </div>
+                <div className="ui-pill px-4 py-2 text-sm font-semibold">{categorySignals.length} active lanes</div>
+              </div>
+
+              <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {categorySignals.map((signal) => (
+                  <div key={signal.category} className="ui-panel-soft rounded-[1.6rem] p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.22em] text-ink/45">{signal.eyebrow}</p>
+                        <h3 className="mt-2 text-2xl font-semibold text-ink">{getCategoryLabel(signal.category)}</h3>
+                      </div>
+                      <span className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase ${signal.tone}`}>{signal.valueLabel}</span>
+                    </div>
+                    <p className="mt-5 text-4xl font-semibold text-ink">{signal.headline}</p>
+                    <p className="mt-2 text-sm font-semibold text-ink/70">{signal.support}</p>
+                    <p className="mt-3 text-sm leading-6 text-ink/62">{signal.description}</p>
+                  </div>
+                ))}
+              </div>
+            </article>
+
+                <section className="grid gap-4 xl:grid-cols-[0.72fr_0.28fr]">
+              <article className="rounded-[2.1rem] border border-ink/10 bg-white p-6 shadow-card">
+                <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Unified ledger</p>
+                    <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl">Operations timeline</h2>
+                  </div>
+                  <p className="text-sm text-ink/55">Grouped {filters.groupBy} and ordered newest first.</p>
+                </div>
+
+                <div className="mt-6 space-y-5">
+                  {overviewGroups.length === 0 ? (
+                    <div className="ui-panel-muted rounded-[1.6rem] border-dashed p-8 text-sm text-ink/65">
+                      No activity matched the current report filters.
+                    </div>
+                  ) : null}
+
+                  {overviewGroups.map((group) => (
+                    <div key={group.key} className="ui-panel-soft rounded-[1.6rem] p-5">
+                      <div className="flex flex-col gap-3 border-b border-ink/10 pb-4 md:flex-row md:items-end md:justify-between">
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.22em] text-ink/45">Report period</p>
+                          <h3 className="mt-2 text-2xl font-semibold text-ink">{group.label}</h3>
+                        </div>
+                        <div className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-ink">{group.operations.length} entries</div>
+                      </div>
+
+                      <div className="mt-5 space-y-3">
+                        {group.operations.map((operation) => (
+                          <div key={operation.id} className="rounded-[1.2rem] border border-ink/10 bg-white px-4 py-4 lg:grid lg:grid-cols-[1.25fr_2.4fr_1fr_1fr] lg:gap-4 lg:items-start">
+                            <div className="text-sm text-ink/62">{formatDateTimeLabel(operation.occurredAt)}</div>
+                            <div className="mt-3 space-y-2 lg:mt-0">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="rounded-full bg-emerald-700 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-white">{getCategoryLabel(operation.category)}</span>
+                                {operation.status ? <span className="ui-pill px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-ink/70">{formatStatusLabel(operation.status)}</span> : null}
+                              </div>
+                              <div>
+                                <p className="text-base font-semibold text-ink">{operation.title}</p>
+                                <p className="mt-1 text-sm leading-6 text-ink/70">{operation.detail}</p>
+                              </div>
+                            </div>
+                            <div className="mt-3 text-sm text-ink/62 lg:mt-0">
+                              <p>{operation.actorName ?? 'System or legacy record'}</p>
+                              {operation.roomLabel ? <p className="mt-1 uppercase tracking-[0.14em] text-ink/45">{operation.roomLabel}</p> : null}
+                            </div>
+                            <div className="mt-3 text-left text-sm font-semibold text-ink lg:mt-0 lg:text-right">{formatAmount(operation.amountGhs) ?? 'No direct value'}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </article>
+
+              <div className="space-y-4">
+                <article className="rounded-[2.1rem] border border-ink/10 bg-white p-6 shadow-card">
+                  <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Activity concentration</p>
+                  <h2 className="mt-2 font-[family-name:var(--font-display)] text-3xl">Where work clusters</h2>
+                  <div className="mt-5 space-y-5">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.2em] text-ink/45">Rooms</p>
+                      <div className="mt-3">{renderInsightRows(activityLeaders.rooms)}</div>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.2em] text-ink/45">Staff</p>
+                      <div className="mt-3">{renderInsightRows(activityLeaders.staff)}</div>
+                    </div>
+                  </div>
+                </article>
+              </div>
+                </section>
+            </div>
+
+            <div className="space-y-4">
+            <article className="rounded-[2.1rem] border border-emerald-900/8 bg-[linear-gradient(180deg,_rgba(255,255,255,0.98),_rgba(233,245,238,0.96))] p-6 text-ink shadow-card">
+              <p className="text-xs uppercase tracking-[0.24em] text-ink/45">{workspaceFilterLabel}</p>
               <div className="mt-5 space-y-5">
                 <div>
-                  <p className="text-sm font-semibold text-white/80">Scope</p>
+                  <p className="text-sm font-semibold text-ink/80">Scope</p>
                   <div className="mt-3 flex flex-wrap gap-3">
                     {[
                       { label: 'Overview', value: 'overview' },
@@ -739,7 +1230,7 @@ export function AdminReportsClient({ filters, hotelProfile, operations, staffOpt
                     ].map((option) => (
                       <button
                         key={option.value}
-                        className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${draftScope === option.value ? 'border-white bg-white text-ink' : 'border-white/20 text-white/75 hover:border-white/40 hover:bg-white/10'}`}
+                        className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${draftScope === option.value ? 'border-emerald-700 bg-emerald-700 text-white shadow-[0_16px_30px_-24px_rgba(15,95,70,0.6)]' : 'border-emerald-900/10 bg-white text-ink hover:border-emerald-200 hover:bg-emerald-50/80'}`}
                         onClick={() => setDraftScope(option.value as ReportFilters['scope'])}
                         type="button"
                       >
@@ -751,9 +1242,9 @@ export function AdminReportsClient({ filters, hotelProfile, operations, staffOpt
 
                 {draftScope === 'staff' ? (
                   <label className="block">
-                    <span className="text-sm font-semibold text-white/80">Staff member</span>
+                    <span className="text-sm font-semibold text-ink/80">Staff member</span>
                     <select
-                      className="mt-2 w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white outline-none transition focus:border-white/40"
+                      className="ui-input mt-2 w-full"
                       onChange={(event) => setDraftStaffId(event.target.value)}
                       value={draftStaffId}
                     >
@@ -768,12 +1259,12 @@ export function AdminReportsClient({ filters, hotelProfile, operations, staffOpt
                 ) : null}
 
                 <div>
-                  <p className="text-sm font-semibold text-white/80">Date preset</p>
+                  <p className="text-sm font-semibold text-ink/80">Date preset</p>
                   <div className="mt-3 flex flex-wrap gap-3">
                     {presetOptions.map((option) => (
                       <button
                         key={option.value}
-                        className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${draftPreset === option.value ? 'border-white bg-white text-ink' : 'border-white/20 text-white/75 hover:border-white/40 hover:bg-white/10'}`}
+                        className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${draftPreset === option.value ? 'border-emerald-700 bg-emerald-700 text-white shadow-[0_16px_30px_-24px_rgba(15,95,70,0.6)]' : 'border-emerald-900/10 bg-white text-ink hover:border-emerald-200 hover:bg-emerald-50/80'}`}
                         onClick={() => setDraftPreset(option.value)}
                         type="button"
                       >
@@ -786,18 +1277,18 @@ export function AdminReportsClient({ filters, hotelProfile, operations, staffOpt
                 {draftPreset === 'custom' ? (
                   <div className="grid gap-3 md:grid-cols-2">
                     <label className="block">
-                      <span className="text-sm font-semibold text-white/80">Start date</span>
+                      <span className="text-sm font-semibold text-ink/80">Start date</span>
                       <input
-                        className="mt-2 w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white outline-none transition focus:border-white/40"
+                        className="ui-input mt-2 w-full"
                         onChange={(event) => setDraftStartDate(event.target.value)}
                         type="date"
                         value={draftStartDate}
                       />
                     </label>
                     <label className="block">
-                      <span className="text-sm font-semibold text-white/80">End date</span>
+                      <span className="text-sm font-semibold text-ink/80">End date</span>
                       <input
-                        className="mt-2 w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white outline-none transition focus:border-white/40"
+                        className="ui-input mt-2 w-full"
                         onChange={(event) => setDraftEndDate(event.target.value)}
                         type="date"
                         value={draftEndDate}
@@ -807,12 +1298,12 @@ export function AdminReportsClient({ filters, hotelProfile, operations, staffOpt
                 ) : null}
 
                 <div>
-                  <p className="text-sm font-semibold text-white/80">Group rows</p>
+                  <p className="text-sm font-semibold text-ink/80">Group rows</p>
                   <div className="mt-3 flex flex-wrap gap-3">
                     {groupOptions.map((option) => (
                       <button
                         key={option.value}
-                        className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${draftGroupBy === option.value ? 'border-white bg-white text-ink' : 'border-white/20 text-white/75 hover:border-white/40 hover:bg-white/10'}`}
+                        className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${draftGroupBy === option.value ? 'border-emerald-700 bg-emerald-700 text-white shadow-[0_16px_30px_-24px_rgba(15,95,70,0.6)]' : 'border-emerald-900/10 bg-white text-ink hover:border-emerald-200 hover:bg-emerald-50/80'}`}
                         onClick={() => setDraftGroupBy(option.value)}
                         type="button"
                       >
@@ -823,12 +1314,12 @@ export function AdminReportsClient({ filters, hotelProfile, operations, staffOpt
                 </div>
 
                 <div>
-                  <p className="text-sm font-semibold text-white/80">Included sheets</p>
+                  <p className="text-sm font-semibold text-ink/80">{workspaceCategoryLabel}</p>
                   <div className="mt-3 flex flex-wrap gap-3">
                     {categoryOptions.map((option) => (
                       <button
                         key={option.value}
-                        className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${draftCategories.includes(option.value) ? 'border-[#d8c191] bg-[#d8c191] text-ink' : 'border-white/20 text-white/75 hover:border-white/40 hover:bg-white/10'}`}
+                        className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${draftCategories.includes(option.value) ? 'border-emerald-700 bg-emerald-700 text-white shadow-[0_16px_30px_-24px_rgba(15,95,70,0.6)]' : 'border-emerald-900/10 bg-white text-ink hover:border-emerald-200 hover:bg-emerald-50/80'}`}
                         onClick={() => toggleCategory(option.value)}
                         type="button"
                       >
@@ -839,20 +1330,20 @@ export function AdminReportsClient({ filters, hotelProfile, operations, staffOpt
                 </div>
 
                 <button
-                  className="rounded-full border border-[#d8c191] bg-[#d8c191] px-5 py-3 text-sm font-semibold text-ink transition hover:bg-[#e2cfaa] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="ui-button-soft border border-transparent disabled:cursor-not-allowed disabled:opacity-60"
                   disabled={isPending || draftCategories.length === 0 || (draftScope === 'staff' && !draftStaffId)}
                   onClick={applyFilters}
                   type="button"
                 >
-                  {isPending ? 'Refreshing report pack...' : 'Apply report filters'}
+                  {applyFiltersLabel}
                 </button>
               </div>
             </article>
 
             <article className="rounded-[2.1rem] border border-ink/10 bg-white p-6 shadow-card">
-              <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Print identity</p>
+              <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Report identity</p>
               {hotelProfile.logoUrl ? (
-                <div className="relative mt-4 h-24 w-24 overflow-hidden rounded-3xl border border-ink/10 bg-[#fcfaf6]">
+                <div className="ui-panel-soft relative mt-4 h-24 w-24 overflow-hidden rounded-3xl">
                   <Image alt={`${hotelProfile.name} logo`} className="object-contain p-3" fill sizes="96px" src={hotelProfile.logoUrl} />
                 </div>
               ) : null}
@@ -865,135 +1356,228 @@ export function AdminReportsClient({ filters, hotelProfile, operations, staffOpt
                   <p key={line}>{line}</p>
                 ))}
               </div>
-              <p className="mt-5 text-sm leading-6 text-ink/65">
-                Branding now stays on the dedicated settings page so report generation remains focused on analysis and output quality.
-              </p>
+              <p className="mt-5 text-sm leading-6 text-ink/65">Branding stays on the dedicated settings page so the working report surface remains focused on operations.</p>
               <Link
-                className="mt-5 inline-flex rounded-full border border-ink/15 px-4 py-2 text-sm font-semibold text-ink transition hover:border-ink/30 hover:bg-parchment"
+                className="ui-button-secondary mt-5 inline-flex px-4 py-2 text-sm"
                 href="/admin/settings"
               >
                 Open hotel settings
               </Link>
             </article>
-          </div>
-        </section>
-
-        <section className="space-y-8">
-          {categoryPages.map((page) => (
-            <article key={page.category} className="overflow-hidden rounded-[2.3rem] border border-ink/10 bg-white shadow-card print:break-after-page">
-              <div className={`bg-gradient-to-r ${page.accent} px-7 py-7 text-white md:px-8`}>
-                <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-                  <div className="space-y-3">
-                    <p className="text-xs uppercase tracking-[0.26em] text-white/62">{page.eyebrow}</p>
-                    <div>
-                      <h2 className="font-[family-name:var(--font-display)] text-5xl">{getCategoryLabel(page.category)}</h2>
-                      <p className="mt-3 max-w-3xl text-sm leading-6 text-white/82">{page.description}</p>
-                    </div>
-                  </div>
-                  <div className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white">
-                    {page.operations.length} records
-                  </div>
+            </div>
+          </section>
+        ) : (
+          <section className="space-y-4">
+            <article className="rounded-[2rem] border border-emerald-900/8 bg-white p-5 shadow-card">
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <p className="text-sm font-semibold text-ink">Export filters</p>
+                  <p className="text-sm leading-6 text-ink/62">Adjust scope, date range, grouping, and included sheets before reviewing the print preview below.</p>
                 </div>
-              </div>
 
-              <div className="space-y-6 px-7 py-7 md:px-8">
-                <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                  {page.pageSummary.map((card) => (
-                    <div key={card.label} className="rounded-[1.5rem] border border-ink/10 bg-[#fbf7f1] p-5">
-                      <p className="text-xs uppercase tracking-[0.22em] text-ink/45">{card.label}</p>
-                      <p className="mt-3 text-2xl font-semibold text-ink">{card.value}</p>
+                <div className="grid gap-5 xl:grid-cols-[0.85fr_1.15fr_0.9fr_1.35fr_auto] xl:items-start">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.18em] text-ink/45">Scope</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {[
+                        { label: 'Overview', value: 'overview' },
+                        { label: 'Staff specific', value: 'staff' }
+                      ].map((option) => (
+                        <button
+                          key={option.value}
+                          className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${draftScope === option.value ? 'border-emerald-700 bg-emerald-700 text-white shadow-[0_16px_30px_-24px_rgba(15,95,70,0.6)]' : 'border-emerald-900/10 bg-white text-ink hover:border-emerald-200 hover:bg-emerald-50/80'}`}
+                          onClick={() => setDraftScope(option.value as ReportFilters['scope'])}
+                          type="button"
+                        >
+                          {option.label}
+                        </button>
+                      ))}
                     </div>
-                  ))}
-                </section>
-
-                <section className="grid gap-4 xl:grid-cols-[0.95fr_0.95fr_1.1fr]">
-                  <article className="rounded-[1.6rem] border border-ink/10 bg-[#fcfaf6] p-5">
-                    <p className="text-xs uppercase tracking-[0.22em] text-ink/45">Period flow</p>
-                    <div className="mt-4">{renderInsightRows(page.periodRows)}</div>
-                  </article>
-                  <article className="rounded-[1.6rem] border border-ink/10 bg-[#fcfaf6] p-5">
-                    <p className="text-xs uppercase tracking-[0.22em] text-ink/45">Status mix</p>
-                    <div className="mt-4">{renderInsightRows(page.mixRows)}</div>
-                  </article>
-                  <article className="rounded-[1.6rem] border border-ink/10 bg-[#fcfaf6] p-5">
-                    <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-1">
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.22em] text-ink/45">Staff coverage</p>
-                        <div className="mt-4">{renderInsightRows(page.staffRows)}</div>
-                      </div>
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.22em] text-ink/45">Room concentration</p>
-                        <div className="mt-4">{renderInsightRows(page.roomRows)}</div>
-                      </div>
-                    </div>
-                  </article>
-                </section>
-
-                <section className="space-y-5">
-                  <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-                    <div>
-                      <p className="text-xs uppercase tracking-[0.22em] text-ink/45">Detailed timeline</p>
-                      <h3 className="mt-2 font-[family-name:var(--font-display)] text-3xl">{getCategoryLabel(page.category)} activity ledger</h3>
-                    </div>
-                    {page.operations.length > 0 ? (
-                      <p className="text-sm text-ink/55">Grouped {filters.groupBy} and ordered newest first inside each period.</p>
+                    {draftScope === 'staff' ? (
+                      <label className="mt-3 block">
+                        <span className="text-xs uppercase tracking-[0.18em] text-ink/45">Staff member</span>
+                        <select
+                          className="ui-input mt-2 w-full"
+                          onChange={(event) => setDraftStaffId(event.target.value)}
+                          value={draftStaffId}
+                        >
+                          <option value="">Select a staff member</option>
+                          {staffOptions.map((staff) => (
+                            <option key={staff.id} value={staff.id}>
+                              {staff.name} · {staff.role}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
                     ) : null}
                   </div>
 
-                  {page.groupedOperations.length === 0 ? (
-                    <div className="rounded-[1.6rem] border border-dashed border-ink/15 bg-[#fcfaf6] p-8 text-sm text-ink/65">
-                      No {getCategoryLabel(page.category).toLowerCase()} activity matched the current report filters.
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.18em] text-ink/45">Date preset</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {presetOptions.map((option) => (
+                        <button
+                          key={option.value}
+                          className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${draftPreset === option.value ? 'border-emerald-700 bg-emerald-700 text-white shadow-[0_16px_30px_-24px_rgba(15,95,70,0.6)]' : 'border-emerald-900/10 bg-white text-ink hover:border-emerald-200 hover:bg-emerald-50/80'}`}
+                          onClick={() => setDraftPreset(option.value)}
+                          type="button"
+                        >
+                          {option.label}
+                        </button>
+                      ))}
                     </div>
-                  ) : null}
-
-                  {page.groupedOperations.map((group) => (
-                    <div key={group.key} className="rounded-[1.6rem] border border-ink/10 bg-[#fcfaf6] p-5">
-                      <div className="flex flex-col gap-3 border-b border-ink/10 pb-4 md:flex-row md:items-end md:justify-between">
-                        <div>
-                          <p className="text-xs uppercase tracking-[0.22em] text-ink/45">Report period</p>
-                          <h4 className="mt-2 text-2xl font-semibold text-ink">{group.label}</h4>
-                        </div>
-                        <div className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-ink">{group.operations.length} entries</div>
+                    {draftPreset === 'custom' ? (
+                      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                        <label className="block">
+                          <span className="text-xs uppercase tracking-[0.18em] text-ink/45">Start date</span>
+                          <input
+                            className="ui-input mt-2 w-full"
+                            onChange={(event) => setDraftStartDate(event.target.value)}
+                            type="date"
+                            value={draftStartDate}
+                          />
+                        </label>
+                        <label className="block">
+                          <span className="text-xs uppercase tracking-[0.18em] text-ink/45">End date</span>
+                          <input
+                            className="ui-input mt-2 w-full"
+                            onChange={(event) => setDraftEndDate(event.target.value)}
+                            type="date"
+                            value={draftEndDate}
+                          />
+                        </label>
                       </div>
+                    ) : null}
+                  </div>
 
-                      <div className="mt-5 space-y-3">
-                        <div className="hidden rounded-[1.1rem] bg-white px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-ink/45 lg:grid lg:grid-cols-[1.35fr_2.3fr_1.1fr_1fr_1fr] lg:gap-4">
-                          <span>Timestamp</span>
-                          <span>Activity</span>
-                          <span>Handled by</span>
-                          <span>Room / status</span>
-                          <span className="text-right">Value</span>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.18em] text-ink/45">Group rows</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {groupOptions.map((option) => (
+                        <button
+                          key={option.value}
+                          className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${draftGroupBy === option.value ? 'border-emerald-700 bg-emerald-700 text-white shadow-[0_16px_30px_-24px_rgba(15,95,70,0.6)]' : 'border-emerald-900/10 bg-white text-ink hover:border-emerald-200 hover:bg-emerald-50/80'}`}
+                          onClick={() => setDraftGroupBy(option.value)}
+                          type="button"
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.18em] text-ink/45">{workspaceCategoryLabel}</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {categoryOptions.map((option) => (
+                        <button
+                          key={option.value}
+                          className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${draftCategories.includes(option.value) ? 'border-emerald-700 bg-emerald-700 text-white shadow-[0_16px_30px_-24px_rgba(15,95,70,0.6)]' : 'border-emerald-900/10 bg-white text-ink hover:border-emerald-200 hover:bg-emerald-50/80'}`}
+                          onClick={() => toggleCategory(option.value)}
+                          type="button"
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 xl:w-[220px]">
+                    <div className="rounded-[1.2rem] border border-ink/8 bg-emerald-50/60 p-4">
+                      <p className="text-xs uppercase tracking-[0.18em] text-ink/45">Print preview</p>
+                      <div className="mt-3 space-y-1.5 text-sm text-ink/72">
+                        <p>{categoryPages.length} sheets selected</p>
+                        <p>{summary.operationsCount} rows in export</p>
+                        <p>{hotelProfile.logoUrl ? 'Branding ready' : 'Text-only branding'}</p>
+                      </div>
+                    </div>
+                    <button
+                      className="ui-button-soft w-full border border-transparent disabled:cursor-not-allowed disabled:opacity-60"
+                      disabled={isPending || draftCategories.length === 0 || (draftScope === 'staff' && !draftStaffId)}
+                      onClick={applyFilters}
+                      type="button"
+                    >
+                      {applyFiltersLabel}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <section className="grid gap-4 xl:grid-cols-[0.72fr_0.28fr]">
+              <article className="rounded-[2rem] border border-ink/10 bg-white p-6 shadow-card">
+                <div className="space-y-1.5">
+                  <h2 className="font-[family-name:var(--font-display)] text-3xl">Print preview</h2>
+                  <p className="text-sm leading-6 text-ink/62">Each selected lane becomes its own sheet in the pack.</p>
+                </div>
+
+                <div className="mt-6 grid gap-4 md:grid-cols-2">
+                  {categoryPages.map((page) => (
+                    <div key={page.category} className="ui-panel-soft overflow-hidden rounded-[1.6rem]">
+                      <div className={`bg-gradient-to-r ${page.accent} px-5 py-5`}>
+                        <p className="text-xs uppercase tracking-[0.22em] text-white/70">{page.eyebrow}</p>
+                        <h3 className="mt-2 text-2xl font-semibold text-white">{getCategoryLabel(page.category)}</h3>
+                        <p className="mt-3 max-w-sm text-sm leading-6 text-white/82">{page.description}</p>
+                      </div>
+                      <div className="space-y-4 p-5">
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          {page.pageSummary.slice(0, 4).map((item) => (
+                            <div key={item.label} className="rounded-[1.1rem] bg-white p-4">
+                              <p className="text-xs uppercase tracking-[0.2em] text-ink/45">{item.label}</p>
+                              <p className="mt-3 text-xl font-semibold text-ink">{item.value}</p>
+                            </div>
+                          ))}
                         </div>
-
-                        {group.operations.map((operation) => (
-                          <div key={operation.id} className="rounded-[1.2rem] border border-ink/10 bg-white px-4 py-4 lg:grid lg:grid-cols-[1.35fr_2.3fr_1.1fr_1fr_1fr] lg:gap-4 lg:items-start">
-                            <div className="text-sm text-ink/62">{formatDateTimeLabel(operation.occurredAt)}</div>
-                            <div className="mt-3 space-y-2 lg:mt-0">
-                              <div className="flex flex-wrap items-center gap-2">
-                                <span className="rounded-full bg-ink px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-white">{getCategoryLabel(operation.category)}</span>
-                                {operation.status ? <span className="rounded-full bg-parchment px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-ink/70">{formatStatusLabel(operation.status)}</span> : null}
-                              </div>
-                              <div>
-                                <p className="text-base font-semibold text-ink">{operation.title}</p>
-                                <p className="mt-1 text-sm leading-6 text-ink/70">{operation.detail}</p>
-                              </div>
-                            </div>
-                            <div className="mt-3 text-sm text-ink/62 lg:mt-0">{operation.actorName ?? 'System or legacy record'}</div>
-                            <div className="mt-3 text-sm text-ink/62 lg:mt-0">
-                              <p>{operation.roomLabel ?? 'No room link'}</p>
-                              {operation.status ? <p className="mt-1 uppercase tracking-[0.14em] text-ink/45">{formatStatusLabel(operation.status)}</p> : null}
-                            </div>
-                            <div className="mt-3 text-left text-sm font-semibold text-ink lg:mt-0 lg:text-right">{formatAmount(operation.amountGhs) ?? 'No direct value'}</div>
-                          </div>
-                        ))}
+                        <div className="rounded-[1.1rem] bg-white p-4">
+                          <p className="text-xs uppercase tracking-[0.2em] text-ink/45">Lead period flow</p>
+                          <div className="mt-3">{renderInsightRows(page.periodRows.slice(0, 3))}</div>
+                        </div>
                       </div>
                     </div>
                   ))}
-                </section>
+                </div>
+              </article>
+
+              <div className="space-y-4">
+                <article className="rounded-[2rem] border border-ink/10 bg-white p-6 shadow-card">
+                  <p className="text-sm font-semibold text-ink">Print identity</p>
+                  {hotelProfile.logoUrl ? (
+                    <div className="ui-panel-soft relative mt-4 h-24 w-24 overflow-hidden rounded-3xl">
+                      <Image alt={`${hotelProfile.name} logo`} className="object-contain p-3" fill sizes="96px" src={hotelProfile.logoUrl} />
+                    </div>
+                  ) : null}
+                  <h2 className="mt-3 font-[family-name:var(--font-display)] text-3xl">{hotelProfile.name}</h2>
+                  <div className="mt-4 space-y-2 text-sm leading-6 text-ink/72">
+                    {addressLines.map((line) => (
+                      <p key={line}>{line}</p>
+                    ))}
+                    {contactLines.map((line) => (
+                      <p key={line}>{line}</p>
+                    ))}
+                  </div>
+                  <div className="mt-5 flex flex-col gap-3">
+                    <button
+                      className="ui-button-primary disabled:cursor-not-allowed disabled:opacity-60"
+                      disabled={isExporting || operations.length === 0}
+                      onClick={exportPdf}
+                      type="button"
+                    >
+                      {isExporting ? 'Generating PDF pack...' : 'Generate PDF pack'}
+                    </button>
+                    <Link className="ui-button-secondary inline-flex justify-center px-4 py-2 text-sm" href="/admin/settings">
+                      Open hotel settings
+                    </Link>
+                  </div>
+                </article>
+
+                <article className="rounded-[2rem] border border-ink/10 bg-white p-6 shadow-card">
+                  <p className="text-sm font-semibold text-ink">Preview coverage</p>
+                  <div className="mt-4">{renderInsightRows(activityLeaders.rooms.slice(0, 3))}</div>
+                </article>
               </div>
-            </article>
-          ))}
-        </section>
+            </section>
+          </section>
+        )}
       </div>
     </main>
   )

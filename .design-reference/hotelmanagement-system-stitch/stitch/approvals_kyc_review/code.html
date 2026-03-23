@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Approvals - L'Hôtel Command</title>
+<script type='text/javascript' nonce='13olYVXVoxymENTSgGwuEA==' src='https://contribution.usercontent.google.com/sK1fsXwRgBZLM-ZHgZ9VmOIb2qD6zRv8OuhmPA1WEQQIRLlKcZTWbGuNy_PlO_H3ExX4i4FTjQu0NUD4veDp6ib3kH-VbeGPcPCy54agQYiRYb4LGRJ6uRmtaksmSDZJg6jLKYjy1weR7klQDEplBpmZVOhlaLphlgIzuufRhXCE8-9TrrumIjRdPQrLlQZS3l6IdM6aAq2mzRoCsQvAO8yA2ihM7Anp4QOeYFIARLwM-kZojqrIJWEYUA7ePrPbMA_I_Ud-lFzB1r6ZWox0Jh-jzjxk52LBhTALqJPloKM5S9005mYx6eE52B8_dTLXKHkXudH2ufVinAM_dJopZg5xgPLW4kOKHje5M0lmmJZDwJblLIUuInZF4fEZli6wvNcsV_OSqKJIR7EtMsnOnaewISJvfiP7GbnWHZXGb1f6pp_VjpFNe5i0jihA3_ZdSMzsjpRts6bh6RyPMJTenhELPvTfrYq4Ve--JKdbgryszcK8sG9vVQ5anFX4dSUnPM4E-vD3X1q4j5w4_yEXyLSdzI2yzAn56XyzRlYC6TibW7jQSBumchlbK-ylA9vBy_NHQhlPgu4Q3B2MENp_dUeqUmt0rIp44MhI2YrFXgRK9-eOHuHaLEjBG3_NNcLcBBcf3zVNZk0T59Fa9lP-EUMPnRwhdug-R8LFdd5OFzkrRolscfKo_srKzrI2O_a09Esfyap3Byxk_RY8xHn49tMy_swDuaujJcZ4vMUCxJgDgjne0J8VhCJS7AIWqID_7gozpbgIKOVn6oFgCgwpxc-v1WfbX4uTv1MPzzCA'></script><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-fixed-variant": "#6e3900",
+              "on-primary-fixed": "#131b2e",
+              "on-surface": "#1c1c1a",
+              "on-tertiary-fixed": "#2f1500",
+              "surface-tint": "#565e74",
+              "primary-container": "#131b2e",
+              "error": "#ba1a1a",
+              "outline": "#76777d",
+              "secondary-fixed": "#ffddb4",
+              "inverse-surface": "#31302f",
+              "surface-bright": "#fcf9f6",
+              "tertiary": "#000000",
+              "surface-variant": "#e5e2df",
+              "surface-dim": "#dcdad7",
+              "tertiary-fixed-dim": "#ffb77d",
+              "secondary-fixed-dim": "#ecbf84",
+              "on-secondary-fixed": "#291800",
+              "primary": "#000000",
+              "secondary-container": "#fecf93",
+              "on-tertiary-container": "#c76c00",
+              "on-surface-variant": "#45464d",
+              "primary-fixed-dim": "#bec6e0",
+              "surface-container-low": "#f6f3f0",
+              "surface-container": "#f0edea",
+              "on-error": "#ffffff",
+              "on-secondary": "#ffffff",
+              "on-primary-fixed-variant": "#3f465c",
+              "inverse-primary": "#bec6e0",
+              "surface-container-highest": "#e5e2df",
+              "surface": "#fcf9f6",
+              "surface-container-lowest": "#ffffff",
+              "on-background": "#1c1c1a",
+              "on-error-container": "#93000a",
+              "on-secondary-fixed-variant": "#5f4112",
+              "tertiary-fixed": "#ffdcc3",
+              "background": "#fcf9f6",
+              "surface-container-high": "#eae8e5",
+              "on-secondary-container": "#795726",
+              "on-primary": "#ffffff",
+              "outline-variant": "#c6c6cd",
+              "on-tertiary": "#ffffff",
+              "error-container": "#ffdad6",
+              "inverse-on-surface": "#f3f0ed",
+              "primary-fixed": "#dae2fd",
+              "on-primary-container": "#7c839b"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body { font-family: 'Manrope', sans-serif; }
+      h1, h2, h3 { font-family: 'Noto Serif', serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface flex min-h-screen">
+<!-- SideNavBar (Source of Truth) -->
+<aside class="h-screen w-64 fixed left-0 top-0 border-r border-slate-200 bg-slate-100 flex flex-col p-4 space-y-2 font-serif antialiased z-50">
+<div class="flex items-center gap-3 px-2 mb-8">
+<div class="w-8 h-8 bg-primary rounded flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-sm">hotel</span>
+</div>
+<div>
+<h2 class="text-lg font-bold tracking-widest uppercase text-slate-900">The Grand</h2>
+<p class="text-[10px] text-slate-500 font-sans tracking-wider uppercase">Premium Ops</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:bg-slate-200/50 rounded-lg transition-all duration-300 hover:pl-2" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-sm">Command Center</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:bg-slate-200/50 rounded-lg transition-all duration-300 hover:pl-2" href="#">
+<span class="material-symbols-outlined" data-icon="dataset">dataset</span>
+<span class="text-sm">Service Desk</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-white text-slate-900 font-semibold shadow-sm rounded-lg transition-all duration-300 hover:pl-2 scale-105" href="#">
+<span class="material-symbols-outlined" data-icon="fact_check">fact_check</span>
+<span class="text-sm">Approvals</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:bg-slate-200/50 rounded-lg transition-all duration-300 hover:pl-2" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="text-sm">Reports</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:bg-slate-200/50 rounded-lg transition-all duration-300 hover:pl-2" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="text-sm">Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:bg-slate-200/50 rounded-lg transition-all duration-300 hover:pl-2" href="#">
+<span class="material-symbols-outlined" data-icon="badge">badge</span>
+<span class="text-sm">Staff</span>
+</a>
+</nav>
+<button class="w-full bg-primary text-on-primary py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 mb-4 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-lg">add</span>
+            New Booking
+        </button>
+<div class="pt-4 border-t border-slate-200 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:bg-slate-200/50 rounded-lg transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="text-sm">Support</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:bg-slate-200/50 rounded-lg transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="text-sm">Sign Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 flex flex-col flex-1 h-screen overflow-hidden">
+<!-- TopAppBar (Source of Truth) -->
+<header class="bg-slate-50/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200 flex justify-between items-center w-full px-6 py-3">
+<div class="flex items-center gap-8">
+<span class="font-serif italic text-xl font-bold text-slate-900">Approvals</span>
+<nav class="hidden md:flex gap-6 font-serif text-sm tracking-tight items-center">
+<a class="text-slate-500 hover:text-slate-700 transition-colors" href="#">Dashboard</a>
+<a class="text-slate-500 hover:text-slate-700 transition-colors" href="#">Reception</a>
+<a class="text-slate-500 hover:text-slate-700 transition-colors" href="#">Service Desk</a>
+<a class="text-slate-900 border-b-2 border-slate-900 pb-1" href="#">Approvals</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+<input class="bg-white border border-slate-200 rounded-full pl-10 pr-4 py-1.5 text-xs w-64 focus:outline-none focus:ring-1 focus:ring-slate-900" placeholder="Search approvals..." type="text"/>
+</div>
+<button class="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-slate-200">
+<img class="w-full h-full object-cover" data-alt="User profile portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvim7jXdeyqPusS3YFpcqmJoeSzvDpQgR2gDhexMwJlFv0gzVqZlRDUiTFhDSNg0vmbTKo60KIhEjZehVGqpNmgDoNvIOyJIQyNqWVtSSCJb6qGhxqZnJCRId91uAxCpLLEAfHDr7LW3PzulVBhvCFufxzpxO_peODu1Qf4kj2jVH5sJF8G1lHkqkXR0uggEFzYbS9LOC6yHCTkF4HoRguNxG0v6ZD0Tiy2IZ1Kgq1nm2-h7Y0cNlh-9fRIlJ9snrFXR0_yPlViJKl"/>
+</div>
+</div>
+</header>
+<!-- Approval Workspace -->
+<div class="flex flex-1 overflow-hidden bg-background">
+<!-- List Panel (Left) -->
+<section class="w-[380px] border-r border-outline-variant flex flex-col bg-surface-container-low">
+<div class="p-4 border-b border-outline-variant flex justify-between items-center">
+<h3 class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Pending (12)</h3>
+<div class="flex gap-1">
+<button class="p-1 hover:bg-surface-container rounded"><span class="material-symbols-outlined text-sm">filter_list</span></button>
+<button class="p-1 hover:bg-surface-container rounded"><span class="material-symbols-outlined text-sm">sort</span></button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-3 space-y-3">
+<!-- Approval Card 1: ACTIVE -->
+<div class="p-4 bg-white border-2 border-primary rounded-lg shadow-sm cursor-pointer relative group">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] bg-secondary-container text-on-secondary-container px-2 py-0.5 font-bold uppercase tracking-tighter">KYC Verification</span>
+<span class="text-[10px] text-on-surface-variant font-medium">2m ago</span>
+</div>
+<h4 class="font-headline font-bold text-slate-900 mb-1">Julianne Moore</h4>
+<p class="text-xs text-slate-500 mb-4">Passport ID: FR-992-K8</p>
+<div class="w-full h-24 bg-slate-100 rounded border border-slate-200 overflow-hidden">
+<img class="w-full h-full object-cover grayscale opacity-80" data-alt="Identification document preview" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB56RMyKopP0dNtquGZqo7CUp3vv6ZLI6JohBrUJN21GfcrfFs8-YHMPdCqRMhn0jV7YHabm-0uU0LVPglMWEZ9FxviZ2xfqUHWpTHJiBrCTduZDbnYeUD-5bAIRJSX0NXB1h7BeUtSglW8REkC_c_AW_p18X9yc0zTUlDkaP4okFc0YHodweie54uLljltbevnZ2QVWdPAbsnXrygMo43tTKG1DkBGhboOPSQToh-M4dsuavmd9rot6kILr6pVMCIhfcWnwhBdyrKH"/>
+</div>
+</div>
+<!-- Approval Card 2 -->
+<div class="p-4 bg-white border border-outline-variant rounded hover:border-slate-400 transition-colors cursor-pointer group">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] bg-surface-container-highest text-on-surface-variant px-2 py-0.5 font-bold uppercase tracking-tighter">Receipt Audit</span>
+<span class="text-[10px] text-on-surface-variant font-medium">14m ago</span>
+</div>
+<h4 class="font-headline font-bold text-slate-900 mb-1">Marcus Thorne</h4>
+<p class="text-xs text-slate-500 mb-4">Dinner Reimbursement - Room 402</p>
+<div class="w-full h-24 bg-slate-100 rounded border border-slate-200 overflow-hidden">
+<img class="w-full h-full object-cover grayscale opacity-50 group-hover:opacity-80 transition-opacity" data-alt="Restaurant receipt document preview" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5Wf5ZGa-6VTTjRq3qMq1w_l6hddBPJvGs8zc4zl--IvMB4iw96Ko3r7h6C5xL7E51dCdjX84qZ1za_5WOVeB5ZoEAa6lXlpWb_osnua9BBgjK7NnZ-roXxeD2uPDqFwjlJVJk7cpv6XRtc9v0vAh5-XUOtwgV-DI77vaIFEn1vsbNwYc6a9ODJn0AFmcI2QikAey0nYJEqIWF6qPh3ujugzgw4z_JnLG8OI66Ll0XFiOO10Qwf9cpiHif3IWMBKEXEqhUiy1r3YCv"/>
+</div>
+</div>
+<!-- Approval Card 3 -->
+<div class="p-4 bg-white border border-outline-variant rounded hover:border-slate-400 transition-colors cursor-pointer group">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] bg-primary-container text-on-primary-container px-2 py-0.5 font-bold uppercase tracking-tighter">Stay Extension</span>
+<span class="text-[10px] text-on-surface-variant font-medium">1h ago</span>
+</div>
+<h4 class="font-headline font-bold text-slate-900 mb-1">Elena Rostova</h4>
+<p class="text-xs text-slate-500 mb-4">Ext: +2 Nights (Deluxe Suite)</p>
+<div class="flex items-center gap-3 p-3 bg-slate-50 rounded border border-slate-100">
+<span class="material-symbols-outlined text-slate-400">calendar_today</span>
+<div class="text-[10px] uppercase font-bold text-slate-600">Request: Oct 12 - Oct 14</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Review Panel (Right) -->
+<section class="flex-1 flex flex-col bg-surface overflow-hidden">
+<!-- Detailed View Header -->
+<div class="px-8 py-6 border-b border-outline-variant flex justify-between items-center bg-white/50">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-secondary text-base">verified_user</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-secondary">Document Verification Required</span>
+</div>
+<h2 class="text-3xl font-headline font-bold text-slate-900">Julianne Moore</h2>
+<p class="text-sm text-slate-500 mt-1">Check-in: Today, 14:00 • Reservation ID: #99281-LH</p>
+</div>
+<!-- Inline Action Cluster -->
+<div class="flex items-center gap-3">
+<button class="px-6 py-2.5 border border-error text-error text-sm font-bold uppercase tracking-widest hover:bg-error/5 transition-colors">
+                            Reject
+                        </button>
+<button class="px-8 py-2.5 bg-primary text-on-primary text-sm font-bold uppercase tracking-widest shadow-lg hover:opacity-90 transition-opacity">
+                            Approve
+                        </button>
+</div>
+</div>
+<!-- Document Review Area -->
+<div class="flex-1 p-8 overflow-y-auto">
+<div class="max-w-4xl mx-auto space-y-8">
+<!-- Main Document Display -->
+<div class="bg-white p-2 border border-outline-variant shadow-xl ring-1 ring-slate-200">
+<div class="relative w-full aspect-[1.4/1] bg-slate-100 overflow-hidden flex items-center justify-center">
+<img class="w-full h-full object-cover shadow-inner" data-alt="High resolution passport scan for identity verification" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyug6HZ4lYJ2RO1KV-MD36qVdwN_ewdPxVhxNknokRTuxbxPe2ziNjKq3iPWerbg8su_0N6z51T5gL4LY2LuR1HvSpW9aCPCcQYhr_Cv6ps0F5nZMMdrM9r5BF4g7XklFroEUSXaOofcLIL_3nlmiiO4B3p1-QhSwVTGm0X_WQUsKCTWZKVCYHxsr_1nUcwEt46_Fl4BMX0Wkk0opxN86xRf0qvrA4KfwxAJQctMHJKW030AbhlyUUA2NbYr--6xzWm0ruND9PxmRZ"/>
+<!-- OCR Overlays -->
+<div class="absolute top-[20%] left-[10%] border-2 border-secondary/40 w-[30%] h-[10%] bg-secondary/10 flex items-center justify-center">
+<span class="text-[10px] text-on-secondary-container font-bold px-1 bg-white/80">MOORE, JULIANNE</span>
+</div>
+<div class="absolute bottom-[10%] left-[10%] border-2 border-secondary/40 w-[80%] h-[15%] bg-secondary/10 flex items-center justify-center">
+<span class="text-[10px] text-on-secondary-container font-bold px-1 bg-white/80 tracking-[0.5em]">P<fra<moore<<julianne<<<<<<<<<<<<<<<<<< span="">
+</fra<moore<<julianne<<<<<<<<<<<<<<<<<<></span></div>
+</div>
+</div>
+<!-- Data Comparison Grid (Bento Style) -->
+<div class="grid grid-cols-3 gap-4">
+<!-- Comparison Card -->
+<div class="p-5 border border-outline-variant bg-white">
+<h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">ID Match Score</h4>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-headline font-bold text-slate-900">98.2%</span>
+<span class="text-[10px] text-green-600 font-bold">OPTIMAL</span>
+</div>
+</div>
+<!-- Comparison Card -->
+<div class="p-5 border border-outline-variant bg-white">
+<h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Document Expiry</h4>
+<div class="flex items-baseline gap-2">
+<span class="text-lg font-headline font-bold text-slate-900 italic">24 SEP 2029</span>
+<span class="material-symbols-outlined text-green-600 text-sm">check_circle</span>
+</div>
+</div>
+<!-- Comparison Card -->
+<div class="p-5 border border-outline-variant bg-white">
+<h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Security Markers</h4>
+<div class="flex gap-2">
+<div class="w-3 h-3 rounded-full bg-green-500"></div>
+<div class="w-3 h-3 rounded-full bg-green-500"></div>
+<div class="w-3 h-3 rounded-full bg-slate-200"></div>
+</div>
+<p class="text-[10px] text-slate-500 mt-2">Hologram verified via mobile app</p>
+</div>
+</div>
+<!-- Notes/Comments Panel -->
+<div class="bg-surface-container p-6 border-l-4 border-primary">
+<h4 class="text-xs font-bold uppercase tracking-widest mb-4">Front Desk Notes</h4>
+<p class="text-sm font-serif italic text-slate-700 leading-relaxed">
+                                "Guest arrived early. ID scan matches photo record. Previous stays at The Grand London were marked as VIP. Document is original plastic card type."
+                            </p>
+<div class="flex items-center gap-2 mt-4 text-[10px] font-bold text-slate-500">
+<img class="w-5 h-5 rounded-full object-cover" data-alt="Staff avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDepVGtEsPv14IWeOG7fC6PMBJThYaoYSYkRgZexnjjGya_m-cJ9oDbZIdNHvVOyrNsvoka306vZ-UnVxh1iQ4ATydV8eLEceO2ZWwUfM4dIYB0p0U349kWwD1HXcTbQd_YJpJOe8SWyOZufviKUpiRbEEua98Pk78bbxMhG_b3EweGQE9jQRhBY81Ww8p691MZVQAVw1972oY1PE8eC0zgZk-gjbPXvwwMMIoQmPjwsYQMI-1XELh4UletdD0C5EZiZ79KAu9gFsjX"/>
+                                Sarah Jenkins, Senior Concierge • 14:12 PM
+                            </div>
+</div>
+</div>
+</div>
+<!-- Secondary Actions Footer -->
+<div class="px-8 py-4 border-t border-outline-variant bg-white flex justify-between items-center">
+<button class="flex items-center gap-2 text-slate-400 hover:text-slate-600 text-xs font-bold uppercase tracking-tighter">
+<span class="material-symbols-outlined text-sm">flag</span>
+                        Escalate to Manager
+                    </button>
+<div class="flex gap-4">
+<button class="text-slate-500 hover:text-slate-800"><span class="material-symbols-outlined">print</span></button>
+<button class="text-slate-500 hover:text-slate-800"><span class="material-symbols-outlined">share</span></button>
+</div>
+</div>
+</section>
+</div>
+</main>
+</body></html>

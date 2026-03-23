@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script type='text/javascript' nonce='mLy+o+rvUl0qaM+v/FAWRA==' src='https://contribution.usercontent.google.com/LePv3MibEkf4Zp1sWVh172mVulLxANQeKMHCBQKDSLXPCPXBJ6QCqBQXBRxo5LM2jx2t1HP0lySpynzDJc3hBpWRh54UasfYhGAGOX3Dd8zt3t7ToSL1bct72jmFfjlEaSl2bq0kcU8TwpjBqGxXEljAE12rHSvE5O0efruCuHX5x8ypXVhfVmokaJMYufkrwNTun_mSYZnh2gXtQIVj4uNsk4H3PQnV6q1jKbq8CGV0oiQRd-xwxN7vbTWtTdEmsgzHGm01QqX4RO73y5bqE3kIzdX2NPTRltfdjRRSCIa7PdICjJQzSN4A0hg-AMCSUAlmFJQIL1_Cvfx7TuoIE7DU-GJXLqn9RP_c-59B-27Y1_GrLemRoRa9lSbQHd0Ev5dImi06Tmw90oFfdEGbWcxpExfYxjHLy6fMcFQVQApDUNtw-8NDRpWvtv_cIfMASlq3sc8Jeqm68I7ogWPG2NEsuNtenHf1wP7mgPYKJ0a82qobULLdjp-EnsZ6cUD_8ivWaaGlcgkc8DvPENzu_3o7LPGcdL1eN85Q655MfGk868j3BriTzir3oTKDe4DrouknJXC_Jw9SS_PMtU2-P0enPNEo80OabdJ_JjNJqxifnSTETTOAjdM9papj7nYxHOFZq4TpnTPPvH4cJZ8h-gVkxWqrfSxHX0huyLjcp8oMHctbsOpSHXDcGBybej2iP8PPBxDZMeR1Xq0noyRFkTs68vs_T2N-YNSLC8BSp33CXCUB3nSetiDx-tQ07b5RlHMJFHL8DOBQO-kg6W5DzbthxL4_j_t0s2cIHg'></script><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&amp;family=Manrope:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-error": "#ffffff",
+              "error-container": "#ffdad6",
+              "surface-container-high": "#eae8e3",
+              "surface": "#fbf9f4",
+              "inverse-on-surface": "#f2f1ec",
+              "background": "#fbf9f4",
+              "surface-container-low": "#f5f3ee",
+              "secondary-container": "#ffb193",
+              "primary-fixed": "#d2e8d8",
+              "surface-bright": "#fbf9f4",
+              "surface-container": "#f0eee9",
+              "on-tertiary": "#ffffff",
+              "on-surface": "#1b1c19",
+              "on-secondary-container": "#7a412a",
+              "surface-dim": "#dbdad5",
+              "on-primary-container": "#f6fff6",
+              "surface-tint": "#506356",
+              "secondary-fixed": "#ffdbce",
+              "inverse-surface": "#30312e",
+              "tertiary": "#725556",
+              "error": "#ba1a1a",
+              "surface-container-lowest": "#ffffff",
+              "on-secondary-fixed": "#370e00",
+              "outline-variant": "#c3c8c2",
+              "secondary": "#8a4f37",
+              "primary-container": "#66796c",
+              "inverse-primary": "#b7ccbc",
+              "primary-fixed-dim": "#b7ccbc",
+              "on-tertiary-fixed-variant": "#5b4041",
+              "on-secondary": "#ffffff",
+              "secondary-fixed-dim": "#ffb599",
+              "on-error-container": "#93000a",
+              "tertiary-fixed-dim": "#e3bebe",
+              "primary": "#4d6054",
+              "tertiary-container": "#8c6d6e",
+              "on-primary-fixed-variant": "#384b3f",
+              "on-tertiary-fixed": "#2b1617",
+              "on-primary": "#ffffff",
+              "on-background": "#1b1c19",
+              "tertiary-fixed": "#ffdada",
+              "surface-variant": "#e4e2dd",
+              "on-tertiary-container": "#fffbff",
+              "on-primary-fixed": "#0d1f15",
+              "outline": "#737873",
+              "on-surface-variant": "#434844",
+              "on-secondary-fixed-variant": "#6e3822",
+              "surface-container-highest": "#e4e2dd"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Manrope', sans-serif; }
+        h1, h2, h3, .serif { font-family: 'Noto Serif', serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-secondary-container">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 bottom-0 flex flex-col py-6 w-[250px] h-screen bg-[#f5f3ee] dark:bg-stone-900 z-50">
+<div class="px-6 mb-10">
+<h1 class="text-2xl font-bold text-[#1b1c19] dark:text-[#fbf9f4] italic">Uni Hotel</h1>
+<p class="font-[&#39;Noto_Serif&#39;] font-medium text-xs tracking-tight text-on-surface-variant opacity-60 uppercase">Management System</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-[#1b1c19]/70 dark:text-[#fbf9f4]/70 hover:bg-[#7C9082]/10 rounded-full mx-2 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-[&#39;Noto_Serif&#39;] font-medium text-sm tracking-tight">Today</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-[#7C9082] text-white rounded-full mx-2 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>
+<span class="font-[&#39;Noto_Serif&#39;] font-medium text-sm tracking-tight">Service Desk</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#1b1c19]/70 dark:text-[#fbf9f4]/70 hover:bg-[#7C9082]/10 rounded-full mx-2 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="desk">desk</span>
+<span class="font-[&#39;Noto_Serif&#39;] font-medium text-sm tracking-tight">Reception</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#1b1c19]/70 dark:text-[#fbf9f4]/70 hover:bg-[#7C9082]/10 rounded-full mx-2 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="hail">hail</span>
+<span class="font-[&#39;Noto_Serif&#39;] font-medium text-sm tracking-tight">Guest Portal</span>
+</a>
+</nav>
+<div class="px-6 mt-auto">
+<div class="flex items-center gap-3 p-2 rounded-xl bg-surface-container">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="User portrait for profile settings" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCO1MelY_N-u6_yjzYTBI4iqEtlB02mFrlRKYctC1aKh-Zbi-F5SeDjot8iXRytM4EOZz2LzTgefz9fcEOOgOrNm_fuOt38lmFA7zn8h0SjDx3i30VYYMz6ApWaPdadKKjrHXL_QNBM-_KUcCbU8pWHjyQVOgXrDMlS2Uw7RJj-02Y53sobWZzKx2jx9c02vgrTj0g_6cC1NbtKJ00cXtUDJ5zo_fJxz49S9G4y-RhcDIz1tGoHPkjEhacOC2KrdR1HB3qmY_zNbA4"/>
+<div class="overflow-hidden">
+<p class="text-xs font-bold truncate">Julian V.</p>
+<p class="text-[10px] opacity-60 truncate">Shift Supervisor</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-[250px] min-h-screen">
+<!-- TopNavBar Shell -->
+<header class="flex justify-between items-center w-full pr-8 py-4 sticky top-0 z-40 bg-[#fbf9f4]/80 backdrop-blur-xl">
+<div class="pl-8 flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50 text-xl" data-icon="search">search</span>
+<input class="w-full bg-surface-container-highest/50 border-none rounded-full py-2.5 pl-12 pr-4 focus:ring-2 focus:ring-[#7C9082]/20 text-sm font-body" placeholder="Search handoffs or guests..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-surface-container transition-colors relative">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-secondary rounded-full"></span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="settings">settings</span>
+</button>
+</div>
+</header>
+<!-- Page Content -->
+<div class="px-10 py-8">
+<div class="flex justify-between items-end mb-10">
+<div>
+<h2 class="text-4xl font-headline font-bold tracking-tight text-on-surface mb-2">Operational Handoffs</h2>
+<p class="text-on-surface-variant/70 font-body">Manage carryover tasks and unresolved guest issues across shifts.</p>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-white px-8 py-3 rounded-full font-medium shadow-lg shadow-primary/10 hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-xl" data-icon="add">add</span>
+                    New Handoff Entry
+                </button>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Urgent Items - High Priority Terracotta -->
+<section class="col-span-12 lg:col-span-4 space-y-6">
+<div class="bg-secondary-fixed p-8 rounded-lg relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-32 h-32 bg-on-secondary-fixed/5 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
+<h3 class="text-on-secondary-fixed font-headline text-xl font-bold mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="warning" style="font-variation-settings: &#39;FILL&#39; 1;">warning</span>
+                            Urgent Carryovers
+                        </h3>
+<div class="space-y-4">
+<!-- Urgent Card 1 -->
+<div class="bg-surface-container-lowest/80 backdrop-blur p-5 rounded-md shadow-sm border-l-4 border-secondary">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-bold uppercase tracking-widest text-secondary">Payment Risk</span>
+<span class="text-[10px] text-on-surface-variant/60">Shift: Night</span>
+</div>
+<h4 class="font-bold text-on-surface mb-1">Room 402 - Declined Card</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">Incidental hold failed at 3:00 AM. Guest needs to provide a new method before breakfast service ends.</p>
+</div>
+<!-- Urgent Card 2 -->
+<div class="bg-surface-container-lowest/80 backdrop-blur p-5 rounded-md shadow-sm border-l-4 border-secondary">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-bold uppercase tracking-widest text-secondary">Maintenance</span>
+<span class="text-[10px] text-on-surface-variant/60">Shift: Morning</span>
+</div>
+<h4 class="font-bold text-on-surface mb-1">HVAC Outage - Suite 10</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">VIP guest arriving at 2 PM. HVAC tech delayed. Potential room move required if not fixed by 12 PM.</p>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-lg">
+<h3 class="font-headline font-semibold text-lg mb-4">Shift Summary</h3>
+<div class="flex items-center justify-between p-3 bg-surface-container-lowest rounded-md mb-3">
+<span class="text-sm font-medium">Pending Tasks</span>
+<span class="text-xl font-headline font-bold text-primary">12</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-surface-container-lowest rounded-md">
+<span class="text-sm font-medium">Resolved Today</span>
+<span class="text-xl font-headline font-bold text-[#7C9082]">28</span>
+</div>
+</div>
+</section>
+<!-- Open Handoffs Board -->
+<section class="col-span-12 lg:col-span-8 bg-surface-container-low rounded-lg p-8">
+<div class="flex justify-between items-center mb-8">
+<h3 class="text-2xl font-headline font-bold">Open Handoffs</h3>
+<div class="flex gap-2">
+<button class="px-4 py-1.5 rounded-full bg-primary text-white text-xs font-medium">Active</button>
+<button class="px-4 py-1.5 rounded-full bg-surface-container-highest/50 text-on-surface-variant text-xs font-medium hover:bg-surface-container-highest transition-colors">Closed</button>
+</div>
+</div>
+<div class="space-y-4">
+<!-- Handoff Item 1 -->
+<div class="bg-surface-container-lowest p-6 rounded-lg group hover:shadow-xl hover:shadow-primary/5 transition-all">
+<div class="flex gap-6 items-start">
+<div class="flex-shrink-0 text-center">
+<p class="text-[10px] uppercase font-bold text-on-surface-variant/40 tracking-tighter">Oct</p>
+<p class="text-2xl font-headline font-bold leading-none">24</p>
+<p class="text-[10px] font-medium text-on-surface-variant/60">08:15</p>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-2">
+<h4 class="text-lg font-bold text-on-surface">Morning Shift Carryover: Housekeeping Audit</h4>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-surface-container-highest text-[10px] font-bold rounded-full text-on-surface-variant">OPERATIONS</span>
+<span class="px-3 py-1 bg-primary-fixed text-[10px] font-bold rounded-full text-on-primary-fixed-variant">IN PROGRESS</span>
+</div>
+</div>
+<p class="text-sm text-on-surface-variant leading-relaxed mb-4 max-w-2xl">
+                                        3rd floor hallway carpet cleaning was interrupted by a guest request. Needs to be completed before 4 PM check-ins. Summary of high-touch point audit also pending for elevators.
+                                    </p>
+<div class="flex items-center gap-4 text-[11px] font-bold text-on-surface-variant/60">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base" data-icon="chat_bubble">chat_bubble</span>
+                                            4 Updates
+                                        </div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base" data-icon="person">person</span>
+                                            Assigned to Sarah K.
+                                        </div>
+</div>
+</div>
+<button class="opacity-0 group-hover:opacity-100 p-2 bg-surface-container-low rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Handoff Item 2 -->
+<div class="bg-surface-container-lowest p-6 rounded-lg group hover:shadow-xl hover:shadow-primary/5 transition-all">
+<div class="flex gap-6 items-start">
+<div class="flex-shrink-0 text-center">
+<p class="text-[10px] uppercase font-bold text-on-surface-variant/40 tracking-tighter">Oct</p>
+<p class="text-2xl font-headline font-bold leading-none">23</p>
+<p class="text-[10px] font-medium text-on-surface-variant/60">22:45</p>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-2">
+<h4 class="text-lg font-bold text-on-surface">Guest Issue: Mr. Thompson (Suite 404)</h4>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-surface-container-highest text-[10px] font-bold rounded-full text-on-surface-variant">GUEST SERVICES</span>
+<span class="px-3 py-1 bg-secondary-fixed text-[10px] font-bold rounded-full text-on-secondary-fixed">ATTENTION</span>
+</div>
+</div>
+<p class="text-sm text-on-surface-variant leading-relaxed mb-4 max-w-2xl">
+                                        Guest reported noise from the neighboring building construction. Offered complementary breakfast for tomorrow. Please follow up at checkout to ensure satisfaction.
+                                    </p>
+<div class="flex items-center gap-4 text-[11px] font-bold text-on-surface-variant/60">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base" data-icon="chat_bubble">chat_bubble</span>
+                                            2 Updates
+                                        </div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base" data-icon="person">person</span>
+                                            Assigned to Reception Team
+                                        </div>
+</div>
+</div>
+<button class="opacity-0 group-hover:opacity-100 p-2 bg-surface-container-low rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Handoff Item 3 -->
+<div class="bg-surface-container-lowest p-6 rounded-lg group hover:shadow-xl hover:shadow-primary/5 transition-all">
+<div class="flex gap-6 items-start">
+<div class="flex-shrink-0 text-center">
+<p class="text-[10px] uppercase font-bold text-on-surface-variant/40 tracking-tighter">Oct</p>
+<p class="text-2xl font-headline font-bold leading-none">23</p>
+<p class="text-[10px] font-medium text-on-surface-variant/60">19:00</p>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-2">
+<h4 class="text-lg font-bold text-on-surface">Evening Security Log - Lost &amp; Found</h4>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-surface-container-highest text-[10px] font-bold rounded-full text-on-surface-variant">SECURITY</span>
+<span class="px-3 py-1 bg-primary-fixed text-[10px] font-bold rounded-full text-on-primary-fixed-variant">IN PROGRESS</span>
+</div>
+</div>
+<p class="text-sm text-on-surface-variant leading-relaxed mb-4 max-w-2xl">
+                                        Blue leather wallet found in the lobby bar. Cataloged and stored in the safe. Owner has not been identified yet. Security cam footage review pending.
+                                    </p>
+<div class="flex items-center gap-4 text-[11px] font-bold text-on-surface-variant/60">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base" data-icon="chat_bubble">chat_bubble</span>
+                                            1 Update
+                                        </div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base" data-icon="person">person</span>
+                                            Assigned to Night Manager
+                                        </div>
+</div>
+</div>
+<button class="opacity-0 group-hover:opacity-100 p-2 bg-surface-container-low rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Pagination / View More -->
+<div class="mt-8 pt-8 border-t border-surface-variant/30 flex justify-center">
+<button class="text-primary font-bold text-sm flex items-center gap-2 hover:opacity-70 transition-opacity">
+                            View Historical Handoffs
+                            <span class="material-symbols-outlined text-lg" data-icon="history">history</span>
+</button>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Contextual FAB -->
+<button class="fixed bottom-8 right-8 w-14 h-14 bg-secondary text-on-secondary rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-90 transition-transform z-50">
+<span class="material-symbols-outlined text-3xl" data-icon="edit_square">edit_square</span>
+</button>
+</body></html>

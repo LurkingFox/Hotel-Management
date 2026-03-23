@@ -127,6 +127,14 @@ function isJsonArrayResponse(response) {
   return response.status === 200 && Array.isArray(response.json)
 }
 
+function pageHasSmokeId(response, smokeId) {
+  return response.status === 200 && response.text.includes(`smoke:${smokeId}`)
+}
+
+function pageIncludes(response, snippets) {
+  return response.status === 200 && snippets.every((snippet) => response.text.includes(snippet))
+}
+
 function isInactiveRedirect(response, nextPath) {
   return [302, 303, 307, 308].includes(response.status) && response.location?.includes('/login') && response.location.includes('error=inactive') && response.location.includes(`next=${encodeURIComponent(nextPath)}`)
 }
@@ -377,27 +385,47 @@ async function main() {
     createCheck(
       'admin today page',
       await request('/admin/today', { headers: { Cookie: adminCookie }, redirect: 'manual' }),
-      (response) => response.status === 200 && response.text.includes('Pending extension confirmations')
+      (response) => pageHasSmokeId(response, 'admin-today')
     ),
     createCheck(
       'admin dashboard page',
       await request('/admin/dashboard', { headers: { Cookie: adminCookie }, redirect: 'manual' }),
-      (response) => response.status === 200 && response.text.includes('Operational command')
+      (response) => pageHasSmokeId(response, 'admin-dashboard')
+    ),
+    createCheck(
+      'admin service desk page',
+      await request('/admin/service-desk?lane=overdue', { headers: { Cookie: adminCookie }, redirect: 'manual' }),
+      (response) => pageHasSmokeId(response, 'admin-service-desk') && pageIncludes(response, ['Overdue', 'Queue control'])
+    ),
+    createCheck(
+      'admin approvals page',
+      await request('/admin/approvals?lane=receipts', { headers: { Cookie: adminCookie }, redirect: 'manual' }),
+      (response) => pageHasSmokeId(response, 'admin-approvals') && pageIncludes(response, ['Approvals lanes', 'Receipt confirmations'])
+    ),
+    createCheck(
+      'admin reports outlook page',
+      await request('/admin/reports?mode=outlook', { headers: { Cookie: adminCookie }, redirect: 'manual' }),
+      (response) => pageHasSmokeId(response, 'admin-reports-outlook') && pageIncludes(response, ['Reports', 'Outlook filters', 'Apply outlook filters'])
+    ),
+    createCheck(
+      'admin reports export studio page',
+      await request('/admin/reports?mode=export', { headers: { Cookie: adminCookie }, redirect: 'manual' }),
+      (response) => pageHasSmokeId(response, 'admin-reports-export') && pageIncludes(response, ['Export studio', 'Export filters', 'Apply export filters'])
     ),
     createCheck(
       'admin bookings page',
       await request('/admin/bookings', { headers: { Cookie: adminCookie }, redirect: 'manual' }),
-      (response) => response.status === 200 && response.text.includes('Live bookings command board')
+      (response) => pageHasSmokeId(response, 'admin-bookings')
     ),
     createCheck(
       'admin payments page',
       await request('/admin/payments', { headers: { Cookie: adminCookie }, redirect: 'manual' }),
-      (response) => response.status === 200 && response.text.includes('Payments ledger')
+      (response) => pageHasSmokeId(response, 'admin-payments')
     ),
     createCheck(
       'admin guest access page',
       await request('/admin/guest-access', { headers: { Cookie: adminCookie }, redirect: 'manual' }),
-      (response) => response.status === 200 && response.text.includes('Guest access registry')
+      (response) => pageHasSmokeId(response, 'admin-guest-access')
     ),
     createCheck(
       'legacy keycards route removed',
@@ -407,22 +435,22 @@ async function main() {
     createCheck(
       'admin access log page',
       await request('/admin/access-log', { headers: { Cookie: adminCookie }, redirect: 'manual' }),
-      (response) => response.status === 200 && response.text.includes('Access log')
+      (response) => pageHasSmokeId(response, 'admin-access-log')
     ),
     createCheck(
       'admin rooms page',
       await request('/admin/rooms', { headers: { Cookie: adminCookie }, redirect: 'manual' }),
-      (response) => response.status === 200 && response.text.includes('Live status and readiness')
+      (response) => pageHasSmokeId(response, 'admin-rooms')
     ),
     createCheck(
       'admin staff page',
       await request('/admin/staff', { headers: { Cookie: adminCookie }, redirect: 'manual' }),
-      (response) => response.status === 200 && response.text.includes('Live staffing board')
+      (response) => pageHasSmokeId(response, 'admin-staff')
     ),
     createCheck(
       'admin settings page',
       await request('/admin/settings', { headers: { Cookie: adminCookie }, redirect: 'manual' }),
-      (response) => response.status === 200 && response.text.includes('Hotel identity')
+      (response) => pageHasSmokeId(response, 'admin-settings')
     ),
     createCheck(
       'sample logo route',
@@ -432,17 +460,17 @@ async function main() {
     createCheck(
       'reception desk page',
       await request('/reception/desk', { headers: { Cookie: receptionCookie }, redirect: 'manual' }),
-      (response) => response.status === 200 && response.text.includes('Live arrivals, stays, and checkout flow')
+      (response) => pageHasSmokeId(response, 'reception-desk')
     ),
     createCheck(
       'reception attendance page',
       await request('/attendance', { headers: { Cookie: receptionCookie }, redirect: 'manual' }),
-      (response) => response.status === 200 && response.text.includes('Start and end your shift from this page.')
+      (response) => pageHasSmokeId(response, 'reception-attendance')
     ),
     createCheck(
       'reception services page',
       await request('/reception/services', { headers: { Cookie: receptionCookie }, redirect: 'manual' }),
-      (response) => response.status === 200 && response.text.includes('Live service charges')
+      (response) => pageHasSmokeId(response, 'reception-services')
     ),
     createCheck(
       'reception rooms api',
@@ -513,7 +541,7 @@ async function main() {
 
     const baselineDeskResponse = await request('/reception/desk', { headers: { Cookie: receptionCookie }, redirect: 'manual' })
     checks.push(
-      createCheck('reception desk baseline access', baselineDeskResponse, (response) => response.status === 200 && response.text.includes('Live arrivals, stays, and checkout flow'))
+      createCheck('reception desk baseline access', baselineDeskResponse, (response) => pageHasSmokeId(response, 'reception-desk'))
     )
 
     const syncMappingsResponse = await request('/api/seam/room-access-devices', {
@@ -765,7 +793,7 @@ async function main() {
 
     const restoredDeskResponse = await request('/reception/desk', { headers: { Cookie: receptionCookie }, redirect: 'manual' })
     checks.push(
-      createCheck('reactivated receptionist access restored', restoredDeskResponse, (response) => response.status === 200 && response.text.includes('Live arrivals, stays, and checkout flow'))
+      createCheck('reactivated receptionist access restored', restoredDeskResponse, (response) => pageHasSmokeId(response, 'reception-desk'))
     )
   } finally {
     if (smokeBookingId) {

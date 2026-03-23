@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Room Inventory | University Hotel HMS</title>
+<script type='text/javascript' nonce='jUaW9yDMLXxrv9ewCZM8cA==' src='https://contribution.usercontent.google.com/hc807hx8X5FNx8MiQMm_7zmblcsVt6rotN3y0KYMwBl3NKb8oBY--_CdW4UWyK330O9IwXtVYLTStRWclwcaBD0M-reMysrpJ-Mb_YE1uWSmycObXyxYVjmd6F2ACvc4bXZkYE0ej21r3to_hcHhgcuCsfosUUFKqr-k71ApfOwQ4pKSFJVqB6i5-GUZhZHOfReav8uwZT6ityu6cC4YXfBloZXV7yY2aSyO9bGb9EedF1WN97s7qGFMkpfDe283WTwKNCc6NoXbPlAqyziUh2H9yG1vcXY2gleZEOGTyqbazXTk36IE1CAQ7Q_n5cJN0vEFsgvGsDsuNpSpD8fgldqh_1ZubyEfFHJ5cZt4hUO5TPdBMqIgCalyNy7aVgmbCjaEn5wyyz00nfyMzTD7awJ0dd4kHXsBrUTVyPkvD1xc8mRKQ_H2RV82BAckATm7Ag0HKH1XxJifEDmR_1l261S9tzj2ffQgONH40DjzTHIsT4Ge6tgVr2gZaOZFFSnJP7vdACK0Om4D_yKxf1d5nvf2xVpUbNWnM1ZNp9LeOKelV6rpQug3E5MQSG3wvZfyq4XUUGpwj8ZYFFCgA5iztIY_43toKMUgyvLgl3DgRyn_bYWpyOmOpDf9pfNDK8ZPhxVRpp0xOVemmlI7ywq8V5jMnmqTq3NFd6P8Ou8X13ZhLyaiPrF_WX4Cf14HhtZN_cNr52m7ycg2caU2wp8j67UL7qMXAJIqlAACzwokcf1pbiei99S2-kCqlLNMtwDSCHLmMMg1WIV9QKV5kuQN0ckIBzjvw0MhmnluaA'></script><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "surface-container-high": "#eae8e3",
+                        "surface": "#fbf9f4",
+                        "inverse-on-surface": "#f2f1ec",
+                        "background": "#fbf9f4",
+                        "surface-container-low": "#f5f3ee",
+                        "secondary-container": "#ffb193",
+                        "primary-fixed": "#d2e8d8",
+                        "surface-bright": "#fbf9f4",
+                        "surface-container": "#f0eee9",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#1b1c19",
+                        "on-secondary-container": "#7a412a",
+                        "surface-dim": "#dbdad5",
+                        "on-primary-container": "#f6fff6",
+                        "surface-tint": "#506356",
+                        "secondary-fixed": "#ffdbce",
+                        "inverse-surface": "#30312e",
+                        "tertiary": "#725556",
+                        "error": "#ba1a1a",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#370e00",
+                        "outline-variant": "#c3c8c2",
+                        "secondary": "#8a4f37",
+                        "primary-container": "#66796c",
+                        "inverse-primary": "#b7ccbc",
+                        "primary-fixed-dim": "#b7ccbc",
+                        "on-tertiary-fixed-variant": "#5b4041",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#ffb599",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#e3bebe",
+                        "primary": "#4d6054",
+                        "tertiary-container": "#8c6d6e",
+                        "on-primary-fixed-variant": "#384b3f",
+                        "on-tertiary-fixed": "#2b1617",
+                        "on-primary": "#ffffff",
+                        "on-background": "#1b1c19",
+                        "tertiary-fixed": "#ffdada",
+                        "surface-variant": "#e4e2dd",
+                        "on-tertiary-container": "#fffbff",
+                        "on-primary-fixed": "#0d1f15",
+                        "outline": "#737873",
+                        "on-surface-variant": "#434844",
+                        "on-secondary-fixed-variant": "#6e3822",
+                        "surface-container-highest": "#e4e2dd"
+                    },
+                    fontFamily: {
+                        "headline": ["Noto Serif"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Manrope', sans-serif; }
+        h1, h2, h3 { font-family: 'Noto Serif', serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased overflow-x-hidden">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 bottom-0 flex flex-col py-6 w-[250px] h-screen border-none bg-[#f5f3ee] dark:bg-stone-900 z-50">
+<div class="px-6 mb-10">
+<h1 class="text-2xl font-bold text-[#1b1c19] dark:text-[#fbf9f4] italic">Uni Hotel</h1>
+<p class="font-[&#39;Noto_Serif&#39;] font-medium text-xs tracking-tight text-[#7C9082] opacity-80">Management System</p>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- Active: Today (Assuming Dashboard/Overview Context for Admin) -->
+<a class="flex items-center gap-3 px-4 py-3 text-[#1b1c19]/70 dark:text-[#fbf9f4]/70 hover:bg-[#7C9082]/10 rounded-full mx-2 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-[&#39;Noto_Serif&#39;] font-medium text-sm tracking-tight">Today</span>
+</a>
+<!-- Reception active context: Room Management -->
+<a class="flex items-center gap-3 px-4 py-3 bg-[#7C9082] text-white rounded-full mx-2 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="desk">desk</span>
+<span class="font-[&#39;Noto_Serif&#39;] font-medium text-sm tracking-tight">Reception</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#1b1c19]/70 dark:text-[#fbf9f4]/70 hover:bg-[#7C9082]/10 rounded-full mx-2 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>
+<span class="font-[&#39;Noto_Serif&#39;] font-medium text-sm tracking-tight">Service Desk</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#1b1c19]/70 dark:text-[#fbf9f4]/70 hover:bg-[#7C9082]/10 rounded-full mx-2 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="hail">hail</span>
+<span class="font-[&#39;Noto_Serif&#39;] font-medium text-sm tracking-tight">Guest Portal</span>
+</a>
+</nav>
+<div class="mt-auto px-6">
+<div class="p-4 bg-surface-container rounded-lg flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</div>
+<div>
+<p class="text-xs font-bold">Admin User</p>
+<p class="text-[10px] opacity-60">Floor Manager</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- TopNavBar Shell -->
+<header class="flex justify-between items-center w-full pl-[270px] pr-8 py-4 sticky top-0 z-40 bg-[#fbf9f4]/80 dark:bg-stone-950/80 backdrop-blur-xl shadow-[0_4px_24px_rgba(124,144,130,0.06)]">
+<div class="flex items-center flex-1 max-w-md bg-surface-container-highest rounded-full px-4 py-2 focus-within:ring-2 focus-within:ring-[#7C9082]/20 transition-all">
+<span class="material-symbols-outlined text-[#7C9082] mr-2" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full font-[&#39;Noto_Serif&#39;]" placeholder="Search rooms, guests, or types..." type="text"/>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4">
+<button class="relative hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-[#7C9082]" data-icon="notifications">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-secondary rounded-full"></span>
+</button>
+<button class="hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-[#7C9082]" data-icon="settings">settings</span>
+</button>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant opacity-20"></div>
+<div class="flex items-center gap-3">
+<img class="w-8 h-8 rounded-full object-cover" data-alt="User profile portrait of an office manager" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQdp_ExLisuyIj8LiwEdgd1R9bvH3X0ciH28xJQaUwftj3elzSBcw7oygtY3LKpi8Eks-vS2y9TJc7gxD-ZJC3CBfccMESsDIkHJXscKs_9SpS8pumDRhSbFNQTxIM3gIqhRhPKYLxWCV8zAM0UmkqQGLj6ZWCnqGhLRrIAigNsIg0Hoyg4JI53AYweN1roqGNRmU3BQ8OT3OUROJ-Fpqt3Yl66h9rcoQ_mTYg3kYiJ40z0scWvJKvC9u-3kxPoI4qoOtsWCS3ywo"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-[250px] p-8 pt-6 min-h-screen">
+<!-- Header & Stats Section (Editorial Hero) -->
+<section class="mb-12 flex flex-col md:flex-row justify-between items-end gap-6">
+<div class="max-w-2xl">
+<nav class="flex items-center gap-2 text-xs font-medium text-[#7C9082] mb-2 uppercase tracking-widest">
+<span>HMS</span>
+<span class="material-symbols-outlined text-[10px]" data-icon="chevron_right">chevron_right</span>
+<span>Inventory</span>
+</nav>
+<h2 class="text-4xl font-headline font-bold text-on-surface leading-tight">Room Inventory</h2>
+<p class="text-on-surface-variant mt-2 font-body max-w-lg">Manage real-time room availability, maintenance cycles, and dynamic pricing tiers across the university campus hotel collection.</p>
+</div>
+<div class="flex gap-4">
+<button class="flex items-center gap-2 px-6 py-3 bg-surface-container-highest text-on-surface rounded-full hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined" data-icon="filter_list">filter_list</span>
+<span class="text-sm font-semibold">Filters</span>
+</button>
+<button class="flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-primary to-primary-container text-white rounded-full shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+<span class="text-sm font-semibold">Add Room</span>
+</button>
+</div>
+</section>
+<!-- KPI Bento Section -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+<div class="p-6 rounded-lg bg-surface-container-low border-none flex flex-col justify-between h-40">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="bed">bed</span>
+<div>
+<h3 class="text-3xl font-headline font-bold">142</h3>
+<p class="text-xs font-label uppercase tracking-tighter opacity-60">Total Rooms</p>
+</div>
+</div>
+<div class="p-6 rounded-lg bg-secondary-fixed border-none flex flex-col justify-between h-40">
+<span class="material-symbols-outlined text-on-secondary-fixed text-3xl" data-icon="meeting_room">meeting_room</span>
+<div>
+<h3 class="text-3xl font-headline font-bold text-on-secondary-fixed">88%</h3>
+<p class="text-xs font-label uppercase tracking-tighter text-on-secondary-fixed opacity-70">Occupancy Rate</p>
+</div>
+</div>
+<div class="p-6 rounded-lg bg-surface-container-low border-none flex flex-col justify-between h-40">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="cleaning_services">cleaning_services</span>
+<div>
+<h3 class="text-3xl font-headline font-bold">12</h3>
+<p class="text-xs font-label uppercase tracking-tighter opacity-60">In Cleaning</p>
+</div>
+</div>
+<div class="p-6 rounded-lg bg-error-container border-none flex flex-col justify-between h-40">
+<span class="material-symbols-outlined text-on-error-container text-3xl" data-icon="build">build</span>
+<div>
+<h3 class="text-3xl font-headline font-bold text-on-error-container">4</h3>
+<p class="text-xs font-label uppercase tracking-tighter text-on-error-container opacity-70">Maintenance</p>
+</div>
+</div>
+</section>
+<!-- Room Inventory Grid (Modern High Density) -->
+<section class="bg-surface-container-lowest rounded-lg p-2 shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-separate border-spacing-y-2">
+<thead>
+<tr class="text-on-surface-variant font-label text-xs uppercase tracking-widest">
+<th class="px-6 py-4 font-semibold">Room No.</th>
+<th class="px-6 py-4 font-semibold">Room Type</th>
+<th class="px-6 py-4 font-semibold">Status</th>
+<th class="px-6 py-4 font-semibold">Current Rate</th>
+<th class="px-6 py-4 font-semibold">Guest</th>
+<th class="px-6 py-4 font-semibold text-right">Action</th>
+</tr>
+</thead>
+<tbody class="font-body text-sm">
+<!-- Row 1 -->
+<tr class="group hover:bg-surface-container-low transition-all duration-300">
+<td class="px-6 py-5 first:rounded-l-lg bg-surface-container-low/40 group-hover:bg-transparent">
+<span class="font-bold text-lg">302</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm opacity-40" data-icon="king_bed">king_bed</span>
+<span>Executive Suite</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-error-container text-on-error-container text-[11px] font-bold">
+                                    Occupied
+                                </span>
+</td>
+<td class="px-6 py-5">
+<span class="font-bold">$285</span><span class="text-xs opacity-40">/night</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<img class="w-6 h-6 rounded-full object-cover" data-alt="Guest profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTyTQgbOePBdyl2SNUeUrnq8aN9ukwsOi3zgOTuAxpw6RRHj-spbuzSb_p8q8PWRUN_NEvMdFJe5eRHv4G8F5_1fF52HuALtXthbwqUvHFpxjmE_t0GkvZ3uLpwHZ8l9A0Ie5TxHLeqKpsQGpdFLe_GMxZjicTr7vx7E5qyXzZcHz29_0KfYwSc_EPz9LlRukWzU_34uOICI-rg3k3bJf1IfX9QLPtr1-pLVDsu4owZxk3VxfOyxi4I_9DIfCWXlaEj6Bf3pMmLfk"/>
+<span class="text-xs font-medium">Elena Richardson</span>
+</div>
+</td>
+<td class="px-6 py-5 last:rounded-r-lg text-right">
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="group hover:bg-surface-container-low transition-all duration-300">
+<td class="px-6 py-5 first:rounded-l-lg bg-surface-container-low/40 group-hover:bg-transparent">
+<span class="font-bold text-lg">214</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm opacity-40" data-icon="single_bed">single_bed</span>
+<span>Deluxe Double</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[11px] font-bold">
+                                    Available
+                                </span>
+</td>
+<td class="px-6 py-5">
+<span class="font-bold">$145</span><span class="text-xs opacity-40">/night</span>
+</td>
+<td class="px-6 py-5">
+<span class="text-xs opacity-30 italic">— Vacant</span>
+</td>
+<td class="px-6 py-5 last:rounded-r-lg text-right">
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="group hover:bg-surface-container-low transition-all duration-300">
+<td class="px-6 py-5 first:rounded-l-lg bg-surface-container-low/40 group-hover:bg-transparent">
+<span class="font-bold text-lg">108</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm opacity-40" data-icon="apartment">apartment</span>
+<span>Standard Studio</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high text-on-surface-variant text-[11px] font-bold">
+                                    Cleaning
+                                </span>
+</td>
+<td class="px-6 py-5">
+<span class="font-bold">$110</span><span class="text-xs opacity-40">/night</span>
+</td>
+<td class="px-6 py-5">
+<span class="text-xs opacity-30 italic">— Cleaning</span>
+</td>
+<td class="px-6 py-5 last:rounded-r-lg text-right">
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="group hover:bg-surface-container-low transition-all duration-300">
+<td class="px-6 py-5 first:rounded-l-lg bg-surface-container-low/40 group-hover:bg-transparent">
+<span class="font-bold text-lg">405</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm opacity-40" data-icon="star">star</span>
+<span>Presidential Loft</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed text-[11px] font-bold">
+                                    Reserved
+                                </span>
+</td>
+<td class="px-6 py-5">
+<span class="font-bold">$490</span><span class="text-xs opacity-40">/night</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 rounded-full bg-outline-variant flex items-center justify-center text-[10px] font-bold">JS</div>
+<span class="text-xs font-medium">James Sterling</span>
+</div>
+</td>
+<td class="px-6 py-5 last:rounded-r-lg text-right">
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="group hover:bg-surface-container-low transition-all duration-300">
+<td class="px-6 py-5 first:rounded-l-lg bg-surface-container-low/40 group-hover:bg-transparent">
+<span class="font-bold text-lg">012</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm opacity-40" data-icon="settings_input_component">settings_input_component</span>
+<span>ADA accessible</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-on-error-container/10 text-error text-[11px] font-bold">
+                                    Maintenance
+                                </span>
+</td>
+<td class="px-6 py-5">
+<span class="font-bold">$125</span><span class="text-xs opacity-40">/night</span>
+</td>
+<td class="px-6 py-5">
+<span class="text-xs opacity-30 italic">— Out of service</span>
+</td>
+<td class="px-6 py-5 last:rounded-r-lg text-right">
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Minimalist -->
+<div class="mt-6 flex justify-between items-center px-6 py-4">
+<span class="text-xs text-on-surface-variant font-medium">Showing 1-15 of 142 rooms</span>
+<div class="flex items-center gap-2">
+<button class="w-10 h-10 rounded-full flex items-center justify-center bg-surface hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center bg-primary text-white font-bold text-xs">1</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center bg-surface hover:bg-surface-container transition-all font-bold text-xs">2</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center bg-surface hover:bg-surface-container transition-all font-bold text-xs">3</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center bg-surface hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Dynamic Insights Section (Asymmetrical Detail) -->
+<section class="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div class="lg:col-span-2 space-y-6">
+<h3 class="text-2xl font-headline font-bold">Maintenance Radar</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="p-5 rounded-lg bg-surface-container border-none flex items-start gap-4">
+<div class="w-12 h-12 rounded-lg bg-error-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-error" data-icon="water_damage">water_damage</span>
+</div>
+<div>
+<p class="text-xs font-bold uppercase tracking-tight text-error mb-1">Critical Priority</p>
+<h4 class="font-headline font-semibold text-lg">Room 012 Leak</h4>
+<p class="text-xs text-on-surface-variant mt-1">Plumbing team dispatched. Estimated resolution in 4 hours.</p>
+</div>
+</div>
+<div class="p-5 rounded-lg bg-surface-container border-none flex items-start gap-4">
+<div class="w-12 h-12 rounded-lg bg-secondary-fixed flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary" data-icon="lightbulb">lightbulb</span>
+</div>
+<div>
+<p class="text-xs font-bold uppercase tracking-tight text-secondary mb-1">Scheduled Task</p>
+<h4 class="font-headline font-semibold text-lg">2nd Floor LED Update</h4>
+<p class="text-xs text-on-surface-variant mt-1">Upgrade scheduled for next Tuesday during low occupancy window.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-primary text-white p-8 rounded-lg flex flex-col justify-between shadow-xl shadow-primary/20 relative overflow-hidden">
+<div class="absolute -right-10 -top-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
+<div class="z-10">
+<span class="material-symbols-outlined text-3xl mb-4" data-icon="analytics">analytics</span>
+<h3 class="text-2xl font-headline font-bold mb-2">Revenue Forecast</h3>
+<p class="text-sm opacity-80 leading-relaxed font-body">Current inventory levels indicate a 14% revenue increase compared to the previous semester.</p>
+</div>
+<div class="mt-8 z-10">
+<button class="w-full py-3 bg-white text-primary font-bold rounded-full hover:bg-inverse-on-surface transition-all text-sm">
+                        View Detailed Report
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Contextual FAB (Only for Main Admin Actions) -->
+<div class="fixed bottom-8 right-8">
+<button class="w-16 h-16 rounded-full bg-secondary-fixed text-on-secondary-fixed shadow-2xl flex items-center justify-center group hover:scale-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-3xl" data-icon="bolt">bolt</span>
+</button>
+</div>
+</body></html>

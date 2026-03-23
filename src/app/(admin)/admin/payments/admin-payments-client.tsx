@@ -280,16 +280,12 @@ export function AdminPaymentsClient({
   }
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,_#11202f_0%,_#11202f_24%,_#f7f1e8_24%,_#f7f1e8_100%)] px-6 py-10 text-ink md:px-10">
+    <main className="min-h-screen bg-[linear-gradient(180deg,_#0f3d2e_0%,_#155d45_24%,_#f9fffc_24%,_#f9fffc_100%)] px-6 py-10 text-ink md:px-10" data-smoke-id="admin-payments">
+      <span className="sr-only">smoke:admin-payments</span>
       <div className="mx-auto max-w-7xl space-y-6">
-        <header className="flex flex-col gap-4 text-white lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm uppercase tracking-[0.28em] text-white/70">Admin Tower</p>
-            <h1 className="font-[family-name:var(--font-display)] text-5xl">Payments ledger</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-white/72">
-              Payments history and receipt review now run on server-backed filters, so older finance records can be pulled in by date range, method, and search instead of being limited to the currently loaded slice.
-            </p>
-          </div>
+        <header className="text-white">
+          <h1 className="font-[family-name:var(--font-display)] text-3xl md:text-[2.2rem]">Finance</h1>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-white/72">Payments, receipt review, and open balance control in one finance workspace.</p>
         </header>
 
         {errorMessage ? <div className="rounded-2xl bg-red-50 px-5 py-4 text-sm text-red-700">{errorMessage}</div> : null}
@@ -312,14 +308,14 @@ export function AdminPaymentsClient({
             <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Bookings with balance</p>
             <p className="mt-3 text-4xl font-semibold text-ink">{summary.openBalances}</p>
           </article>
-          <article className="rounded-[1.75rem] border border-[#d6c1a0] bg-[#f8efe3] p-5 shadow-card">
+          <article className="rounded-[1.75rem] border border-status-warning/20 bg-status-warning-soft p-5 shadow-card">
             <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Awaiting receipt review</p>
-            <p className="mt-3 text-4xl font-semibold text-terracotta">{summary.awaitingReceipt}</p>
+            <p className="mt-3 text-4xl font-semibold text-status-warning">{summary.awaitingReceipt}</p>
           </article>
         </section>
 
-        <section className="rounded-[2rem] border border-[#d6c1a0] bg-[#fff8ef] p-6 shadow-card">
-          <p className="text-sm uppercase tracking-[0.24em] text-terracotta">Control note</p>
+        <section className="rounded-[2rem] border border-status-warning/20 bg-status-warning-soft p-6 shadow-card">
+          <p className="text-sm uppercase tracking-[0.24em] text-status-warning">Control note</p>
           <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl text-ink">Service receipts now need admin confirmation</h2>
           <p className="mt-3 max-w-4xl text-sm leading-6 text-ink/70">
             Reception can raise and complete service requests, but they cannot close the money side anymore. A service charge only leaves the review queue after an admin confirms receipt and the system writes a matching payment entry against the booking.
@@ -337,7 +333,7 @@ export function AdminPaymentsClient({
                 {(['all', 'cash', 'momo', 'bank_transfer', 'cheque'] as const).map((method) => (
                   <button
                     key={method}
-                    className={`rounded-full px-5 py-3 text-sm font-semibold transition ${filters.method === method ? 'bg-ink text-white' : 'bg-parchment text-ink hover:bg-[#eadfce]'}`}
+                    className={filters.method === method ? 'ui-chip-active px-5 py-3' : 'ui-chip px-5 py-3'}
                     disabled={isPending}
                     onClick={() => navigate({ method: method === 'all' ? undefined : method, ppage: undefined, spage: undefined })}
                     type="button"
@@ -350,7 +346,7 @@ export function AdminPaymentsClient({
 
             <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               {breakdown.map((entry) => (
-                <article key={entry.method} className="rounded-[1.5rem] border border-ink/10 bg-[#fcfaf6] p-5">
+                <article key={entry.method} className="ui-panel-soft border border-ink/10 p-5">
                   <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${paymentStyles[entry.method]}`}>
                     {paymentLabels[entry.method]}
                   </span>
@@ -363,7 +359,7 @@ export function AdminPaymentsClient({
               <label className="block">
                 <span className="text-sm font-semibold text-ink/75">Search ledger and review queues</span>
                 <input
-                  className="mt-2 w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 text-sm outline-none transition focus:border-terracotta"
+                  className="ui-input mt-2 bg-surface-sunken text-sm"
                   disabled={isPending}
                   onChange={(event) => setSearchDraft(event.target.value)}
                   placeholder="Search guest, room, reference, receiver, service note"
@@ -372,14 +368,14 @@ export function AdminPaymentsClient({
               </label>
               <label className="block">
                 <span className="text-sm font-semibold text-ink/75">From</span>
-                <input className="mt-2 w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 text-sm outline-none transition focus:border-terracotta" disabled={isPending} onChange={(event) => setFromDateDraft(event.target.value)} type="date" value={fromDateDraft} />
+                <input className="ui-input mt-2 bg-surface-sunken text-sm" disabled={isPending} onChange={(event) => setFromDateDraft(event.target.value)} type="date" value={fromDateDraft} />
               </label>
               <label className="block">
                 <span className="text-sm font-semibold text-ink/75">To</span>
-                <input className="mt-2 w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 text-sm outline-none transition focus:border-terracotta" disabled={isPending} onChange={(event) => setToDateDraft(event.target.value)} type="date" value={toDateDraft} />
+                <input className="ui-input mt-2 bg-surface-sunken text-sm" disabled={isPending} onChange={(event) => setToDateDraft(event.target.value)} type="date" value={toDateDraft} />
               </label>
-              <button className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#1e2735] disabled:opacity-60" disabled={isPending} type="submit">Apply</button>
-              <button className="rounded-full border border-ink/12 px-5 py-3 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-60" disabled={isPending} onClick={handleClearFilters} type="button">Clear</button>
+              <button className="ui-button-primary disabled:opacity-60" disabled={isPending} type="submit">Apply</button>
+              <button className="ui-button-secondary disabled:opacity-60" disabled={isPending} onClick={handleClearFilters} type="button">Clear</button>
             </form>
 
             <div className="mt-4 flex flex-wrap gap-3">
@@ -391,7 +387,7 @@ export function AdminPaymentsClient({
                 <button
                   key={preset.value}
                   className={`rounded-full px-4 py-2 text-sm font-semibold transition disabled:opacity-60 ${
-                    activePreset === preset.value ? 'border border-ink bg-ink text-white' : 'border border-ink/12 text-ink hover:bg-parchment'
+                    activePreset === preset.value ? 'border border-ink bg-ink text-white' : 'border border-ink/12 text-ink hover:bg-surface-sunken'
                   }`}
                   disabled={isPending}
                   onClick={() => handlePreset(preset.value)}
@@ -402,18 +398,18 @@ export function AdminPaymentsClient({
               ))}
             </div>
 
-            <div className="mt-4 flex flex-col gap-3 rounded-[1.5rem] bg-[#fcfaf6] px-4 py-4 text-sm text-ink/65 lg:flex-row lg:items-center lg:justify-between">
+            <div className="ui-panel-soft mt-4 flex flex-col gap-3 px-4 py-4 text-sm text-ink/65 lg:flex-row lg:items-center lg:justify-between">
               <span>Showing {payments.length} of {totalPaymentCount} matching payments</span>
               <div className="flex flex-wrap items-center gap-3">
                 <span>{visibleRangeLabel}</span>
-                <button className="rounded-full border border-ink/12 px-4 py-2 font-semibold text-ink transition hover:bg-parchment" onClick={() => handleExport('payments')} type="button">
+                <button className="ui-button-secondary px-4 py-2" onClick={() => handleExport('payments')} type="button">
                   Export ledger CSV
                 </button>
               </div>
             </div>
 
             <div className="mt-8 overflow-hidden rounded-[1.5rem] border border-ink/10">
-              <div className="grid grid-cols-[1.2fr_0.7fr_0.9fr_0.8fr_0.8fr_1fr] gap-4 border-b border-ink/10 bg-[#fcfaf6] px-5 py-4 text-xs uppercase tracking-[0.24em] text-ink/45">
+              <div className="grid grid-cols-[1.2fr_0.7fr_0.9fr_0.8fr_0.8fr_1fr] gap-4 border-b border-ink/10 bg-surface-sunken px-5 py-4 text-xs uppercase tracking-[0.24em] text-ink/45">
                 <span>Guest</span>
                 <span>Room</span>
                 <span>Method</span>
@@ -447,12 +443,12 @@ export function AdminPaymentsClient({
               <div className="mt-4 flex items-center justify-between gap-4">
                 <p className="text-sm text-ink/60">Page {currentPaymentsPage} of {totalPaymentPages}</p>
                 <div className="flex flex-wrap items-center gap-2">
-                  <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={isPending || currentPaymentsPage === 1} onClick={() => navigate({ ppage: '1' })} type="button">First</button>
-                  <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={isPending || currentPaymentsPage === 1} onClick={() => navigate({ ppage: String(Math.max(1, currentPaymentsPage - 1)) })} type="button">Previous</button>
+                    <button className="ui-button-secondary px-4 py-2 disabled:opacity-50" disabled={isPending || currentPaymentsPage === 1} onClick={() => navigate({ ppage: '1' })} type="button">First</button>
+                    <button className="ui-button-secondary px-4 py-2 disabled:opacity-50" disabled={isPending || currentPaymentsPage === 1} onClick={() => navigate({ ppage: String(Math.max(1, currentPaymentsPage - 1)) })} type="button">Previous</button>
                   {visiblePaymentPages.map((pageNumber) => (
                     <button
                       key={pageNumber}
-                      className={`min-w-10 rounded-full px-4 py-2 text-sm font-semibold transition disabled:opacity-50 ${pageNumber === currentPaymentsPage ? 'bg-ink text-white' : 'border border-ink/12 text-ink hover:bg-parchment'}`}
+                        className={`min-w-10 rounded-full px-4 py-2 text-sm font-semibold transition disabled:opacity-50 ${pageNumber === currentPaymentsPage ? 'bg-ink text-white' : 'border border-ink/12 text-ink hover:bg-surface-sunken'}`}
                       disabled={isPending || pageNumber === currentPaymentsPage}
                       onClick={() => navigate({ ppage: String(pageNumber) })}
                       type="button"
@@ -460,25 +456,25 @@ export function AdminPaymentsClient({
                       {pageNumber}
                     </button>
                   ))}
-                  <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={isPending || currentPaymentsPage === totalPaymentPages} onClick={() => navigate({ ppage: String(Math.min(totalPaymentPages, currentPaymentsPage + 1)) })} type="button">Next</button>
-                  <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={isPending || currentPaymentsPage === totalPaymentPages} onClick={() => navigate({ ppage: String(totalPaymentPages) })} type="button">Last</button>
+                    <button className="ui-button-secondary px-4 py-2 disabled:opacity-50" disabled={isPending || currentPaymentsPage === totalPaymentPages} onClick={() => navigate({ ppage: String(Math.min(totalPaymentPages, currentPaymentsPage + 1)) })} type="button">Next</button>
+                    <button className="ui-button-secondary px-4 py-2 disabled:opacity-50" disabled={isPending || currentPaymentsPage === totalPaymentPages} onClick={() => navigate({ ppage: String(totalPaymentPages) })} type="button">Last</button>
                 </div>
               </div>
             ) : null}
           </article>
 
           <div className="space-y-6">
-            <article className="rounded-[2rem] border border-[#d6c1a0] bg-white p-6 shadow-card">
-              <p className="text-sm uppercase tracking-[0.24em] text-terracotta">Receipt review queue</p>
+            <article className="rounded-[2rem] border border-status-warning/20 bg-white p-6 shadow-card">
+              <p className="text-sm uppercase tracking-[0.24em] text-status-warning">Receipt review queue</p>
               <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl">Service charges awaiting money confirmation</h2>
               <p className="mt-3 text-sm leading-6 text-ink/65">
                 This queue follows the same server filters as the ledger, using resolved service dates for its historical range.
               </p>
 
-              <div className="mt-4 rounded-[1.5rem] bg-[#fcfaf6] px-4 py-4 text-sm text-ink/65">
+              <div className="ui-panel-soft mt-4 px-4 py-4 text-sm text-ink/65">
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                   <span>Showing {serviceCharges.length} of {totalServiceCount} matching service receipts</span>
-                  <button className="rounded-full border border-ink/12 px-4 py-2 font-semibold text-ink transition hover:bg-parchment" onClick={() => handleExport('payment-receipts')} type="button">
+                  <button className="ui-button-secondary px-4 py-2" onClick={() => handleExport('payment-receipts')} type="button">
                     Export receipt queue CSV
                   </button>
                 </div>
@@ -489,7 +485,7 @@ export function AdminPaymentsClient({
                   const draft = receiptDrafts[charge.id] ?? { method: 'cash' as PayMethod, reference: '' }
 
                   return (
-                    <article key={charge.id} className="rounded-[1.5rem] border border-[#ead6bd] bg-[#fff8ef] p-5">
+                    <article key={charge.id} className="rounded-[1.5rem] border border-status-warning/20 bg-status-warning-soft p-5">
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-ink/60">{charge.type}</p>
@@ -498,7 +494,7 @@ export function AdminPaymentsClient({
                         </div>
                         <div className="text-right">
                           <p className="text-2xl font-semibold text-ink">{formatGHS(charge.amount_ghs)}</p>
-                          <p className="mt-2 text-xs uppercase tracking-[0.18em] text-terracotta">Raised by {charge.requested_by ?? 'system'}</p>
+                          <p className="mt-2 text-xs uppercase tracking-[0.18em] text-status-warning">Raised by {charge.requested_by ?? 'system'}</p>
                           <p className="mt-1 text-xs uppercase tracking-[0.18em] text-ink/45">Completed by {charge.resolved_by ?? 'Unrecorded'}</p>
                         </div>
                       </div>
@@ -506,7 +502,7 @@ export function AdminPaymentsClient({
                       <div className="mt-4 grid gap-3 md:grid-cols-2">
                         <label className="space-y-2 text-sm text-ink/65">
                           <span className="font-semibold text-ink">Receipt method</span>
-                          <select className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta" onChange={(event) => updateReceiptDraft(charge.id, { method: event.target.value as PayMethod })} value={draft.method}>
+                          <select className="ui-input" onChange={(event) => updateReceiptDraft(charge.id, { method: event.target.value as PayMethod })} value={draft.method}>
                             {(['cash', 'momo', 'bank_transfer', 'cheque'] as const).map((method) => (
                               <option key={method} value={method}>{paymentLabels[method]}</option>
                             ))}
@@ -514,7 +510,7 @@ export function AdminPaymentsClient({
                         </label>
                         <label className="space-y-2 text-sm text-ink/65">
                           <span className="font-semibold text-ink">Receipt reference</span>
-                          <input className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 outline-none transition focus:border-terracotta" onChange={(event) => updateReceiptDraft(charge.id, { reference: event.target.value })} placeholder={draft.method === 'cash' ? 'Optional for cash' : 'Required for this method'} value={draft.reference} />
+                          <input className="ui-input" onChange={(event) => updateReceiptDraft(charge.id, { reference: event.target.value })} placeholder={draft.method === 'cash' ? 'Optional for cash' : 'Required for this method'} value={draft.reference} />
                         </label>
                       </div>
 
@@ -526,7 +522,7 @@ export function AdminPaymentsClient({
                 })}
 
                 {serviceCharges.length === 0 ? (
-                  <div className="rounded-2xl bg-[#fcfaf6] px-4 py-6 text-sm text-ink/55">No service charges currently match the active receipt-review filters.</div>
+                  <div className="ui-panel-soft px-4 py-6 text-sm text-ink/55">No service charges currently match the active receipt-review filters.</div>
                 ) : null}
               </div>
 
@@ -534,12 +530,12 @@ export function AdminPaymentsClient({
                 <div className="mt-4 flex items-center justify-between gap-4">
                   <p className="text-sm text-ink/60">Page {currentServicePage} of {totalServicePages}</p>
                   <div className="flex flex-wrap items-center gap-2">
-                    <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={isPending || currentServicePage === 1} onClick={() => navigate({ spage: '1' })} type="button">First</button>
-                    <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={isPending || currentServicePage === 1} onClick={() => navigate({ spage: String(Math.max(1, currentServicePage - 1)) })} type="button">Previous</button>
+                    <button className="ui-button-secondary px-4 py-2 disabled:opacity-50" disabled={isPending || currentServicePage === 1} onClick={() => navigate({ spage: '1' })} type="button">First</button>
+                    <button className="ui-button-secondary px-4 py-2 disabled:opacity-50" disabled={isPending || currentServicePage === 1} onClick={() => navigate({ spage: String(Math.max(1, currentServicePage - 1)) })} type="button">Previous</button>
                     {visibleServicePages.map((pageNumber) => (
                       <button
                         key={pageNumber}
-                        className={`min-w-10 rounded-full px-4 py-2 text-sm font-semibold transition disabled:opacity-50 ${pageNumber === currentServicePage ? 'bg-ink text-white' : 'border border-ink/12 text-ink hover:bg-parchment'}`}
+                        className={`min-w-10 rounded-full px-4 py-2 text-sm font-semibold transition disabled:opacity-50 ${pageNumber === currentServicePage ? 'bg-ink text-white' : 'border border-ink/12 text-ink hover:bg-surface-sunken'}`}
                         disabled={isPending || pageNumber === currentServicePage}
                         onClick={() => navigate({ spage: String(pageNumber) })}
                         type="button"
@@ -547,8 +543,8 @@ export function AdminPaymentsClient({
                         {pageNumber}
                       </button>
                     ))}
-                    <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={isPending || currentServicePage === totalServicePages} onClick={() => navigate({ spage: String(Math.min(totalServicePages, currentServicePage + 1)) })} type="button">Next</button>
-                    <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={isPending || currentServicePage === totalServicePages} onClick={() => navigate({ spage: String(totalServicePages) })} type="button">Last</button>
+                    <button className="ui-button-secondary px-4 py-2 disabled:opacity-50" disabled={isPending || currentServicePage === totalServicePages} onClick={() => navigate({ spage: String(Math.min(totalServicePages, currentServicePage + 1)) })} type="button">Next</button>
+                    <button className="ui-button-secondary px-4 py-2 disabled:opacity-50" disabled={isPending || currentServicePage === totalServicePages} onClick={() => navigate({ spage: String(totalServicePages) })} type="button">Last</button>
                   </div>
                 </div>
               ) : null}
@@ -562,7 +558,7 @@ export function AdminPaymentsClient({
               </p>
               <div className="mt-6 space-y-3">
                 {outstandingBookings.map((booking) => (
-                  <div key={booking.id} className="rounded-2xl bg-[#fcfaf6] p-4">
+                  <div key={booking.id} className="ui-panel-soft p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="font-semibold text-ink">{booking.guest_name}</p>
@@ -582,7 +578,7 @@ export function AdminPaymentsClient({
                   </div>
                 ))}
                 {outstandingBookings.length === 0 ? (
-                  <div className="rounded-2xl bg-[#fcfaf6] px-4 py-6 text-sm text-ink/55">No open balances right now.</div>
+                  <div className="ui-panel-soft px-4 py-6 text-sm text-ink/55">No open balances right now.</div>
                 ) : null}
               </div>
             </article>

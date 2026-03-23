@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script type='text/javascript' nonce='xOfXmOBcBvbyRhcI+GNigw==' src='https://contribution.usercontent.google.com/H6jrsLfs1FkRGC4Wp_73mmVFc8bP2O6_q_4qihVbiDiBz0UtwmB-zS066tQCNYik_bAfrpNW48jUQfKZyMLSBqhaWbsRZfSbe5llr_OaX0czEkW7SjgB4Trn2NBE3SSXNL26hlp4y0zIBKFvW6QGuhBwwL_CMwUAs8XcOStz4lp3ezvauPkoHz0lwGbAhDjsOWkyeH-x4A8ARMSkYTVTi8YNQZ0HVomWtEVdZGb0LhbvLrmFPSXJgqhtHPAx59zftIsa4D6FZ3lgEAxoRCA1cTB2Oq10UgXT2kOztrDaXlhj0_p8QhHKt8LJozLB4c6ItxyVwLzuh5IMSwzSaA_EMYKMHIJGXuLdO3AN8C-Zwa42DCkoGytrxuH09JEC2MKzzmkMDlHqNbpKN6iOkra0KoF4OsChCcpJez94ljvz5q_JDu6WuduX43BsyZ9dY3HrgKEJ52lLP-I5svSGPsFE_PQ8Ih_nLPr2tW80HHvZ14OzlmNDkPKvfXnCii3MzL7RsrgQWGn1a9WJ32Vq-BDfvs3IxGGo5f0PL08L0U5tqlI59uOz6Vo55YlTNsW9RelgODEYfBclGLzrf623eNmIynVE3y7KWYVqDqw_1NL15ZZVerzRiWD6sBsekWzJgRtWlxt6wtdjk8EaX6d_MNA_dULBdihCI0OFfYJIX2sJEHaRIYu5TN8W3mK1XfkfhNxqSVLGPWL0nN_iJSBYbb5T95qVPbGst95uzjUjVVoS8ap9lD8_LE1114_Sqg-JTgflk-MEvjTihv84AsfcN-qbgZF-Y_S74vQKXoxh36eW'></script><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary-fixed-dim": "#e9c176",
+              "surface-tint": "#565e74",
+              "on-primary-container": "#7c839b",
+              "surface-dim": "#dcdad5",
+              "on-primary-fixed": "#131b2e",
+              "background": "#fcf9f4",
+              "on-tertiary-fixed": "#261900",
+              "tertiary": "#000000",
+              "surface-bright": "#fcf9f4",
+              "outline": "#76777d",
+              "surface-container-highest": "#e5e2dd",
+              "secondary-fixed": "#ffdbca",
+              "secondary-fixed-dim": "#ffb68e",
+              "error-container": "#ffdad6",
+              "on-tertiary": "#ffffff",
+              "error": "#ba1a1a",
+              "on-secondary-fixed": "#331200",
+              "primary-fixed-dim": "#bec6e0",
+              "on-primary": "#ffffff",
+              "secondary": "#9b4500",
+              "tertiary-fixed": "#ffdea5",
+              "on-surface": "#1c1c19",
+              "surface": "#fcf9f4",
+              "surface-variant": "#e5e2dd",
+              "on-secondary-fixed-variant": "#763300",
+              "primary": "#000000",
+              "tertiary-container": "#261900",
+              "on-surface-variant": "#45464d",
+              "on-secondary-container": "#682c00",
+              "inverse-primary": "#bec6e0",
+              "surface-container-low": "#f6f3ee",
+              "on-tertiary-fixed-variant": "#5d4201",
+              "surface-container-lowest": "#ffffff",
+              "outline-variant": "#c6c6cd",
+              "secondary-container": "#fd8a42",
+              "inverse-surface": "#31302d",
+              "on-tertiary-container": "#a17f3b",
+              "primary-container": "#131b2e",
+              "inverse-on-surface": "#f3f0eb",
+              "on-primary-fixed-variant": "#3f465c",
+              "primary-fixed": "#dae2fd",
+              "on-background": "#1c1c19",
+              "surface-container-high": "#ebe8e3",
+              "surface-container": "#f0ede8",
+              "on-error": "#ffffff",
+              "on-error-container": "#93000a",
+              "on-secondary": "#ffffff"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+      }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      .glass-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+      }
+      .custom-shadow {
+        box-shadow: 0 8px 40px -12px rgba(28, 28, 25, 0.08);
+      }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-secondary-fixed">
+<!-- Sidebar Navigation (The Curator) -->
+<aside class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 overflow-y-auto bg-[#f6f3ee] dark:bg-slate-900 border-r-0 z-40">
+<div class="p-8">
+<h1 class="font-[&#39;Noto_Serif&#39;] text-lg italic text-[#131b2e] dark:text-white">The Curator</h1>
+<p class="font-[&#39;Manrope&#39;] text-[10px] uppercase tracking-[0.2em] font-bold text-outline mt-1">Grand Hotel Est. 1924</p>
+</div>
+<nav class="flex-1 mt-4">
+<a class="text-slate-500 dark:text-slate-400 py-3 px-6 flex items-center gap-3 hover:bg-[#ebe8e3]/50 transition-all duration-300 font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold" href="#">
+<span class="material-symbols-outlined" data-icon="today">today</span> Today
+            </a>
+<a class="text-slate-500 dark:text-slate-400 py-3 px-6 flex items-center gap-3 hover:bg-[#ebe8e3]/50 transition-all duration-300 font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span> Dashboard
+            </a>
+<a class="bg-[#ebe8e3] dark:bg-slate-800 text-[#0f172a] border-l-4 border-[#9b4500] py-3 px-6 flex items-center gap-3 font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="concierge">concierge</span> Service Desk
+            </a>
+<a class="text-slate-500 dark:text-slate-400 py-3 px-6 flex items-center gap-3 hover:bg-[#ebe8e3]/50 transition-all duration-300 font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold" href="#">
+<span class="material-symbols-outlined" data-icon="approval">approval</span> Approvals
+            </a>
+<a class="text-slate-500 dark:text-slate-400 py-3 px-6 flex items-center gap-3 hover:bg-[#ebe8e3]/50 transition-all duration-300 font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span> Reports
+            </a>
+<a class="text-slate-500 dark:text-slate-400 py-3 px-6 flex items-center gap-3 hover:bg-[#ebe8e3]/50 transition-all duration-300 font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold" href="#">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span> Bookings
+            </a>
+<a class="text-slate-500 dark:text-slate-400 py-3 px-6 flex items-center gap-3 hover:bg-[#ebe8e3]/50 transition-all duration-300 font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span> Payments
+            </a>
+</nav>
+<div class="p-6">
+<button class="w-full bg-primary-container text-on-primary py-4 rounded-md font-label text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span> New Booking
+            </button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 min-h-screen">
+<!-- Top Navigation Bar -->
+<header class="flex justify-between items-center w-full px-8 py-4 bg-[#fcf9f4] dark:bg-slate-950 sticky top-0 z-50">
+<div class="flex items-center gap-8 flex-1">
+<h2 class="text-xl font-bold tracking-tighter font-[&#39;Noto_Serif&#39;] text-[#0f172a] dark:text-white">The Executive Concierge</h2>
+<!-- Quick Search Bar -->
+<div class="relative w-full max-w-md group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg" data-icon="search">search</span>
+<input class="w-full bg-surface-container-low border-none focus:ring-0 focus:bg-surface-container text-sm py-2.5 pl-10 pr-4 rounded-lg transition-colors placeholder:text-outline/60" placeholder="Search guests, rooms, or confirmation..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-[#f6f3ee] rounded-full transition-colors relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-secondary rounded-full border-2 border-background"></span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-[#f6f3ee] rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+</button>
+</div>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-md font-label text-xs uppercase tracking-widest font-bold hover:opacity-90 active:scale-95 transition-all">
+                    Check-in
+                </button>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-surface-container-highest">
+<img alt="Manager Profile" class="w-full h-full object-cover" data-alt="Professional hotel manager headshot in suit" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3NpScIxSqa8WrIhruYa10uwm7vXColniTMsaT95ZInLtcIrDXsiNZUkzVKKV1CY7jlW5wxzFnznsnxTOvKhSm_7cMWMIqB-jHo1qsVHbZ7qDl_3Xm7ndyY6_dQFDtcIHardDBnGOH_sexCb8qYmmkpTDE75jM6IDEu8mCDk_rE1TiUS5_VqeGyN4IMgA356A7TMmOj_LEqVYnf98BFMwutQ2V4_pHSSiRKFwqJUKz_QJHIwNTBUc9Hn2GXFY7sICG0U0dE8BLyM_M"/>
+</div>
+</div>
+</header>
+<!-- Service Desk Content -->
+<div class="px-8 py-6 max-w-[1600px] mx-auto">
+<!-- Quick Actions Banner -->
+<div class="flex gap-4 mb-10 overflow-x-auto no-scrollbar pb-2">
+<button class="flex items-center gap-3 bg-surface-container-lowest custom-shadow px-6 py-4 rounded-xl border-l-4 border-secondary hover:bg-surface-container-high transition-all shrink-0">
+<span class="material-symbols-outlined text-secondary" data-icon="login">login</span>
+<div class="text-left">
+<p class="text-[10px] font-bold uppercase tracking-widest text-outline">Guest Arrival</p>
+<p class="font-bold text-primary">Check-in</p>
+</div>
+</button>
+<button class="flex items-center gap-3 bg-surface-container-lowest custom-shadow px-6 py-4 rounded-xl border-l-4 border-primary-container hover:bg-surface-container-high transition-all shrink-0">
+<span class="material-symbols-outlined text-primary-container" data-icon="logout">logout</span>
+<div class="text-left">
+<p class="text-[10px] font-bold uppercase tracking-widest text-outline">Guest Departure</p>
+<p class="font-bold text-primary">Check-out</p>
+</div>
+</button>
+<button class="flex items-center gap-3 bg-surface-container-lowest custom-shadow px-6 py-4 rounded-xl border-l-4 border-tertiary-fixed-dim hover:bg-surface-container-high transition-all shrink-0">
+<span class="material-symbols-outlined text-on-tertiary-fixed-variant" data-icon="upgrade">upgrade</span>
+<div class="text-left">
+<p class="text-[10px] font-bold uppercase tracking-widest text-outline">Availability</p>
+<p class="font-bold text-primary">Upgrade Room</p>
+</div>
+</button>
+<button class="flex items-center gap-3 bg-surface-container-lowest custom-shadow px-6 py-4 rounded-xl border-l-4 border-outline hover:bg-surface-container-high transition-all shrink-0">
+<span class="material-symbols-outlined text-outline" data-icon="key">key</span>
+<div class="text-left">
+<p class="text-[10px] font-bold uppercase tracking-widest text-outline">Security</p>
+<p class="font-bold text-primary">Assign Key</p>
+</div>
+</button>
+</div>
+<!-- Main Split View Layout (Asymmetric Grid) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Arrivals Section -->
+<section class="lg:col-span-7 space-y-6">
+<div class="flex items-baseline justify-between">
+<h3 class="font-headline text-3xl tracking-tight">Today's Arrivals</h3>
+<span class="font-label text-xs font-bold text-outline-variant uppercase tracking-widest">14 Pending · 08 Completed</span>
+</div>
+<div class="space-y-3">
+<!-- Guest Card: Priority -->
+<div class="glass-card custom-shadow rounded-xl p-6 border-l-4 border-secondary flex items-center justify-between group hover:translate-x-1 transition-transform cursor-pointer">
+<div class="flex items-center gap-6">
+<div class="relative">
+<div class="w-14 h-14 rounded-full bg-surface-container-highest flex items-center justify-center text-primary font-headline text-xl italic">EV</div>
+<span class="absolute -bottom-1 -right-1 bg-tertiary-fixed text-on-tertiary-fixed-variant text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter shadow-sm">VIP</span>
+</div>
+<div>
+<h4 class="font-bold text-lg text-primary tracking-tight">Eleanor Vance</h4>
+<p class="text-sm text-on-surface-variant">Suite 402 · King Heritage</p>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="text-center">
+<p class="text-[10px] font-bold uppercase tracking-widest text-outline mb-1">Room Status</p>
+<span class="bg-[#e7f5ed] text-[#1a5d3a] text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Inspected</span>
+</div>
+<div class="text-center">
+<p class="text-[10px] font-bold uppercase tracking-widest text-outline mb-1">Payment</p>
+<span class="material-symbols-outlined text-secondary" data-icon="check_circle" style="font-variation-settings: &#39;FILL&#39; 1;">check_circle</span>
+</div>
+<button class="opacity-0 group-hover:opacity-100 bg-primary-container text-on-primary px-4 py-2 rounded font-label text-[10px] font-bold uppercase tracking-widest transition-opacity">Action</button>
+</div>
+</div>
+<!-- Guest Card: Standard -->
+<div class="bg-surface-container-lowest custom-shadow rounded-xl p-6 flex items-center justify-between group hover:bg-surface-container-high transition-all cursor-pointer">
+<div class="flex items-center gap-6">
+<div class="w-14 h-14 rounded-full bg-surface-container-highest flex items-center justify-center text-primary font-headline text-xl italic">JM</div>
+<div>
+<h4 class="font-bold text-lg text-primary tracking-tight">Julian Montgomery</h4>
+<p class="text-sm text-on-surface-variant">Room 215 · Deluxe Twin</p>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="text-center">
+<p class="text-[10px] font-bold uppercase tracking-widest text-outline mb-1">Room Status</p>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Cleaning</span>
+</div>
+<div class="text-center">
+<p class="text-[10px] font-bold uppercase tracking-widest text-outline mb-1">Payment</p>
+<span class="material-symbols-outlined text-outline-variant" data-icon="pending">pending</span>
+</div>
+<button class="opacity-0 group-hover:opacity-100 bg-primary-container text-on-primary px-4 py-2 rounded font-label text-[10px] font-bold uppercase tracking-widest transition-opacity">Action</button>
+</div>
+</div>
+<!-- Guest Card: Arrival 3 -->
+<div class="bg-surface-container-lowest custom-shadow rounded-xl p-6 flex items-center justify-between group hover:bg-surface-container-high transition-all cursor-pointer">
+<div class="flex items-center gap-6">
+<div class="w-14 h-14 rounded-full bg-surface-container-highest flex items-center justify-center text-primary font-headline text-xl italic">SC</div>
+<div>
+<h4 class="font-bold text-lg text-primary tracking-tight">Sophia Chen</h4>
+<p class="text-sm text-on-surface-variant">Room 308 · Superior Queen</p>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="text-center">
+<p class="text-[10px] font-bold uppercase tracking-widest text-outline mb-1">Room Status</p>
+<span class="bg-[#e7f5ed] text-[#1a5d3a] text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Inspected</span>
+</div>
+<div class="text-center">
+<p class="text-[10px] font-bold uppercase tracking-widest text-outline mb-1">Payment</p>
+<span class="material-symbols-outlined text-secondary" data-icon="check_circle" style="font-variation-settings: &#39;FILL&#39; 1;">check_circle</span>
+</div>
+<button class="opacity-0 group-hover:opacity-100 bg-primary-container text-on-primary px-4 py-2 rounded font-label text-[10px] font-bold uppercase tracking-widest transition-opacity">Action</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Departures Section (Narrower Column) -->
+<section class="lg:col-span-5 space-y-6">
+<div class="flex items-baseline justify-between">
+<h3 class="font-headline text-2xl tracking-tight">Departures</h3>
+<span class="font-label text-xs font-bold text-outline-variant uppercase tracking-widest">06 Remaining</span>
+</div>
+<div class="bg-surface-container-low rounded-2xl p-2 space-y-1">
+<!-- Departure Row 1 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between group hover:bg-surface-container-high transition-colors">
+<div class="flex gap-4 items-center">
+<div class="text-right border-r border-outline-variant pr-4">
+<p class="font-bold text-primary">11:00</p>
+<p class="text-[10px] text-outline uppercase font-black">Room 104</p>
+</div>
+<div>
+<p class="font-bold text-sm">Marcus Aurelius</p>
+<p class="text-[10px] text-error font-bold tracking-tight uppercase">Late Check-out Req.</p>
+</div>
+</div>
+<button class="w-8 h-8 rounded bg-surface-container flex items-center justify-center hover:bg-primary-container hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="receipt_long">receipt_long</span>
+</button>
+</div>
+<!-- Departure Row 2 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between group hover:bg-surface-container-high transition-colors">
+<div class="flex gap-4 items-center">
+<div class="text-right border-r border-outline-variant pr-4">
+<p class="font-bold text-primary">12:30</p>
+<p class="text-[10px] text-outline uppercase font-black">Suite 505</p>
+</div>
+<div>
+<p class="font-bold text-sm">Beatrice Portinari</p>
+<p class="text-[10px] text-on-surface-variant font-medium">Mini-bar audit pending</p>
+</div>
+</div>
+<button class="w-8 h-8 rounded bg-surface-container flex items-center justify-center hover:bg-primary-container hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="receipt_long">receipt_long</span>
+</button>
+</div>
+<!-- Departure Row 3 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between group hover:bg-surface-container-high transition-colors opacity-60">
+<div class="flex gap-4 items-center">
+<div class="text-right border-r border-outline-variant pr-4">
+<p class="font-bold text-outline">09:15</p>
+<p class="text-[10px] text-outline uppercase font-black">Room 222</p>
+</div>
+<div>
+<p class="font-bold text-sm">Thomas More</p>
+<span class="text-[9px] bg-surface-container-highest px-2 py-0.5 rounded font-bold uppercase tracking-widest text-outline-variant">Departed</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-secondary-container" data-icon="task_alt" style="font-variation-settings: &#39;FILL&#39; 1;">task_alt</span>
+</div>
+</div>
+<!-- Room Readiness Overview Card -->
+<div class="bg-primary-container text-on-primary p-6 rounded-2xl relative overflow-hidden">
+<div class="relative z-10">
+<h4 class="font-headline italic text-lg mb-4">Housekeeping Velocity</h4>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-white/10 p-4 rounded-xl backdrop-blur-sm border border-white/10">
+<p class="text-[10px] uppercase tracking-widest font-bold opacity-60 mb-1">Dirty</p>
+<p class="text-3xl font-headline leading-none">12</p>
+</div>
+<div class="bg-white/10 p-4 rounded-xl backdrop-blur-sm border border-white/10">
+<p class="text-[10px] uppercase tracking-widest font-bold opacity-60 mb-1">Clean</p>
+<p class="text-3xl font-headline leading-none">08</p>
+</div>
+</div>
+<button class="w-full mt-6 py-3 bg-secondary text-on-primary font-label text-[10px] uppercase tracking-widest font-black rounded hover:opacity-90 transition-opacity">
+                                Broadcast Rush Order
+                            </button>
+</div>
+<!-- Abstract BG Decoration -->
+<div class="absolute -bottom-10 -right-10 w-40 h-40 bg-secondary/20 rounded-full blur-3xl"></div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Mobile Bottom Navigation Shell -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-surface-container-lowest flex justify-around items-center py-3 border-t border-outline-variant/10 z-50">
+<button class="flex flex-col items-center gap-1 text-secondary">
+<span class="material-symbols-outlined" data-icon="concierge" style="font-variation-settings: &#39;FILL&#39; 1;">concierge</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Desk</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-outline">
+<span class="material-symbols-outlined" data-icon="meeting_room">meeting_room</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Rooms</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-outline">
+<span class="material-symbols-outlined" data-icon="person_search">person_search</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Guests</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-outline">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Tools</span>
+</button>
+</nav>
+</body></html>

@@ -1,0 +1,66 @@
+# Hotel Management System: UI/UX Overhaul Strategy
+
+## 1. Visual & Art Direction: "The Executive Command Center"
+The goal is to move away from "Default Tailwind" and "Generic SaaS" into a space that feels like a premium, bespoke tool for high-end hospitality. 
+
+*   **Atmosphere:** Calm, polished, and efficient. It should feel expensive but functional—like an executive's desk or a boutique hotel's back-office.
+*   **Depth & Texture:** Use subtle borders, layered shadows, and "bone" neutral backgrounds instead of flat white. 
+*   **Contrast:** High functional contrast for operational data, low aesthetic contrast for background surfaces to reduce eye strain during long shifts.
+
+## 2. Design Tokens (CSS Variables & Tailwind Strategy)
+
+### Color Palette (The "Midnight & Sandstone" System)
+*   **Primary/Anchor:** `--color-ink`: #0F172A (Deep Midnight Navy)
+*   **Backgrounds:**
+    *   `--color-surface-base`: #F8F5F2 (Warm Bone/Parchment)
+    *   `--color-surface-sunken`: #EFEDE9 (Sandstone)
+*   **Accents:**
+    *   `--color-accent-gold`: #B48C56 (Muted Gold/Brass)
+    *   `--color-accent-copper`: #D97706 (Refined Terracotta)
+*   **Status (Semantic):**
+    *   `--color-status-urgent`: #991B1B (Deep Crimson, not bright red)
+    *   `--color-status-warning`: #92400E (Burnished Orange)
+    *   `--color-status-success`: #065F46 (Forest Green)
+
+### Typography Hierarchy
+*   **Display (Headings):** Serif or high-character Sans (e.g., *Playfair Display* for elegance or *Inter Tight* for modern precision). Used for "Hero Bands" and "Section Headers."
+*   **Operational (UI/Tables):** Highly readable, rhythmic Sans (e.g., *JetBrains Mono* for IDs/Metrics or *IBM Plex Sans* for density).
+*   **Rhythm:** Strict 4px/8px grid for vertical rhythm to ensure dense tables remain scannable.
+
+## 3. Component Primitive System
+*   **Page Shell:** A consistent layout with a sidebar that feels "integrated" into the frame, using CSS variables for responsive padding.
+*   **Command Card:** High-signal cards with "tactile" hover states for the Today view.
+*   **Metric Card:** Minimalist but punchy, focusing on trend lines and clear values.
+*   **Queue Card:** Used in Service Desk/Approvals. Focus on SLA status via subtle side-border markers.
+*   **Data Table Wrapper:** Custom scrollbars, fixed headers, and "Parchment" alternating row styles.
+
+## 4. Page-Specific Design Goals
+
+### Today (Command Center)
+*   **Priority:** Exception handling. 
+*   **Design:** A "Hero Band" for top-level stats (Occupancy, RevPAR) followed by an "Urgent Actions" lane.
+
+### Service Desk (The Queue)
+*   **Priority:** Flow and SLA pressure.
+*   **Design:** Lane-based layout with "Queue Cards" that use typography (size/weight) to denote urgency rather than just bright colors.
+
+### Approvals (High-Signal Review)
+*   **Priority:** Speed of decision.
+*   **Design:** Side-by-side view for receipts/KYC vs. action controls to minimize eye movement.
+
+### Reports (The Studio)
+*   **Priority:** Analytical clarity.
+*   **Design:** "Outlook" uses rich charts; "Export Studio" looks like a document preview—clean, white-space heavy, and ready for PDF generation.
+
+### Dashboard (The Launchpad)
+*   **Priority:** Navigation and confidence.
+*   **Design:** Less about "every chart we have" and more about "where do I need to go next?" using "Command Cards."
+
+### Reception Desk (The Front Line)
+*   **Priority:** Speed under pressure.
+*   **Design:** Large touch-friendly targets, high-contrast text for guest names/room numbers, and a simplified workflow focus.
+
+## 5. Motion & Implementation
+*   **Staggered Reveals:** `fade-in-up` with slight delays for page sections.
+*   **Tactile Feedback:** `active:scale-95` on buttons; subtle `box-shadow` transitions on hover.
+*   **Rollout:** Phased by route. The Page Shell and Global CSS Variables are implemented first to provide an immediate "wrapper" feel before individual pages are updated.

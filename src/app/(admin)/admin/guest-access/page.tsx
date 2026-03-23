@@ -33,9 +33,14 @@ type GuestAccessSearchParams = {
   to?: string | string[]
 }
 
+type AdminGuestAccessPageProps = {
+  searchParams?: GuestAccessSearchParams | Promise<GuestAccessSearchParams>
+}
+
 const PAGE_SIZE = 12
 
-export default async function AdminGuestAccessPage({ searchParams }: { searchParams?: GuestAccessSearchParams }) {
+export default async function AdminGuestAccessPage({ searchParams }: AdminGuestAccessPageProps) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined
   const { supabase, user } = await createAuthenticatedServerSupabaseClient()
   const migrationState = getAccessMigrationState()
 
@@ -43,11 +48,11 @@ export default async function AdminGuestAccessPage({ searchParams }: { searchPar
     redirect('/login')
   }
 
-  const query = getSingleParam(searchParams?.query).trim()
-  const fromDate = getSingleParam(searchParams?.from)
-  const toDate = getSingleParam(searchParams?.to)
-  const statusParam = getSingleParam(searchParams?.status)
-  const requestedPage = getPage(searchParams?.page)
+  const query = getSingleParam(resolvedSearchParams?.query).trim()
+  const fromDate = getSingleParam(resolvedSearchParams?.from)
+  const toDate = getSingleParam(resolvedSearchParams?.to)
+  const statusParam = getSingleParam(resolvedSearchParams?.status)
+  const requestedPage = getPage(resolvedSearchParams?.page)
   const status: 'all' | AccessCredentialStatus = parseGuestAccessStatus(statusParam)
 
   const filters: GuestAccessFilters = {

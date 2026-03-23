@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>University Hotel - Guest Portal</title>
+<script type='text/javascript' nonce='6MFDHQQWyaQWmaPnQRnhFA==' src='https://contribution.usercontent.google.com/cSHta936L4prdRa89Al0W4gqkJcQPeybMTNHByWQsqzFqlImk88VkPd-o5zOKrE_k6PRe0s8sb17Vir-3CvuZ7ZjNH-RgY84KGx6pP_WMWwpXbrBkD2j8YcK7MSJgW3Vn1TYrz0-AquARO7z17kqyOFYl1rL3ZaYPg8JWQQG-oPu_UHHCUnm6yRuGwTriqB5vfKwJ9bGBvbJxXYTN1tFlv7oll1gNUdI9PvKgO8kFO18Nn3hGmI3TO3X_fM000H8ymPGlukzDpbH7iqSfqsBTDFgFZNF_kCU5cNDZipeRRNqJfWzLw76RtiHAoa2M6DlYYDwot1goVfpMllfOsoeHad04J5gjWdS2yo4-mzyzFW3dnZTrfVt2X9NkDou9968DLg3pnfBEtmS_-xWch_vtVgRuh1ePIBRLcRWmIivSB--z1MPIqBHf_lyfHmnJ97K3QwcicZNE5tKDKA91l-rnP8p1tPy4STcQ8x_sm8p4LyFqMuSqte2Y9xLeTnadrKgyCweSN6WB13G5gG1IAMI5m_wwb20n4TlTk8g3RzimhkW_TThBfdH3953oYHorXF7omH3SDI0GGCF4ulpqyrnGrFcifcd3GLWEkHZco3ag4FMqERMddmYL8jo8xrhbZYrFejVwrPrPjqCj1lxe9hNLFPs_djagGH7ZuiOkb0IzhyY-XHGrjeyOkUOsn76iqZAyY8SYlbcTWHKfqzcFD6lsaMPohjMyZzYWVWP4uTL59JLEa5BJie7i9MJzyH92mbh1qJ38jTERImeQgYvcJbFvRI-B_7Vtn-s7yMwQw'></script><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#4A6741", // Deep Organic Green
+          "secondary": "#E8EAE3", // Soft Sage
+          "background-light": "#F9F8F6", // Warm Paper
+          "background-dark": "#1A1C19",
+          "text-main": "#2D302C",
+          "text-muted": "#757970",
+        },
+        fontFamily: {
+          "sans": ["Plus Jakarta Sans", "sans-serif"],
+          "serif": ["Noto Serif", "serif"]
+        },
+        borderRadius: {
+          "DEFAULT": "1rem", 
+          "lg": "1.5rem", 
+          "xl": "2rem", 
+          "full": "9999px"
+        },
+        boxShadow: {
+          'soft': '0 4px 24px -2px rgba(74, 103, 65, 0.08)',
+          'soft-hover': '0 8px 32px -4px rgba(74, 103, 65, 0.12)',
+        }
+      },
+    },
+  }
+</script>
+<style>
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .serif-greeting {
+    font-family: 'Noto Serif', serif;
+  }
+</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex justify-center items-start pt-10 pb-20 px-4">
+<!-- Main Container -->
+<main class="w-full max-w-[560px] flex flex-col gap-8">
+<!-- TopNav -->
+<header class="flex items-center justify-between px-2">
+<div class="flex items-center gap-3">
+<div class="size-10 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]" data-icon="hotel">hotel</span>
+</div>
+<h1 class="text-text-main font-bold text-lg tracking-tight">University Hotel</h1>
+</div>
+<button class="w-11 h-11 rounded-full bg-white shadow-soft flex items-center justify-center text-text-main hover:bg-gray-50 transition-all">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+</header>
+<!-- Welcome Card (Digital Welcome Book style) -->
+<section class="w-full bg-white rounded-xl shadow-soft overflow-hidden flex flex-col border border-primary/5">
+<div class="w-full h-56 bg-cover bg-center" data-alt="Cozy hotel room bed with soft lighting" style="background-image: url(&#39;https://lh3.googleusercontent.com/aida-public/AB6AXuBTaRKANQgRwfcJt9VZeLICsYqMhz_UlvFy0J4YkRT9LGzidtzNOcpyEtdp1PTcsmNVqlxYmjZeijdY7gEJ2ZhL14uch9grUEcFMU6ReO9NfotYhmkWynfiZs57wTyPk9O_hL9yec62oft4X22mTixs1tS9U7aqMHFiCSInE5JRE7uxAdnrbWFwVW3ceigYZPUujZJXxDf70yr50ameoEyaZ4J3sb24BE7mHYSHsHlLwYflkOmn04upcHkRdNf20LeTD106vEuVRW8&#39;);"></div>
+<div class="p-8 flex flex-col gap-2 bg-gradient-to-b from-white to-[#FDFDFB]">
+<h2 class="serif-greeting text-text-main text-[34px] font-medium leading-tight italic">Good morning, Alex</h2>
+<div class="flex items-center gap-2 text-text-muted text-[14px] font-medium mt-1">
+<span>Room 312</span>
+<span class="w-1 h-1 rounded-full bg-primary/30"></span>
+<span>Oct 12 — Oct 15</span>
+</div>
+</div>
+</section>
+<!-- Quick Actions Grid -->
+<section class="grid grid-cols-2 gap-5">
+<!-- Action Card 1 -->
+<button class="bg-white rounded-xl shadow-soft p-7 flex flex-col items-center justify-center gap-5 hover:-translate-y-1 hover:shadow-soft-hover transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary/20 border border-transparent hover:border-primary/5">
+<div class="w-16 h-16 rounded-full bg-secondary/50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300">
+<span class="material-symbols-outlined text-3xl" data-icon="room_service">room_service</span>
+</div>
+<span class="text-text-main font-semibold text-[15px]">Room Service</span>
+</button>
+<!-- Action Card 2 -->
+<button class="bg-white rounded-xl shadow-soft p-7 flex flex-col items-center justify-center gap-5 hover:-translate-y-1 hover:shadow-soft-hover transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary/20 border border-transparent hover:border-primary/5">
+<div class="w-16 h-16 rounded-full bg-secondary/50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300">
+<span class="material-symbols-outlined text-3xl" data-icon="spa">spa</span>
+</div>
+<span class="text-text-main font-semibold text-[15px]">Amenities</span>
+</button>
+<!-- Action Card 3 -->
+<button class="bg-white rounded-xl shadow-soft p-7 flex flex-col items-center justify-center gap-5 hover:-translate-y-1 hover:shadow-soft-hover transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary/20 border border-transparent hover:border-primary/5">
+<div class="w-16 h-16 rounded-full bg-secondary/50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300">
+<span class="material-symbols-outlined text-3xl" data-icon="cleaning_services">cleaning_services</span>
+</div>
+<span class="text-text-main font-semibold text-[15px]">Housekeeping</span>
+</button>
+<!-- Action Card 4 -->
+<button class="bg-white rounded-xl shadow-soft p-7 flex flex-col items-center justify-center gap-5 hover:-translate-y-1 hover:shadow-soft-hover transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary/20 border border-transparent hover:border-primary/5">
+<div class="w-16 h-16 rounded-full bg-secondary/50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300">
+<span class="material-symbols-outlined text-3xl" data-icon="wifi">wifi</span>
+</div>
+<span class="text-text-main font-semibold text-[15px]">Wi-Fi Access</span>
+</button>
+</section>
+<!-- Support Section -->
+<section class="bg-white rounded-xl shadow-soft p-6 flex items-center justify-between border border-transparent hover:border-primary/20 transition-all cursor-pointer group">
+<div class="flex items-center gap-5">
+<div class="w-14 h-14 rounded-full bg-background-light flex items-center justify-center text-primary/70">
+<span class="material-symbols-outlined text-2xl" data-icon="support_agent">support_agent</span>
+</div>
+<div>
+<h3 class="text-text-main font-bold text-[16px]">Front Desk Chat</h3>
+<p class="text-text-muted text-[13px] font-medium">Available now • Replies in 2 mins</p>
+</div>
+</div>
+<div class="w-10 h-10 rounded-full flex items-center justify-center text-text-muted group-hover:bg-primary/5 group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</div>
+</section>
+</main>
+</body></html>

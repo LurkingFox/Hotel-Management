@@ -187,23 +187,12 @@ export function AdminRoomsClient({ rooms }: AdminRoomsClientProps) {
   }
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,_#11202f_0%,_#11202f_24%,_#f7f1e8_24%,_#f7f1e8_100%)] px-6 py-10 text-ink md:px-10">
+    <main className="min-h-screen bg-[linear-gradient(180deg,_#0f3d2e_0%,_#155d45_24%,_#f9fffc_24%,_#f9fffc_100%)] px-6 py-10 text-ink md:px-10" data-smoke-id="admin-rooms">
+      <span className="sr-only">smoke:admin-rooms</span>
       <div className="mx-auto max-w-7xl space-y-6">
-        <header className="flex flex-col gap-4 text-white lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm uppercase tracking-[0.28em] text-white/70">Admin Tower</p>
-            <h1 className="font-[family-name:var(--font-display)] text-5xl">Rooms</h1>
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              className="rounded-full border border-white/30 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10 disabled:opacity-60"
-              disabled={isPending}
-              onClick={seedRooms}
-              type="button"
-            >
-              Seed default rooms
-            </button>
-          </div>
+        <header className="text-white">
+          <h1 className="font-[family-name:var(--font-display)] text-3xl md:text-[2.2rem]">Rooms</h1>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-white/72">Control room readiness, nightly pricing, and inventory state from one board.</p>
         </header>
 
         {errorMessage ? <div className="rounded-2xl bg-red-50 px-5 py-4 text-sm text-red-700">{errorMessage}</div> : null}
@@ -237,11 +226,21 @@ export function AdminRoomsClient({ rooms }: AdminRoomsClientProps) {
                 Create new inventory with the room number, room type, default nightly rate, and opening status before the desk starts selling it.
               </p>
             </div>
+            <div className="flex justify-start xl:justify-end">
+              <button
+                className="ui-button-secondary px-4 py-2 disabled:opacity-60"
+                disabled={isPending}
+                onClick={seedRooms}
+                type="button"
+              >
+                Seed default rooms
+              </button>
+            </div>
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
               <label className="space-y-2 text-sm text-ink/65">
                 <span className="font-semibold text-ink">Room number</span>
                 <input
-                  className="w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 text-ink outline-none transition focus:border-ink/25"
+                  className="ui-input w-full rounded-2xl px-4 py-3 text-ink"
                   onChange={(event) => setNewRoom((current) => ({ ...current, number: event.target.value }))}
                   placeholder="401"
                   value={newRoom.number}
@@ -250,7 +249,7 @@ export function AdminRoomsClient({ rooms }: AdminRoomsClientProps) {
               <label className="space-y-2 text-sm text-ink/65">
                 <span className="font-semibold text-ink">Room type</span>
                 <select
-                  className="w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 text-ink outline-none transition focus:border-ink/25"
+                  className="ui-input w-full rounded-2xl px-4 py-3 text-ink"
                   onChange={(event) => setNewRoom((current) => ({ ...current, type: event.target.value as RoomType }))}
                   value={newRoom.type}
                 >
@@ -264,7 +263,7 @@ export function AdminRoomsClient({ rooms }: AdminRoomsClientProps) {
               <label className="space-y-2 text-sm text-ink/65">
                 <span className="font-semibold text-ink">Nightly rate</span>
                 <input
-                  className="w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 text-ink outline-none transition focus:border-ink/25"
+                  className="ui-input w-full rounded-2xl px-4 py-3 text-ink"
                   inputMode="decimal"
                   onChange={(event) => setNewRoom((current) => ({ ...current, rate_ghs: event.target.value }))}
                   placeholder="650"
@@ -274,7 +273,7 @@ export function AdminRoomsClient({ rooms }: AdminRoomsClientProps) {
               <label className="space-y-2 text-sm text-ink/65">
                 <span className="font-semibold text-ink">Opening status</span>
                 <select
-                  className="w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 text-ink outline-none transition focus:border-ink/25"
+                  className="ui-input w-full rounded-2xl px-4 py-3 text-ink"
                   onChange={(event) => setNewRoom((current) => ({ ...current, status: event.target.value as RoomStatus }))}
                   value={newRoom.status}
                 >
@@ -290,7 +289,7 @@ export function AdminRoomsClient({ rooms }: AdminRoomsClientProps) {
 
           <div className="mt-5 flex justify-end">
             <button
-              className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#163a2e] disabled:opacity-60"
+              className="ui-button-primary disabled:opacity-60"
               disabled={isPending}
               onClick={createRoom}
               type="button"
@@ -310,7 +309,7 @@ export function AdminRoomsClient({ rooms }: AdminRoomsClientProps) {
               {(['all', ...roomStatuses] as const).map((filter) => (
                 <button
                   key={filter}
-                  className={`rounded-full px-5 py-3 text-sm font-semibold transition ${statusFilter === filter ? 'bg-ink text-white' : 'bg-parchment text-ink hover:bg-[#eadfce]'}`}
+                  className={statusFilter === filter ? 'ui-chip-active' : 'ui-chip'}
                   onClick={() => setStatusFilter(filter)}
                   type="button"
                 >
@@ -322,7 +321,7 @@ export function AdminRoomsClient({ rooms }: AdminRoomsClientProps) {
 
           <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {filteredRooms.map((room) => (
-              <article key={room.id} className="rounded-[1.75rem] border border-ink/10 bg-[#fcfaf6] p-6">
+              <article key={room.id} className="ui-panel-soft rounded-[1.75rem] p-6">
                 <div className="space-y-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -379,7 +378,7 @@ export function AdminRoomsClient({ rooms }: AdminRoomsClientProps) {
                   {roomStatuses.map((status) => (
                     <button
                       key={`${room.id}-${status}`}
-                      className={`rounded-full px-3 py-2 text-xs font-semibold uppercase transition ${room.status === status ? 'bg-ink text-white' : 'bg-white text-ink hover:bg-parchment'}`}
+                      className={room.status === status ? 'ui-chip-active px-3 py-2 text-xs uppercase' : 'ui-chip px-3 py-2 text-xs uppercase'}
                       disabled={isPending || room.status === status}
                       onClick={() => updateRoomStatus(room.id, status)}
                       type="button"
@@ -390,7 +389,7 @@ export function AdminRoomsClient({ rooms }: AdminRoomsClientProps) {
                   </div>
 
                   <button
-                    className="w-full rounded-full bg-ink px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#163a2e] disabled:opacity-60"
+                    className="ui-button-primary w-full disabled:opacity-60"
                     disabled={isPending}
                     onClick={() => saveRoomDetails(room.id)}
                     type="button"
@@ -402,7 +401,7 @@ export function AdminRoomsClient({ rooms }: AdminRoomsClientProps) {
             ))}
 
             {filteredRooms.length === 0 ? (
-              <div className="col-span-full rounded-[1.75rem] border border-dashed border-ink/15 bg-[#fcfaf6] px-6 py-10 text-center text-sm text-ink/55">
+              <div className="ui-panel-muted col-span-full rounded-[1.75rem] border-dashed px-6 py-10 text-center text-sm text-ink/55">
                 No rooms match this filter.
               </div>
             ) : null}

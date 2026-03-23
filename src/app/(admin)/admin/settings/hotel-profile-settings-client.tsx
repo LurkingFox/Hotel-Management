@@ -196,13 +196,14 @@ export function HotelProfileSettingsClient({ initialMappings, initialProfile, sa
   const contactLines = getHotelContactLines(profile)
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,_#11202f_0%,_#11202f_24%,_#f7f1e8_24%,_#f7f1e8_100%)] px-6 py-10 text-ink md:px-10">
+    <main className="min-h-screen bg-[linear-gradient(180deg,_#0f3d2e_0%,_#155d45_24%,_#f9fffc_24%,_#f9fffc_100%)] px-6 py-10 text-ink md:px-10" data-smoke-id="admin-settings">
+      <span className="sr-only">smoke:admin-settings</span>
       <div className="mx-auto max-w-6xl space-y-8">
         <header className="rounded-[2rem] border border-ink/10 bg-white/80 p-7 shadow-card backdrop-blur">
           <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
             <div className="space-y-3">
-              <p className="text-xs uppercase tracking-[0.3em] text-ink/45">University Hotel settings</p>
-              <h1 className="font-[family-name:var(--font-display)] text-5xl">Hotel identity</h1>
+              <p className="text-xs uppercase tracking-[0.3em] text-ink/45">Settings lane</p>
+              <h1 className="font-[family-name:var(--font-display)] text-5xl">Settings</h1>
               <p className="max-w-3xl text-sm leading-6 text-ink/70">
                 Manage the official hotel name, address, contacts, website, and logo used across report exports and administrative documents.
               </p>
@@ -217,45 +218,45 @@ export function HotelProfileSettingsClient({ initialMappings, initialProfile, sa
                 <p className="text-xs uppercase tracking-[0.24em] text-ink/45">Profile editor</p>
                 <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl">Branding and contact details</h2>
               </div>
-              <div className="rounded-full bg-parchment px-4 py-2 text-sm font-semibold text-ink">Admin only</div>
+              <div className="ui-pill px-4 py-2 text-sm font-semibold">Admin only</div>
             </div>
 
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               <label className="block md:col-span-2">
                 <span className="text-sm font-semibold text-ink/75">Hotel name</span>
-                <input className="mt-2 w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 text-sm text-ink outline-none transition focus:border-ink/25" onChange={(event) => update('name', event.target.value)} value={profile.name} />
+                <input className="ui-input mt-2 w-full rounded-2xl px-4 py-3 text-sm text-ink" onChange={(event) => update('name', event.target.value)} value={profile.name} />
               </label>
               <label className="block">
                 <span className="text-sm font-semibold text-ink/75">Address line 1</span>
-                <input className="mt-2 w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 text-sm text-ink outline-none transition focus:border-ink/25" onChange={(event) => update('addressLine1', event.target.value)} value={profile.addressLine1} />
+                <input className="ui-input mt-2 w-full rounded-2xl px-4 py-3 text-sm text-ink" onChange={(event) => update('addressLine1', event.target.value)} value={profile.addressLine1} />
               </label>
               <label className="block">
                 <span className="text-sm font-semibold text-ink/75">Address line 2</span>
-                <input className="mt-2 w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 text-sm text-ink outline-none transition focus:border-ink/25" onChange={(event) => update('addressLine2', event.target.value)} value={profile.addressLine2} />
+                <input className="ui-input mt-2 w-full rounded-2xl px-4 py-3 text-sm text-ink" onChange={(event) => update('addressLine2', event.target.value)} value={profile.addressLine2} />
               </label>
               <label className="block">
                 <span className="text-sm font-semibold text-ink/75">City</span>
-                <input className="mt-2 w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 text-sm text-ink outline-none transition focus:border-ink/25" onChange={(event) => update('city', event.target.value)} value={profile.city} />
+                <input className="ui-input mt-2 w-full rounded-2xl px-4 py-3 text-sm text-ink" onChange={(event) => update('city', event.target.value)} value={profile.city} />
               </label>
               <label className="block">
                 <span className="text-sm font-semibold text-ink/75">Region</span>
-                <input className="mt-2 w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 text-sm text-ink outline-none transition focus:border-ink/25" onChange={(event) => update('region', event.target.value)} value={profile.region} />
+                <input className="ui-input mt-2 w-full rounded-2xl px-4 py-3 text-sm text-ink" onChange={(event) => update('region', event.target.value)} value={profile.region} />
               </label>
               <label className="block">
                 <span className="text-sm font-semibold text-ink/75">Phone</span>
-                <input className="mt-2 w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 text-sm text-ink outline-none transition focus:border-ink/25" onChange={(event) => update('phone', event.target.value)} value={profile.phone} />
+                <input className="ui-input mt-2 w-full rounded-2xl px-4 py-3 text-sm text-ink" onChange={(event) => update('phone', event.target.value)} value={profile.phone} />
               </label>
               <label className="block">
                 <span className="text-sm font-semibold text-ink/75">Email</span>
-                <input className="mt-2 w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 text-sm text-ink outline-none transition focus:border-ink/25" onChange={(event) => update('email', event.target.value)} value={profile.email} />
+                <input className="ui-input mt-2 w-full rounded-2xl px-4 py-3 text-sm text-ink" onChange={(event) => update('email', event.target.value)} value={profile.email} />
               </label>
               <label className="block md:col-span-2">
                 <span className="text-sm font-semibold text-ink/75">Website</span>
-                <input className="mt-2 w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 text-sm text-ink outline-none transition focus:border-ink/25" onChange={(event) => update('website', event.target.value)} value={profile.website} />
+                <input className="ui-input mt-2 w-full rounded-2xl px-4 py-3 text-sm text-ink" onChange={(event) => update('website', event.target.value)} value={profile.website} />
               </label>
               <label className="block md:col-span-2">
                 <span className="text-sm font-semibold text-ink/75">Hotel logo</span>
-                <input accept="image/png,image/jpeg" className="mt-2 block w-full rounded-2xl border border-dashed border-ink/15 bg-[#fcfaf6] px-4 py-3 text-sm text-ink" disabled={isUploading} onChange={uploadLogo} type="file" />
+                <input accept="image/png,image/jpeg" className="ui-panel-muted mt-2 block w-full rounded-2xl border-dashed px-4 py-3 text-sm text-ink" disabled={isUploading} onChange={uploadLogo} type="file" />
                 <p className="mt-2 text-xs uppercase tracking-[0.18em] text-ink/45">PNG or JPEG only, max 2 MB</p>
               </label>
               <div className="md:col-span-2">
@@ -267,7 +268,7 @@ export function HotelProfileSettingsClient({ initialMappings, initialProfile, sa
                     return (
                       <button
                         key={sampleLogo.id}
-                        className={`rounded-[1.5rem] border p-3 text-left transition ${selected ? 'border-ink bg-parchment' : 'border-ink/10 bg-[#fcfaf6] hover:border-ink/25 hover:bg-white'}`}
+                        className={`rounded-[1.5rem] border p-3 text-left transition ${selected ? 'border-ink bg-surface-raised' : 'border-ink/10 bg-surface-soft hover:border-ink/25 hover:bg-white'}`}
                         onClick={() => applySampleLogo(sampleLogo)}
                         type="button"
                       >
@@ -288,7 +289,7 @@ export function HotelProfileSettingsClient({ initialMappings, initialProfile, sa
             </div>
 
             <div className="mt-5 flex flex-wrap items-center gap-3">
-              <button className="rounded-full border border-ink/15 bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#211d18] disabled:cursor-not-allowed disabled:opacity-60" disabled={isSaving || isUploading} onClick={saveProfile} type="button">
+              <button className="ui-button-primary disabled:cursor-not-allowed disabled:opacity-60" disabled={isSaving || isUploading} onClick={saveProfile} type="button">
                 {isSaving ? 'Saving profile...' : 'Save hotel profile'}
               </button>
               {message ? <p className="text-sm text-green-700">{message}</p> : null}
@@ -328,7 +329,7 @@ export function HotelProfileSettingsClient({ initialMappings, initialProfile, sa
               </p>
             </div>
             <button
-              className="rounded-full border border-ink/15 bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#211d18] disabled:cursor-not-allowed disabled:opacity-60"
+              className="ui-button-primary disabled:cursor-not-allowed disabled:opacity-60"
               disabled={isSyncingMappings}
               onClick={syncMappingsFromEnv}
               type="button"
@@ -339,7 +340,7 @@ export function HotelProfileSettingsClient({ initialMappings, initialProfile, sa
 
           <div className="mt-6 grid gap-4">
             {mappings.map((mapping) => (
-              <article key={mapping.room.id} className="rounded-[1.5rem] border border-ink/10 bg-[#fcfaf6] p-5">
+              <article key={mapping.room.id} className="ui-panel-soft rounded-[1.5rem] p-5">
                 <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                   <div>
                     <p className="text-lg font-semibold text-ink">Room {mapping.room.number}</p>
@@ -354,7 +355,7 @@ export function HotelProfileSettingsClient({ initialMappings, initialProfile, sa
                   <label className="space-y-2">
                     <span className="text-sm font-semibold text-ink/75">Seam device ID</span>
                     <input
-                      className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 text-sm text-ink outline-none transition focus:border-ink/25"
+                      className="ui-input w-full rounded-2xl px-4 py-3 text-sm text-ink"
                       onChange={(event) => updateMapping(mapping.room.id, 'externalDeviceId', event.target.value)}
                       placeholder="device_abc123"
                       value={mapping.externalDeviceId}
@@ -363,7 +364,7 @@ export function HotelProfileSettingsClient({ initialMappings, initialProfile, sa
                   <label className="space-y-2">
                     <span className="text-sm font-semibold text-ink/75">Display name</span>
                     <input
-                      className="w-full rounded-2xl border border-ink/10 bg-white px-4 py-3 text-sm text-ink outline-none transition focus:border-ink/25"
+                      className="ui-input w-full rounded-2xl px-4 py-3 text-sm text-ink"
                       onChange={(event) => updateMapping(mapping.room.id, 'displayName', event.target.value)}
                       placeholder={`Room ${mapping.room.number}`}
                       value={mapping.displayName}
@@ -371,7 +372,7 @@ export function HotelProfileSettingsClient({ initialMappings, initialProfile, sa
                   </label>
                   <div className="flex items-end">
                     <button
-                      className="w-full rounded-full border border-ink/15 bg-white px-5 py-3 text-sm font-semibold text-ink transition hover:bg-parchment disabled:cursor-not-allowed disabled:opacity-60"
+                      className="ui-button-secondary w-full disabled:cursor-not-allowed disabled:opacity-60"
                       disabled={isSavingMappings[mapping.room.id] || !mapping.externalDeviceId.trim()}
                       onClick={() => saveMapping(mapping.room.id)}
                       type="button"

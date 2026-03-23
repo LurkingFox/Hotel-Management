@@ -33,9 +33,14 @@ type StaffHistorySearchParams = {
   shiftTo?: string | string[]
 }
 
+type AdminStaffPageProps = {
+  searchParams?: StaffHistorySearchParams | Promise<StaffHistorySearchParams>
+}
+
 const PAGE_SIZE = 8
 
-export default async function AdminStaffPage({ searchParams }: { searchParams?: StaffHistorySearchParams }) {
+export default async function AdminStaffPage({ searchParams }: AdminStaffPageProps) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined
   const { supabase, user, session } = await createAuthenticatedServerSupabaseClient()
 
   if (!user) {
@@ -67,11 +72,11 @@ export default async function AdminStaffPage({ searchParams }: { searchParams?: 
     staffAccounts = (await response.json()) as StaffAccount[]
   }
 
-  const query = getSingleParam(searchParams?.shiftQuery).trim()
-  const fromDate = getSingleParam(searchParams?.shiftFrom)
-  const toDate = getSingleParam(searchParams?.shiftTo)
-  const requestedPage = getPage(searchParams?.shiftPage)
-  const statusParam = getSingleParam(searchParams?.shiftStatus)
+  const query = getSingleParam(resolvedSearchParams?.shiftQuery).trim()
+  const fromDate = getSingleParam(resolvedSearchParams?.shiftFrom)
+  const toDate = getSingleParam(resolvedSearchParams?.shiftTo)
+  const requestedPage = getPage(resolvedSearchParams?.shiftPage)
+  const statusParam = getSingleParam(resolvedSearchParams?.shiftStatus)
   const status: 'all' | 'closed' | 'open' = parseShiftStatus(statusParam)
 
   const historyFilters: ShiftHistoryFilters = {

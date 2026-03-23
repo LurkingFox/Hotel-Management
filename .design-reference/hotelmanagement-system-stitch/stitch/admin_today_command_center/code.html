@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Executive Concierge | Today Command Center</title>
+<script type='text/javascript' nonce='znnS4+o+bX/L40Fh8GoX5g==' src='https://contribution.usercontent.google.com/Tgit8vlkWV07gam3jH4H2Uv1RNGYQQstM5vrHoVe6TtZKnqt-HvMvsIPC2zGv0-hkKF9fYPFtNtkWnyeYYl7Tl50ZLJweBnQhsJTwi-NIjxwST0c2uGyGJOM-gk4hxfbFMbzb5sXVF6muCnFO6FCv4PYF03KT3Iq514qvBq6MxOe3rm_x-LnPeHzvux6jxtyd2qMc9J8hewTJKqgjQQeHFCPf45-Ef9TW25ztZSUHhFsuB58bwy-2MOpHTYAN2v8YRifE0wVWKzSlhDq3itIXKZOivbrLIV8M8iRt7thJ_X8n8vN65MgIu12NdhdjE3q3F95vbkxLS-sjCfm4_whph4zB3bNSnehxJo_6IRtEwC-Oy5xV2ZwBA_h7tTeZFdKHeqfQGiGSj41Pb-5aPu9aYC6LPudCjbKuCXs740YjkVJvcv56DcOZwgFnH9iZAF3ITGnJSbhYP9_1-D3xO6ZASXn8YZN8CHQ4Y-MOcPcFtFJA-3hWlQx5D2ssHZ-SX8w2NG2l_vXUh4oZD40LRAbHDz3BwPSTPLs0qCkWsM5lpWXdntCKvkOfdT8vWzUhxownt3HwENugwTSCYYc6UIM4tmKy7srvdBbNn1pNdBEZQxH9ix0L-h9K9VkbEoss6tAPZStWuRpHTGYSiI89ekP73CHGKSKMswdbQY2g_HtW0_9PUJiTUVywnwoeCQSm4e9j22XbTplNNhAqJHEec8uL2TeBIp08-U7UatW-LtZgpWYk1MoESfvt8FdZIJmpRmX9oMq501ql7zpWlVjjrzy631QNa265XQ3Y4UNX_5F'></script><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary-fixed-dim": "#e9c176",
+                        "surface-tint": "#565e74",
+                        "on-primary-container": "#7c839b",
+                        "surface-dim": "#dcdad5",
+                        "on-primary-fixed": "#131b2e",
+                        "background": "#fcf9f4",
+                        "on-tertiary-fixed": "#261900",
+                        "tertiary": "#000000",
+                        "surface-bright": "#fcf9f4",
+                        "outline": "#76777d",
+                        "surface-container-highest": "#e5e2dd",
+                        "secondary-fixed": "#ffdbca",
+                        "secondary-fixed-dim": "#ffb68e",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#331200",
+                        "primary-fixed-dim": "#bec6e0",
+                        "on-primary": "#ffffff",
+                        "secondary": "#9b4500",
+                        "tertiary-fixed": "#ffdea5",
+                        "on-surface": "#1c1c19",
+                        "surface": "#fcf9f4",
+                        "surface-variant": "#e5e2dd",
+                        "on-secondary-fixed-variant": "#763300",
+                        "primary": "#000000",
+                        "tertiary-container": "#261900",
+                        "on-surface-variant": "#45464d",
+                        "on-secondary-container": "#682c00",
+                        "inverse-primary": "#bec6e0",
+                        "surface-container-low": "#f6f3ee",
+                        "on-tertiary-fixed-variant": "#5d4201",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c6c6cd",
+                        "secondary-container": "#fd8a42",
+                        "inverse-surface": "#31302d",
+                        "on-tertiary-container": "#a17f3b",
+                        "primary-container": "#131b2e",
+                        "inverse-on-surface": "#f3f0eb",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "primary-fixed": "#dae2fd",
+                        "on-background": "#1c1c19",
+                        "surface-container-high": "#ebe8e3",
+                        "surface-container": "#f0ede8",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff"
+                    },
+                    fontFamily: {
+                        "headline": ["Noto Serif", "serif"],
+                        "body": ["Manrope", "sans-serif"],
+                        "label": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+        }
+        .parchment-glow {
+            box-shadow: 0 8px 32px rgba(28, 28, 25, 0.08);
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e5e2dd; }
+    </style>
+</head>
+<body class="bg-background font-body text-on-surface">
+<!-- SideNavBar Shell -->
+<aside class="h-screen w-64 fixed left-0 top-0 overflow-y-auto bg-[#f6f3ee] dark:bg-slate-900 flex flex-col h-full border-r-0 z-50">
+<div class="p-8 flex flex-col gap-1">
+<h1 class="font-[&#39;Noto_Serif&#39;] text-lg italic text-[#131b2e] dark:text-white">The Curator</h1>
+<p class="font-[&#39;Manrope&#39;] text-[10px] uppercase tracking-[0.2em] font-semibold text-slate-500">Grand Hotel Est. 1924</p>
+</div>
+<nav class="flex-1 px-4">
+<!-- Active Tab: Today -->
+<a class="bg-[#ebe8e3] dark:bg-slate-800 text-[#0f172a] border-l-4 border-[#9b4500] py-3 px-6 flex items-center gap-3 transition-transform translate-x-1" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="today">today</span>
+<span class="font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold">Today</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 py-3 px-6 flex items-center gap-3 hover:bg-[#ebe8e3]/50 transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="dashboard">dashboard</span>
+<span class="font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold">Dashboard</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 py-3 px-6 flex items-center gap-3 hover:bg-[#ebe8e3]/50 transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="concierge">concierge</span>
+<span class="font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold">Service Desk</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 py-3 px-6 flex items-center gap-3 hover:bg-[#ebe8e3]/50 transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="approval">approval</span>
+<span class="font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold">Approvals</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 py-3 px-6 flex items-center gap-3 hover:bg-[#ebe8e3]/50 transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="analytics">analytics</span>
+<span class="font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold">Reports</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 py-3 px-6 flex items-center gap-3 hover:bg-[#ebe8e3]/50 transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="event_available">event_available</span>
+<span class="font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold">Bookings</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 py-3 px-6 flex items-center gap-3 hover:bg-[#ebe8e3]/50 transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="payments">payments</span>
+<span class="font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold">Payments</span>
+</a>
+</nav>
+<div class="mt-auto p-6 flex flex-col gap-4">
+<button class="w-full bg-primary-container text-on-primary py-3 px-4 font-label text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                New Booking
+            </button>
+<a class="text-slate-500 py-2 px-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="help_outline">help_outline</span>
+                Help Center
+            </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 min-h-screen flex flex-col">
+<!-- TopAppBar Shell -->
+<header class="bg-[#fcf9f4] dark:bg-slate-950 flex justify-between items-center w-full px-8 py-4 sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<span class="text-xl font-bold tracking-tighter font-[&#39;Noto_Serif&#39;] text-[#0f172a] dark:text-white">The Executive Concierge</span>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4 text-slate-500">
+<button class="hover:bg-[#f6f3ee] p-2 rounded-full transition-colors"><span class="material-symbols-outlined" data-icon="search">search</span></button>
+<button class="hover:bg-[#f6f3ee] p-2 rounded-full transition-colors relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-secondary rounded-full"></span>
+</button>
+<button class="hover:bg-[#f6f3ee] p-2 rounded-full transition-colors"><span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span></button>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant/30"></div>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="text-[10px] font-bold uppercase tracking-widest text-secondary">On Duty</p>
+<p class="text-xs font-semibold">Julian Vane</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden">
+<img alt="Manager Profile" class="w-full h-full object-cover" data-alt="Portrait of a professional hotel manager in a suit" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBe7C3t6NaeOioRLK2ujJmUwrv8CoJgicRWuwCcnhMhc648y07cNdDEHASs9vi75exNQ8bvWvg5AcWRLVnj_3eEFicISFqclhDX2z-yqzmAUkxQrhGWfav_y-IJMRF2-w4ZhKI-yr8AqbU_7alBtms5HyOVkPPPSmTusqVyOvVx9W4ygcPnH-9QtTLYkL195i6iXIg_73TtB43csMnzK4lH5HSyDEAIEfJXjlwP4uY8WbhidkmMyOcjG8Wv36RXeRt3G6mEQ6O06t5T"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Dashboard Body -->
+<div class="px-8 py-8 flex flex-col gap-8 max-w-[1600px] w-full mx-auto">
+<!-- Hero Band: Intentional Asymmetry -->
+<section class="flex flex-col md:flex-row gap-6 items-end">
+<div class="flex-1">
+<span class="label-sm text-[10px] uppercase tracking-[0.3em] font-extrabold text-secondary mb-2 block">Performance Pulse</span>
+<h2 class="font-headline text-4xl text-primary-container tracking-tight">Morning Briefing</h2>
+</div>
+<div class="grid grid-cols-3 gap-12 bg-primary-container text-on-primary p-10 rounded-none w-full md:w-auto min-w-[600px] relative overflow-hidden">
+<!-- Subtle background decoration -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
+<div class="flex flex-col gap-1">
+<p class="text-[10px] uppercase tracking-widest text-on-primary-container font-bold">Occupancy</p>
+<p class="font-headline text-4xl font-bold tracking-tighter">94<span class="text-xl font-normal opacity-60">%</span></p>
+<div class="flex items-center gap-1 text-[10px] text-tertiary-fixed-dim">
+<span class="material-symbols-outlined text-xs" data-icon="trending_up">trending_up</span>
+                            +2.4% vs LY
+                        </div>
+</div>
+<div class="flex flex-col gap-1 border-l border-white/10 pl-12">
+<p class="text-[10px] uppercase tracking-widest text-on-primary-container font-bold">ADR</p>
+<p class="font-headline text-4xl font-bold tracking-tighter"><span class="text-xl font-normal opacity-60">$</span>452</p>
+<p class="text-[10px] opacity-60 italic font-body">Premium Suites</p>
+</div>
+<div class="flex flex-col gap-1 border-l border-white/10 pl-12">
+<p class="text-[10px] uppercase tracking-widest text-on-primary-container font-bold">RevPAR</p>
+<p class="font-headline text-4xl font-bold tracking-tighter"><span class="text-xl font-normal opacity-60">$</span>424</p>
+<p class="text-[10px] opacity-60 font-body">Target: $410</p>
+</div>
+</div>
+</section>
+<!-- Main Bento Grid -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Urgent Command Cards (Terracotta Accents) -->
+<div class="col-span-12 lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- VIP Arrival Card -->
+<div class="bg-surface-container-lowest parchment-glow p-6 flex flex-col justify-between group hover:translate-y-[-4px] transition-transform duration-300">
+<div class="flex justify-between items-start mb-8">
+<div class="bg-tertiary-fixed px-2 py-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-on-tertiary-fixed-variant" data-icon="verified" style="font-variation-settings: &#39;FILL&#39; 1;">verified</span>
+<span class="text-[9px] font-bold uppercase tracking-widest text-on-tertiary-fixed-variant">Urgent</span>
+</div>
+<span class="material-symbols-outlined text-secondary text-2xl" data-icon="person_alert">person_alert</span>
+</div>
+<div>
+<p class="font-headline text-3xl mb-1">3 VIP Arrivals</p>
+<p class="text-xs text-on-surface-variant leading-relaxed">Missing room preferences or dietary restrictions for arrivals in next 4 hours.</p>
+</div>
+<button class="mt-6 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-secondary hover:gap-4 transition-all">
+                            View Profiles <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<!-- Maintenance Card -->
+<div class="bg-surface-container-lowest parchment-glow p-6 flex flex-col justify-between group hover:translate-y-[-4px] transition-transform duration-300">
+<div class="flex justify-between items-start mb-8">
+<div class="bg-error-container px-2 py-1">
+<span class="text-[9px] font-bold uppercase tracking-widest text-error">Escalated</span>
+</div>
+<span class="material-symbols-outlined text-error text-2xl" data-icon="engineering">engineering</span>
+</div>
+<div>
+<p class="font-headline text-3xl mb-1">2 Failures</p>
+<p class="text-xs text-on-surface-variant leading-relaxed">Elevator A (Lobby) &amp; Room 402 (HVAC). Tech team ETA: 20 mins.</p>
+</div>
+<button class="mt-6 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-secondary">
+                            Track Status <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<!-- Refunds Card -->
+<div class="bg-surface-container-lowest parchment-glow p-6 flex flex-col justify-between group hover:translate-y-[-4px] transition-transform duration-300">
+<div class="flex justify-between items-start mb-8">
+<div class="bg-surface-container-highest px-2 py-1">
+<span class="text-[9px] font-bold uppercase tracking-widest text-on-surface">Review</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-2xl" data-icon="payments">payments</span>
+</div>
+<div>
+<p class="font-headline text-3xl mb-1">4 Pending</p>
+<p class="text-xs text-on-surface-variant leading-relaxed">High-value refund requests (&gt; $1,500) awaiting executive approval.</p>
+</div>
+<button class="mt-6 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-secondary">
+                            Approve All <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Live Queue (Side Card) -->
+<div class="col-span-12 lg:col-span-4 bg-surface-container-low p-8 flex flex-col gap-6">
+<div class="flex justify-between items-center">
+<h3 class="font-headline text-xl">Desk Activity</h3>
+<span class="text-[10px] font-bold uppercase tracking-widest opacity-50">Live Update</span>
+</div>
+<div class="flex flex-col gap-8">
+<!-- Arrivals -->
+<div class="relative">
+<div class="flex justify-between items-end mb-2">
+<p class="text-xs font-bold uppercase tracking-widest">Arrivals</p>
+<p class="font-headline text-2xl">42 <span class="text-xs font-normal opacity-50">/ 68</span></p>
+</div>
+<div class="w-full h-1 bg-surface-container-highest overflow-hidden">
+<div class="bg-secondary h-full" style="width: 61%;"></div>
+</div>
+<div class="mt-4 flex flex-col gap-3">
+<div class="flex items-center gap-3 p-3 bg-white/50 border-l-2 border-secondary">
+<div class="w-8 h-8 rounded-full bg-slate-200">
+<img alt="Guest" class="w-full h-full rounded-full object-cover" data-alt="Female guest headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYefUXcekvHbHK1wiOQqGxj67O2Y78VvhiPYlAQZPcaeIseTKvoVjdyLLtEW-SCKgaDneX-ToKxaIZR78G562aBxSfKahschFRFFJ5RJ7Q2M8--Au857wtyNUj6xM2zyybJLIBbt85GtIPFCCdEB4MtA-NIx5T8WsZl5zu9qfUtW7jOLs5qmU5v4Ti3exLTKmy93VOgdCJ2ZME8masvegT7bAhVXOO72mzhbnN1ltYyXyoKV6UdzpSaUXgZpUcgxZ5-ZGrMZ0FOe0Y"/>
+</div>
+<div class="flex-1">
+<p class="text-xs font-bold">Elena Rodriguez</p>
+<p class="text-[10px] opacity-60">Titanium Elite · Checking in now</p>
+</div>
+<span class="material-symbols-outlined text-sm text-secondary" data-icon="circle" style="font-variation-settings: &#39;FILL&#39; 1;">circle</span>
+</div>
+</div>
+</div>
+<!-- Departures -->
+<div class="relative">
+<div class="flex justify-between items-end mb-2">
+<p class="text-xs font-bold uppercase tracking-widest">Departures</p>
+<p class="font-headline text-2xl">54 <span class="text-xs font-normal opacity-50">/ 58</span></p>
+</div>
+<div class="w-full h-1 bg-surface-container-highest overflow-hidden">
+<div class="bg-primary-container h-full" style="width: 93%;"></div>
+</div>
+<p class="mt-2 text-[10px] italic opacity-60">4 Express check-outs remaining</p>
+</div>
+</div>
+<button class="mt-auto w-full border border-outline/20 py-4 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-surface transition-colors">
+                        Manage Full Queue
+                    </button>
+</div>
+<!-- Specialized Component: Room Matrix / Status Seal Section -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container-lowest parchment-glow p-8">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h3 class="font-headline text-2xl">Housekeeping Integrity</h3>
+<p class="text-xs text-on-surface-variant">Real-time room readiness by floor</p>
+</div>
+<div class="flex gap-2">
+<div class="px-3 py-1 bg-surface-container text-[10px] font-bold uppercase tracking-widest">Floor 01-12</div>
+<div class="px-3 py-1 border border-outline/20 text-[10px] font-bold uppercase tracking-widest opacity-50">Floor 14-24</div>
+</div>
+</div>
+<div class="grid grid-cols-4 md:grid-cols-8 gap-3">
+<!-- Example Room Seals -->
+<div class="flex flex-col items-center gap-1 group">
+<div class="w-full aspect-square bg-surface-container flex items-center justify-center border-b-2 border-primary-container group-hover:bg-primary-container group-hover:text-white transition-all cursor-pointer">
+<span class="font-headline text-lg">101</span>
+</div>
+<span class="text-[8px] font-bold text-primary-container uppercase tracking-tighter">Ready</span>
+</div>
+<div class="flex flex-col items-center gap-1 group">
+<div class="w-full aspect-square bg-surface-container flex items-center justify-center border-b-2 border-primary-container group-hover:bg-primary-container group-hover:text-white transition-all cursor-pointer">
+<span class="font-headline text-lg">102</span>
+</div>
+<span class="text-[8px] font-bold text-primary-container uppercase tracking-tighter">Ready</span>
+</div>
+<div class="flex flex-col items-center gap-1 group">
+<div class="w-full aspect-square bg-tertiary-fixed flex items-center justify-center border-b-2 border-secondary group-hover:opacity-80 transition-all cursor-pointer">
+<span class="font-headline text-lg text-on-tertiary-fixed-variant">103</span>
+</div>
+<span class="text-[8px] font-bold text-secondary uppercase tracking-tighter">Cleaning</span>
+</div>
+<div class="flex flex-col items-center gap-1 group">
+<div class="w-full aspect-square bg-surface-container flex items-center justify-center border-b-2 border-primary-container group-hover:bg-primary-container group-hover:text-white transition-all cursor-pointer">
+<span class="font-headline text-lg">104</span>
+</div>
+<span class="text-[8px] font-bold text-primary-container uppercase tracking-tighter">Ready</span>
+</div>
+<div class="flex flex-col items-center gap-1 group">
+<div class="w-full aspect-square bg-surface-container flex items-center justify-center border-b-2 border-primary-container group-hover:bg-primary-container group-hover:text-white transition-all cursor-pointer">
+<span class="font-headline text-lg">105</span>
+</div>
+<span class="text-[8px] font-bold text-primary-container uppercase tracking-tighter">Ready</span>
+</div>
+<div class="flex flex-col items-center gap-1 group">
+<div class="w-full aspect-square bg-surface-container flex items-center justify-center border-b-2 border-primary-container group-hover:bg-primary-container group-hover:text-white transition-all cursor-pointer">
+<span class="font-headline text-lg">106</span>
+</div>
+<span class="text-[8px] font-bold text-primary-container uppercase tracking-tighter">Ready</span>
+</div>
+<div class="flex flex-col items-center gap-1 group">
+<div class="w-full aspect-square bg-error-container flex items-center justify-center border-b-2 border-error group-hover:opacity-80 transition-all cursor-pointer">
+<span class="font-headline text-lg text-error">107</span>
+</div>
+<span class="text-[8px] font-bold text-error uppercase tracking-tighter">O.O.I</span>
+</div>
+<div class="flex flex-col items-center gap-1 group">
+<div class="w-full aspect-square bg-surface-container flex items-center justify-center border-b-2 border-primary-container group-hover:bg-primary-container group-hover:text-white transition-all cursor-pointer">
+<span class="font-headline text-lg">108</span>
+</div>
+<span class="text-[8px] font-bold text-primary-container uppercase tracking-tighter">Ready</span>
+</div>
+</div>
+<div class="mt-12 flex justify-between items-end border-t border-outline/10 pt-8">
+<div class="flex gap-12">
+<div>
+<p class="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-1">Clean/Inspected</p>
+<p class="font-headline text-2xl">184 <span class="text-sm opacity-40 italic">rms</span></p>
+</div>
+<div>
+<p class="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-1">In Progress</p>
+<p class="font-headline text-2xl text-secondary">12 <span class="text-sm opacity-40 italic">rms</span></p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-green-600"></div>
+<span class="text-[10px] font-bold uppercase tracking-widest">Floor Manager Active</span>
+</div>
+</div>
+</div>
+<!-- Weather/Experience Context Card -->
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-6">
+<div class="flex-1 bg-primary-container relative p-8 text-on-primary overflow-hidden">
+<img alt="Weather" class="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-overlay" data-alt="Sunny beach resort view" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIDW-9SKu9pC5zEOxbJ50nyc-0U1hzE-LCzd9qldchNp-xD2OnGfF2-7eIIYofxGBaIONf60kbvPfyqbnfJiseyUhRkNgXl6wHjbmXNvbFJKzsdm8DqnZFmi7AnD-T18Q2JowIUaoSDONT79Ci7SIeryJeFvZY_So35jYXqXtBfuggOU13lPj1v5FPjQKz_BT7JDbv0RoLFRLV4kf7sTet9eZrGTSHxk1V3ABw9zcbG2x6BVWEQ0AgpqL6QDqkXUdwRdnd4jKrB4lf"/>
+<div class="relative z-10 h-full flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start">
+<h4 class="font-headline text-xl">Local Context</h4>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-lg" data-icon="light_mode">light_mode</span>
+<span class="text-xl font-headline">78°F</span>
+</div>
+</div>
+<p class="text-xs text-on-primary-container mt-2">Sunny with light breeze. High demand for Terrace dining anticipated.</p>
+</div>
+<div class="bg-white/10 backdrop-blur-md p-4 mt-8">
+<p class="text-[10px] font-bold uppercase tracking-widest mb-2 opacity-60">Guest Feedback Trend</p>
+<div class="flex items-center justify-between">
+<div class="flex gap-1">
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="star" style="font-variation-settings: &#39;FILL&#39; 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="star" style="font-variation-settings: &#39;FILL&#39; 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="star" style="font-variation-settings: &#39;FILL&#39; 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="star" style="font-variation-settings: &#39;FILL&#39; 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="star_half">star_half</span>
+</div>
+<span class="text-lg font-headline">4.82</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Subtle Footer Signature -->
+<footer class="mt-auto px-8 py-6 flex justify-between items-center text-on-surface-variant/40">
+<p class="text-[10px] font-bold uppercase tracking-widest">© 1924 The Curator Hotel Systems</p>
+<div class="flex gap-6">
+<a class="text-[10px] font-bold uppercase tracking-widest hover:text-on-surface transition-colors" href="#">Privacy</a>
+<a class="text-[10px] font-bold uppercase tracking-widest hover:text-on-surface transition-colors" href="#">Audit Logs</a>
+<a class="text-[10px] font-bold uppercase tracking-widest hover:text-on-surface transition-colors" href="#">System Health</a>
+</div>
+</footer>
+</main>
+</body></html>

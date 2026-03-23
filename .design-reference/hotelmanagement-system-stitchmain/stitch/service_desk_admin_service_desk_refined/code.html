@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Service Desk Triage - Uni Hotel</title>
+<script type='text/javascript' nonce='M64eBx3UkBpI9WyxwxEs9Q==' src='https://contribution.usercontent.google.com/uMsYi2MSzhr4d6NIrfPipQ8K0xmphh4hhgcqxUMPLwTXXqkaD0LVPJyj0Wmi7CfbJs1FqoXDZ1xHLHpsWbDgYWeJ8xwrl9gmI0nP5Kj98yMGstJDMMWadoPvrU6yF5AWMcRVoq2Gi_GuZ-cc8IK8gIXVPDL9gGhKfOEMdJmufyCwwcnyO8kAiSd2Z_zwazxwkEA-5P02qHFTq1xbwKnSwFNO9oFiqoPCfbhtqy7DftNaeKhe5zakpzVutDFL01WWiiY81kQp4RXPhH8mYyLqYv3dvgyfXh4T9Fj9YEc2eJB-jCIdD03616FN1s7cvea3YIw4XGeWYH_Ot6tSWxSaEFqaUBNTyN72KTR2To5cW804x1OYJ6SHTULeEKKszCEtcd5lh2uv2WkDHd8_zqIm8oN_649zOeGcyofYVHqVuyf6LqsvmVOamcPzeuK-ah2rdMLogU0qHMJr1h8NUcH_t8WkjbsAXdMeSASqHxAP0MgGXeIhRoPLLgt5lnXkQqrPRoPajeQBTCyhbqZZWuzrv3ReMFH-3jUIhAaqYUTbk0JiSfOOvAcfJhb9xyuVrBY5Dpv2iJSb7qMBgf-B5TkIkb_fBBEPuwWcAeHEvYm7N3skpDIVWMEKS-NqgqOuxFMbkDBBwmCBj0VFwW2CabnhfkIE2snIt9nFU9VeJvF-bRbVaAL1iWe0B3oEZhT31Xe1TiGnznP08o9hl5uc1UNmvLlHCwaz2-CSbUfCwRVWpP80XDFhobMr7Fczd64on7U7nBvVNyoHDZIqliDlNeZLkJUkW9eOxxxQQ5Ugdw'></script><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,500;0,600;0,700;1,700&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#7C9082",
+                        "accent-terracotta": "#D48C70",
+                        "sand": "#F7F5F0",
+                        "surface": "#fbf9f4",
+                        "text-main": "#1b1c19",
+                        "text-muted": "#706d64"
+                    },
+                    fontFamily: {
+                        "display": ["Noto Serif", "serif"],
+                        "sans": ["Work Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.75rem",
+                        "lg": "1.25rem",
+                        "xl": "2rem",
+                        "full": "9999px",
+                        "card": "16px",
+                        "drawer": "32px"
+                    },
+                    boxShadow: {
+                        'organic': '0 4px 20px rgba(124, 144, 130, 0.08)',
+                        'floating': '0 12px 40px rgba(27, 28, 25, 0.06)'
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background-color: #F7F5F0;
+            color: #1b1c19;
+        }
+        
+        h1, h2, h3, .font-display {
+            font-family: 'Noto Serif', serif;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d4d2cc;
+            border-radius: 10px;
+        }
+
+        .kanban-col {
+            min-height: calc(100vh - 240px);
+        }
+
+        .custom-blur {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-sand text-text-main flex h-screen overflow-hidden">
+<!-- SideNavBar (Shared Component Implementation) -->
+<aside class="fixed left-0 top-0 bottom-0 w-[250px] bg-[#f5f3ee] flex flex-col py-6 z-50">
+<div class="flex flex-col h-full justify-between">
+<div class="flex flex-col gap-8">
+<!-- Logo Area -->
+<div class="flex items-center gap-3 px-6">
+<div class="w-10 h-10 rounded-xl bg-[#7C9082]/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-[#7C9082]" data-icon="hotel">hotel</span>
+</div>
+<div class="flex flex-col">
+<span class="text-2xl font-bold text-[#1b1c19] italic leading-none">Uni Hotel</span>
+<span class="text-[10px] uppercase tracking-widest text-[#7C9082] font-semibold mt-1">Management</span>
+</div>
+</div>
+<!-- Navigation -->
+<nav class="flex flex-col gap-1 px-2 font-[&#39;Noto_Serif&#39;] font-medium text-sm tracking-tight">
+<a class="flex items-center gap-3 px-4 py-3 text-[#1b1c19]/70 hover:bg-[#7C9082]/10 rounded-full transition-all group" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="dashboard">dashboard</span>
+<span>Today</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-[#7C9082] text-white rounded-full transition-all duration-300 shadow-lg shadow-[#7C9082]/20" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="support_agent" data-weight="fill" style="font-variation-settings: &#39;FILL&#39; 1;">support_agent</span>
+<span>Service Desk</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#1b1c19]/70 hover:bg-[#7C9082]/10 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="desk">desk</span>
+<span>Reception</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#1b1c19]/70 hover:bg-[#7C9082]/10 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="hail">hail</span>
+<span>Guest Portal</span>
+</a>
+</nav>
+</div>
+<!-- User Profile -->
+<div class="px-6 pt-6 mt-auto">
+<div class="flex items-center gap-3 p-3 bg-white/40 rounded-2xl">
+<div class="w-9 h-9 rounded-full bg-[#7C9082]/20 flex items-center justify-center text-xs font-bold text-[#7C9082]">
+                    JD
+                </div>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-[#1b1c19]">Jane Doe</span>
+<span class="text-[10px] text-text-muted">Admin Staff</span>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-full ml-[250px] overflow-hidden relative">
+<!-- TopNavBar (Shared Component Implementation) -->
+<header class="flex justify-between items-center w-full pr-8 pl-10 py-4 sticky top-0 z-40 bg-[#fbf9f4]/80 backdrop-blur-xl shadow-[0_4px_24px_rgba(124,144,130,0.06)]">
+<div class="flex items-center gap-4 flex-1 max-w-md">
+<div class="relative w-full group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#7C9082] transition-colors group-focus-within:text-[#1b1c19]" data-icon="search">search</span>
+<input class="w-full pl-12 pr-4 py-2.5 bg-sand/50 border-none rounded-full text-sm font-[&#39;Noto_Serif&#39;] focus:ring-2 focus:ring-[#7C9082]/20 transition-all" placeholder="Search tasks or rooms..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6 text-[#7C9082]">
+<button class="hover:opacity-80 transition-opacity flex relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-accent-terracotta rounded-full border-2 border-[#fbf9f4]"></span>
+</button>
+<button class="hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-[#7C9082]/20">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0XI8bo8Fv0M5yuCGnR7ybVvUnFWjjAn0o8EU31Atf351X6EDLK8dCOgpEVfRqKAWAX_ulPLlr6ZXXQqJkSxNCFnEg9E_tF6RcuAss48dF1X9tLnHIMwkFZ0q5f018M9PsrC6uzfZSCCDSu9HXnLb81zO61tZQ2-_XavUfrf4kZPUi57e5t7H1-22G5kgyFkG2m0DQXIPqOVMkOdySUODxP6NGrsby7P3Tq0ASkcvOLfkwSZU8YKPM2OyOKvQT7A1Lw2lQvE2R-7o"/>
+</div>
+</div>
+</header>
+<!-- Page Header & Filters -->
+<div class="px-10 py-6 shrink-0">
+<div class="flex items-end justify-between mb-8">
+<div>
+<h1 class="text-4xl font-bold text-text-main tracking-tight">Service Desk</h1>
+<p class="text-text-muted text-sm mt-1 font-sans">Manage and facilitate the guest experience.</p>
+</div>
+<button class="bg-[#7C9082] text-white font-medium px-6 py-3 rounded-full shadow-lg shadow-[#7C9082]/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-lg" data-icon="add">add</span>
+                New Task
+            </button>
+</div>
+<div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+<button class="px-5 py-2 rounded-full bg-white text-sm font-medium text-text-main shadow-organic border border-stone-100 whitespace-nowrap">All Tasks</button>
+<button class="px-5 py-2 rounded-full bg-[#7C9082] text-white text-sm font-medium shadow-organic whitespace-nowrap">My Tasks</button>
+<button class="px-5 py-2 rounded-full bg-white border border-stone-100 text-sm font-medium text-text-main shadow-organic flex items-center gap-2 whitespace-nowrap">
+<span class="w-2 h-2 rounded-full bg-blue-400"></span> Housekeeping
+            </button>
+<button class="px-5 py-2 rounded-full bg-white border border-stone-100 text-sm font-medium text-text-main shadow-organic flex items-center gap-2 whitespace-nowrap">
+<span class="w-2 h-2 rounded-full bg-orange-400"></span> Maintenance
+            </button>
+<button class="px-5 py-2 rounded-full bg-white border border-stone-100 text-sm font-medium text-text-main shadow-organic flex items-center gap-2 whitespace-nowrap">
+<span class="w-2 h-2 rounded-full bg-purple-400"></span> Guest Request
+            </button>
+</div>
+</div>
+<!-- Kanban Board -->
+<div class="flex-1 overflow-x-auto px-10">
+<div class="flex gap-8 h-full min-w-max">
+<!-- Column: New -->
+<div class="w-80 flex flex-col gap-5">
+<div class="flex items-center justify-between px-2">
+<div class="flex items-center gap-3">
+<h2 class="font-display font-bold text-lg text-text-main">New</h2>
+<span class="bg-white text-text-muted text-[10px] font-bold px-2 py-0.5 rounded-full border border-stone-200">3</span>
+</div>
+<button class="text-text-muted hover:text-text-main"><span class="material-symbols-outlined text-xl" data-icon="more_horiz">more_horiz</span></button>
+</div>
+<div class="flex flex-col gap-5 kanban-col overflow-y-auto pb-10 pr-2">
+<!-- Urgent Task Card -->
+<div class="bg-surface rounded-card p-5 shadow-organic border border-stone-100/50 hover:shadow-floating transition-all duration-300 relative group cursor-grab">
+<!-- Urgent Priority Dot (Terracotta) -->
+<div class="absolute top-5 right-5 w-2.5 h-2.5 rounded-full bg-accent-terracotta ring-4 ring-accent-terracotta/10" title="Urgent Priority"></div>
+<h3 class="font-display font-semibold text-text-main text-lg leading-snug mb-2 group-hover:text-primary transition-colors">AC not working</h3>
+<p class="text-sm text-text-muted mb-5 line-clamp-2 leading-relaxed font-sans">Guest reports the AC is blowing warm air. Room is currently 80 degrees.</p>
+<div class="flex items-center justify-between mt-auto">
+<div class="flex flex-wrap gap-2">
+<span class="bg-orange-50 text-orange-700 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md">Maintenance</span>
+<span class="bg-stone-100 text-text-muted text-[10px] font-bold px-2 py-1 rounded-md flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]" data-icon="meeting_room">meeting_room</span> 302
+                                </span>
+</div>
+<div class="flex items-center gap-2">
+<button class="w-8 h-8 rounded-full border border-dashed border-stone-300 flex items-center justify-center hover:bg-primary/10 text-stone-400 hover:text-primary transition-all">
+<span class="material-symbols-outlined text-[16px]" data-icon="person_add">person_add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Standard Task Card -->
+<div class="bg-surface rounded-card p-5 shadow-organic border border-stone-100/50 hover:shadow-floating transition-all duration-300 group cursor-grab">
+<h3 class="font-display font-semibold text-text-main text-lg leading-snug mb-4 group-hover:text-primary transition-colors">Extra Towels</h3>
+<div class="flex items-center justify-between mt-auto">
+<div class="flex flex-wrap gap-2">
+<span class="bg-purple-50 text-purple-700 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md">Request</span>
+<span class="bg-stone-100 text-text-muted text-[10px] font-bold px-2 py-1 rounded-md flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]" data-icon="meeting_room">meeting_room</span> 114
+                                </span>
+</div>
+<span class="text-[10px] font-medium text-text-muted uppercase tracking-tighter">25m ago</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Column: In Progress -->
+<div class="w-80 flex flex-col gap-5">
+<div class="flex items-center justify-between px-2">
+<div class="flex items-center gap-3">
+<h2 class="font-display font-bold text-lg text-text-main">In Progress</h2>
+<span class="bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full">2</span>
+</div>
+<button class="text-text-muted hover:text-text-main"><span class="material-symbols-outlined text-xl" data-icon="more_horiz">more_horiz</span></button>
+</div>
+<div class="flex flex-col gap-5 kanban-col overflow-y-auto pb-10 pr-2">
+<!-- Active Card -->
+<div class="bg-surface rounded-card p-5 shadow-floating border-2 border-primary/40 relative z-10 cursor-grab">
+<h3 class="font-display font-semibold text-text-main text-lg leading-snug mb-2">Spill in hallway</h3>
+<p class="text-sm text-text-muted mb-5 line-clamp-2 leading-relaxed font-sans">Coffee spill near the elevators on the 4th floor.</p>
+<div class="flex items-center justify-between mt-auto">
+<div class="flex flex-wrap gap-2">
+<span class="bg-blue-50 text-blue-700 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md">Housekeeping</span>
+<span class="bg-stone-100 text-text-muted text-[10px] font-bold px-2 py-1 rounded-md">Floor 4</span>
+</div>
+<div class="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-[10px] font-bold text-white shadow-sm ring-2 ring-white" title="Assigned to Jane Doe">
+                                JD
+                            </div>
+</div>
+</div>
+<!-- Standard Task Card -->
+<div class="bg-surface rounded-card p-5 shadow-organic border border-stone-100/50 hover:shadow-floating transition-all duration-300 group cursor-grab">
+<h3 class="font-display font-semibold text-text-main text-lg leading-snug mb-4 group-hover:text-primary transition-colors">Late Checkout Request</h3>
+<div class="flex items-center justify-between mt-auto">
+<div class="flex flex-wrap gap-2">
+<span class="bg-purple-50 text-purple-700 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md">Request</span>
+<span class="bg-stone-100 text-text-muted text-[10px] font-bold px-2 py-1 rounded-md flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]" data-icon="meeting_room">meeting_room</span> 512
+                                </span>
+</div>
+<div class="w-7 h-7 rounded-full bg-stone-200 flex items-center justify-center text-[10px] font-bold text-stone-600 ring-2 ring-white">
+                                MK
+                            </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column: Resolved -->
+<div class="w-80 flex flex-col gap-5">
+<div class="flex items-center justify-between px-2">
+<div class="flex items-center gap-3">
+<h2 class="font-display font-bold text-lg text-text-main">Resolved</h2>
+<span class="bg-white text-text-muted text-[10px] font-bold px-2 py-0.5 rounded-full border border-stone-200">0</span>
+</div>
+</div>
+<div class="flex flex-col gap-5 kanban-col pb-10 pr-2">
+<div class="border-2 border-dashed border-stone-200 rounded-card h-40 flex flex-col items-center justify-center text-text-muted/60 bg-white/40">
+<span class="material-symbols-outlined mb-3 text-3xl opacity-30" data-icon="check_circle">check_circle</span>
+<p class="text-sm font-medium font-display">No tasks resolved today</p>
+<p class="text-[10px] uppercase tracking-widest mt-1 opacity-50">Steady pace</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right-Side Drawer (Context Panel) - Modern Organic Refinement -->
+<div class="absolute top-0 right-0 h-full w-[440px] bg-[#fbf9f4] shadow-2xl rounded-l-[40px] z-[60] flex flex-col border-l border-stone-100/50 animate-drawer-slide shadow-stone-900/10">
+<!-- Drawer Header -->
+<div class="p-8 border-b border-stone-100/80 flex justify-between items-start">
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-3">
+<span class="bg-blue-50 text-blue-700 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md">Housekeeping</span>
+<span class="text-[11px] text-text-muted font-medium flex items-center gap-1.5 font-sans">
+<span class="material-symbols-outlined text-[16px]" data-icon="schedule">schedule</span> 1h ago
+                    </span>
+</div>
+<h2 class="text-2xl font-display font-bold text-text-main tracking-tight">Spill in hallway</h2>
+<div class="flex items-center gap-2 mt-2 text-primary font-medium text-sm">
+<span class="material-symbols-outlined text-[18px]" data-icon="location_on">location_on</span>
+<span>Floor 4 • Near West Elevators</span>
+</div>
+</div>
+<button class="w-10 h-10 rounded-full hover:bg-stone-100 flex items-center justify-center text-stone-400 transition-colors">
+<span class="material-symbols-outlined text-[24px]" data-icon="close">close</span>
+</button>
+</div>
+<!-- Drawer Body -->
+<div class="flex-1 overflow-y-auto p-8 flex flex-col gap-8 bg-sand/30">
+<!-- Reported By -->
+<div class="bg-white p-5 rounded-2xl shadow-organic border border-stone-100">
+<h4 class="text-[10px] font-bold text-text-muted uppercase tracking-[0.15em] mb-4">Reported By</h4>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-stone-100 flex items-center justify-center text-lg font-bold text-stone-600 border border-stone-200">
+                        SR
+                    </div>
+<div>
+<p class="font-display font-bold text-text-main">Sarah Rogers</p>
+<p class="text-xs text-text-muted font-sans">Guest • Premium Suite 410</p>
+</div>
+<button class="ml-auto w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="chat_bubble">chat_bubble</span>
+</button>
+</div>
+</div>
+<!-- Activity Log -->
+<div class="flex flex-col gap-5">
+<div class="flex items-center justify-between">
+<h4 class="text-[10px] font-bold text-text-muted uppercase tracking-[0.15em]">Activity</h4>
+<span class="text-[10px] font-semibold text-primary uppercase">Live Updates</span>
+</div>
+<!-- Messages -->
+<div class="space-y-6">
+<!-- System Notification -->
+<div class="flex gap-4">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-1 border border-primary/20">
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="auto_awesome">auto_awesome</span>
+</div>
+<div class="flex-1">
+<div class="text-sm text-text-main bg-white/80 p-4 rounded-2xl rounded-tl-sm shadow-sm border border-stone-100 leading-relaxed font-sans">
+                                Reported via <strong>Guest Portal</strong>. Automated assignment triggered for Floor 4 staff.
+                            </div>
+<p class="text-[10px] text-text-muted mt-2 ml-1 uppercase tracking-tight font-bold">10:42 AM</p>
+</div>
+</div>
+<!-- Staff Update -->
+<div class="flex gap-4 flex-row-reverse">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-[10px] font-bold text-white shrink-0 mt-1 ring-4 ring-primary/10">
+                            JD
+                        </div>
+<div class="flex flex-col items-end flex-1">
+<div class="text-sm text-white bg-primary p-4 rounded-2xl rounded-tr-sm shadow-md leading-relaxed font-sans">
+                                On my way with the cleaning kit. Will mark as resolved once cleared.
+                            </div>
+<p class="text-[10px] text-text-muted mt-2 mr-1 uppercase tracking-tight font-bold text-right">11:15 AM</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Drawer Footer -->
+<div class="p-6 border-t border-stone-100 bg-white">
+<div class="flex items-center justify-between mb-6 px-1">
+<div class="flex items-center gap-3">
+<span class="text-[11px] font-bold text-text-muted uppercase tracking-wider">Change Status</span>
+<select class="text-sm border-stone-200 rounded-full focus:ring-primary/20 focus:border-primary py-1.5 pl-4 pr-10 bg-sand/50 font-medium">
+<option>New</option>
+<option selected="">In Progress</option>
+<option>Resolved</option>
+<option>On Hold</option>
+</select>
+</div>
+<div class="flex gap-2">
+<button class="w-9 h-9 rounded-full bg-stone-100 text-stone-500 flex items-center justify-center hover:bg-stone-200 transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="attachment">attachment</span>
+</button>
+</div>
+</div>
+<div class="relative group">
+<input class="w-full pl-5 pr-14 py-4 rounded-2xl border-stone-100 bg-sand/40 focus:bg-white focus:ring-4 focus:ring-primary/5 focus:border-primary text-sm transition-all font-sans placeholder:text-stone-400" placeholder="Type an update..." type="text"/>
+<button class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center hover:scale-[1.05] active:scale-95 transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-[20px]" data-icon="send">send</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<style>
+    @keyframes drawer-slide {
+        from { transform: translateX(100%); }
+        to { transform: translateX(0); }
+    }
+    .animate-drawer-slide {
+        animation: drawer-slide 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+</style>
+</body></html>

@@ -21,20 +21,25 @@ type AccessLogSearchParams = {
   to?: string | string[]
 }
 
+type AdminAccessLogPageProps = {
+  searchParams?: AccessLogSearchParams | Promise<AccessLogSearchParams>
+}
+
 const PAGE_SIZE = 12
 
-export default async function AdminAccessLogPage({ searchParams }: { searchParams?: AccessLogSearchParams }) {
+export default async function AdminAccessLogPage({ searchParams }: AdminAccessLogPageProps) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined
   const { supabase, user } = await createAuthenticatedServerSupabaseClient()
 
   if (!user) {
     redirect('/login')
   }
 
-  const query = getSingleParam(searchParams?.query).trim()
-  const fromDate = getSingleParam(searchParams?.from)
-  const toDate = getSingleParam(searchParams?.to)
-  const resultParam = getSingleParam(searchParams?.result)
-  const page = getPage(searchParams?.page)
+  const query = getSingleParam(resolvedSearchParams?.query).trim()
+  const fromDate = getSingleParam(resolvedSearchParams?.from)
+  const toDate = getSingleParam(resolvedSearchParams?.to)
+  const resultParam = getSingleParam(resolvedSearchParams?.result)
+  const page = getPage(resolvedSearchParams?.page)
   const resultFilter: 'all' | AccessResult = parseAccessResult(resultParam)
 
   const filters: AccessLogFilters = {

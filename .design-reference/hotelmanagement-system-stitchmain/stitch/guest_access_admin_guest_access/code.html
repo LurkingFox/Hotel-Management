@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Guest Access Management | Uni Hotel HMS</title>
+<script type='text/javascript' nonce='RJ0D74YU3AkKqJ3qt7zgRA==' src='https://contribution.usercontent.google.com/TrCkEtv7q0I7wzODCyfbCQHnUuuUfZnTpn2241flg-B7es3KFSdvAwEoo5Er9amSmOjfYx73nlZOROCDfJL7ic9A0OZt9gtvzMYEpDc0rUGSPi9uj5dHBvD89SssGWOp6unVAjrJfo_TORn_OYxaxIjPXbl-bizdgAYUguIlEXaize6EfSf7BOPCEukvyM8FAP3-HfDXSdpEp4EF3f92jBzCxCEEK-v4PVJ_sPG5DOdS1-BoFacW_JYbPBtgFXTqZqQhUCqgBYjvverxgKlGUpVNnfbum3BELyrXueTH4fG18vr_rDwoPbXA0ZpgX_yrSgEKrCbu9bZPmDLXtBXwWcdwOg6cIfSuLU8VpFoWiIyALj7wJ668Actr5fW8HPMTxaTXvzz24w_1NDWpzmtuSy7WPNvDd84Mz7Najv29vEe8xwTpXij_Hw5DLVn2gXGv5jNixOTnkjdFwnPW0OkKHPvGAR5flY15TWgJYCpvDbyEiSpNDSdmiAWB0IvgS6qa8K0MNnuiZa23QViKHblN-Z6czpEqPhnnQPAa_AS0IlJM1IdEzyzW04jnkMH54ii73HtdRxXZI74_e5FRy1iKedN_4aS7W8mDbRO60T7tgFBDZ28TQWmoepMe388wBeOcecG6DxdqcpDzOSKrgd3Bp6y1AK4o5MIxQpFNm4w_ylFI4OLlNukeEZMLAyA92RyThWkLKEjW169Wr4PbZp5_2RtE7extaP9HlkfDEpc9lNjnYpZSqVTvGSTgLb1JnXsos4dQkKRlqBy_PXH_JvUKmV6odZMX09zJqkL86Q'></script><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&amp;family=Manrope:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-error": "#ffffff",
+              "error-container": "#ffdad6",
+              "surface-container-high": "#eae8e3",
+              "surface": "#fbf9f4",
+              "inverse-on-surface": "#f2f1ec",
+              "background": "#fbf9f4",
+              "surface-container-low": "#f5f3ee",
+              "secondary-container": "#ffb193",
+              "primary-fixed": "#d2e8d8",
+              "surface-bright": "#fbf9f4",
+              "surface-container": "#f0eee9",
+              "on-tertiary": "#ffffff",
+              "on-surface": "#1b1c19",
+              "on-secondary-container": "#7a412a",
+              "surface-dim": "#dbdad5",
+              "on-primary-container": "#f6fff6",
+              "surface-tint": "#506356",
+              "secondary-fixed": "#ffdbce",
+              "inverse-surface": "#30312e",
+              "tertiary": "#725556",
+              "error": "#ba1a1a",
+              "surface-container-lowest": "#ffffff",
+              "on-secondary-fixed": "#370e00",
+              "outline-variant": "#c3c8c2",
+              "secondary": "#8a4f37",
+              "primary-container": "#66796c",
+              "inverse-primary": "#b7ccbc",
+              "primary-fixed-dim": "#b7ccbc",
+              "on-tertiary-fixed-variant": "#5b4041",
+              "on-secondary": "#ffffff",
+              "secondary-fixed-dim": "#ffb599",
+              "on-error-container": "#93000a",
+              "tertiary-fixed-dim": "#e3bebe",
+              "primary": "#4d6054",
+              "tertiary-container": "#8c6d6e",
+              "on-primary-fixed-variant": "#384b3f",
+              "on-tertiary-fixed": "#2b1617",
+              "on-primary": "#ffffff",
+              "on-background": "#1b1c19",
+              "tertiary-fixed": "#ffdada",
+              "surface-variant": "#e4e2dd",
+              "on-tertiary-container": "#fffbff",
+              "on-primary-fixed": "#0d1f15",
+              "outline": "#737873",
+              "on-surface-variant": "#434844",
+              "on-secondary-fixed-variant": "#6e3822",
+              "surface-container-highest": "#e4e2dd"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      body { font-family: 'Manrope', sans-serif; }
+      .font-serif { font-family: 'Noto Serif', serif; }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 bottom-0 flex flex-col py-6 w-[250px] h-screen border-none bg-[#f5f3ee] dark:bg-stone-900 z-50">
+<div class="px-8 mb-10">
+<span class="text-2xl font-bold text-[#1b1c19] dark:text-[#fbf9f4] italic font-serif">Uni Hotel</span>
+<p class="text-xs tracking-widest uppercase opacity-50 font-medium mt-1">Management System</p>
+</div>
+<nav class="flex-1 space-y-2">
+<!-- Today -->
+<a class="flex items-center gap-3 px-4 py-3 text-[#1b1c19]/70 dark:text-[#fbf9f4]/70 hover:bg-[#7C9082]/10 rounded-full mx-2 transition-all font-serif font-medium text-sm tracking-tight" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Today
+            </a>
+<!-- Service Desk (Active Logic: Assuming Admin/Management Context) -->
+<a class="flex items-center gap-3 px-4 py-3 bg-[#7C9082] text-white rounded-full mx-2 transition-all duration-300 font-serif font-medium text-sm tracking-tight scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="support_agent" style="font-variation-settings: &#39;FILL&#39; 1;">support_agent</span>
+                Service Desk
+            </a>
+<!-- Reception -->
+<a class="flex items-center gap-3 px-4 py-3 text-[#1b1c19]/70 dark:text-[#fbf9f4]/70 hover:bg-[#7C9082]/10 rounded-full mx-2 transition-all font-serif font-medium text-sm tracking-tight" href="#">
+<span class="material-symbols-outlined" data-icon="desk">desk</span>
+                Reception
+            </a>
+<!-- Guest Portal -->
+<a class="flex items-center gap-3 px-4 py-3 text-[#1b1c19]/70 dark:text-[#fbf9f4]/70 hover:bg-[#7C9082]/10 rounded-full mx-2 transition-all font-serif font-medium text-sm tracking-tight" href="#">
+<span class="material-symbols-outlined" data-icon="hail">hail</span>
+                Guest Portal
+            </a>
+</nav>
+<div class="px-6 mt-auto">
+<div class="p-4 rounded-lg bg-surface-container flex items-center gap-3">
+<img alt="University Hotel Logo" class="w-10 h-10 rounded-full bg-primary-container p-1" data-alt="University Hotel brand monogram logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKtkVU76tjZ71Tvnthy_iw7LCkT5fWgEozHwHzFwD9wXp3ovTeGRcr-5EpSFWpYibUI7laObMXbYW_JVYVqoL6xnkv867vrCq-oLCV8BgOAGelRABFda5449ETyKCEX5sFUkMh5X9yF0xrM74JsDo7D6uonUkDI6xZk-34-0lZVuMMLJbA9eZDOse8aUhBPCX1_EOLT-aC1SqrDvzlPzYs6LZOQ_gLRP_6LzQoKbAOnfzzUjZ2jOP-9mFwbcvWLsu1mQcwLajhX08"/>
+<div>
+<p class="text-xs font-bold">Admin Console</p>
+<p class="text-[10px] opacity-60">v2.4.0-stable</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- TopNavBar Shell -->
+<header class="flex justify-between items-center w-full pl-[270px] pr-8 py-4 sticky top-0 z-40 bg-[#fbf9f4]/80 dark:bg-stone-950/80 backdrop-blur-xl">
+<div class="flex items-center gap-6 flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="w-full pl-12 pr-4 py-2.5 bg-surface-container-highest border-none rounded-full text-sm focus:ring-2 focus:ring-[#7C9082]/20 transition-all" placeholder="Search guests, rooms, or credentials..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant/30 mx-2"></div>
+<div class="flex items-center gap-3">
+<span class="text-sm font-medium font-serif">Alex Sterling</span>
+<img alt="User Profile" class="w-10 h-10 rounded-full object-cover ring-2 ring-primary-fixed" data-alt="Professional portrait of a hotel administrator" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOZC3eO0XsRLTUbLMRqg65PirleIylAxztEiqsJrEFrle0biLlmsbU1OdDE2pLF8-f_9t07n1wo0z4IqQuqF5HFHddluXAGFOV8yo4rJDs27IIbonBKDW55_lNIN4seTBGtXxrQJRz-xdoidFahtTJfXc5FVvEnoHUyEBnwxxsSCSiEA-VhsoZ2xoGPvQkKGumnKVsULZoB3S8TJm7DtBCu9ZsLbdT7wtqHnD1JUGT6LlZUU7wqfj-n61Y4MTAQIg-09h0I_8DDyo"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-[250px] p-8 min-h-screen">
+<!-- Hero Editorial Header -->
+<header class="mb-12 flex justify-between items-end">
+<div class="max-w-2xl">
+<h1 class="text-5xl font-serif font-bold text-on-surface tracking-tight mb-4">Guest Access</h1>
+<p class="text-on-surface-variant text-lg leading-relaxed">
+                    Manage secure digital credentials and physical key sync states for the academic term. 
+                    Monitor real-time synchronization with Seam cloud providers.
+                </p>
+</div>
+<div class="flex gap-4">
+<button class="px-8 py-4 bg-surface-container-low text-on-surface font-semibold rounded-full hover:bg-surface-container-high transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-xl" data-icon="sync">sync</span>
+                    Resync All
+                </button>
+<button class="px-8 py-4 bg-gradient-to-br from-primary to-primary-container text-white font-semibold rounded-full shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-xl" data-icon="add">add</span>
+                    Issue New Access
+                </button>
+</div>
+</header>
+<!-- Stats Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+<div class="bg-surface-container-lowest p-6 rounded-lg shadow-sm border border-outline-variant/10">
+<p class="text-sm text-on-surface-variant font-medium mb-1">Active Keys</p>
+<p class="text-4xl font-serif font-bold text-primary">1,284</p>
+<div class="mt-4 flex items-center gap-1 text-xs text-primary font-bold">
+<span class="material-symbols-outlined text-sm" data-icon="trending_up">trending_up</span>
+                    12% from last week
+                </div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-lg shadow-sm border border-outline-variant/10">
+<p class="text-sm text-on-surface-variant font-medium mb-1">Sync Success Rate</p>
+<p class="text-4xl font-serif font-bold text-on-surface">99.8%</p>
+<div class="mt-4 flex items-center gap-1 text-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="cloud_done">cloud_done</span>
+                    Powered by Seam API
+                </div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-lg shadow-sm border border-outline-variant/10">
+<p class="text-sm text-on-surface-variant font-medium mb-1">Pending Check-ins</p>
+<p class="text-4xl font-serif font-bold text-secondary">42</p>
+<div class="mt-4 flex items-center gap-1 text-xs text-on-secondary-fixed-variant">
+<span class="material-symbols-outlined text-sm" data-icon="schedule">schedule</span>
+                    Next 24 hours
+                </div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-lg shadow-sm border border-outline-variant/10">
+<p class="text-sm text-on-surface-variant font-medium mb-1">Alerts</p>
+<p class="text-4xl font-serif font-bold text-error">3</p>
+<div class="mt-4 flex items-center gap-1 text-xs text-error font-bold">
+<span class="material-symbols-outlined text-sm" data-icon="warning">warning</span>
+                    Degraded sync state
+                </div>
+</div>
+</section>
+<!-- Table Container (Editorial Style) -->
+<section class="bg-surface-container-low rounded-lg overflow-hidden shadow-sm">
+<div class="px-8 py-6 flex justify-between items-center bg-surface-container-lowest/50 backdrop-blur-sm">
+<h2 class="text-xl font-serif font-bold">Credential Registry</h2>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-full hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined" data-icon="filter_list">filter_list</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-high/30">
+<tr>
+<th class="px-8 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Guest &amp; Room</th>
+<th class="px-8 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Access Period</th>
+<th class="px-8 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Status</th>
+<th class="px-8 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Seam Sync</th>
+<th class="px-8 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<!-- Row 1: Active -->
+<tr class="hover:bg-surface-container-lowest/40 transition-colors group">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                                        JS
+                                    </div>
+<div>
+<p class="font-bold text-on-surface">Julianne Smith</p>
+<p class="text-xs text-on-surface-variant">Suite 402 • Executive Wing</p>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="text-sm">
+<p class="font-medium">Oct 12 — Oct 19</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-tighter">Expires in 4 days</p>
+</div>
+</td>
+<td class="px-8 py-6">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-xs font-bold gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                                    Active
+                                </span>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2 text-sm text-primary">
+<span class="material-symbols-outlined text-lg" data-icon="cloud_done">cloud_done</span>
+<span class="font-medium">Synchronized</span>
+</div>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover:opacity-100">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2: Degraded -->
+<tr class="hover:bg-surface-container-lowest/40 transition-colors group">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-error/10 flex items-center justify-center text-error font-bold">
+                                        MR
+                                    </div>
+<div>
+<p class="font-bold text-on-surface">Marcus Rodriguez</p>
+<p class="text-xs text-on-surface-variant">Room 110 • Garden Block</p>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="text-sm text-error font-medium">
+<p>Oct 08 — Oct 15</p>
+<p class="text-[10px] uppercase tracking-tighter opacity-80">Manual override required</p>
+</div>
+</td>
+<td class="px-8 py-6">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-error-container text-on-error-container text-xs font-bold gap-1.5">
+<span class="material-symbols-outlined text-sm" data-icon="running_with_errors">running_with_errors</span>
+                                    Degraded
+                                </span>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2 text-sm text-error">
+<span class="material-symbols-outlined text-lg" data-icon="cloud_off">cloud_off</span>
+<span class="font-medium">Auth Failure</span>
+</div>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover:opacity-100">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3: Expired -->
+<tr class="hover:bg-surface-container-lowest/40 transition-colors group opacity-60">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-dim flex items-center justify-center text-on-surface-variant font-bold">
+                                        EL
+                                    </div>
+<div>
+<p class="font-bold text-on-surface">Elena Loomis</p>
+<p class="text-xs text-on-surface-variant">Suite 205 • West Tower</p>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="text-sm text-on-surface-variant">
+<p>Sep 28 — Oct 05</p>
+<p class="text-[10px] uppercase tracking-tighter">Archived</p>
+</div>
+</td>
+<td class="px-8 py-6">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-surface-variant text-on-surface-variant text-xs font-bold gap-1.5">
+                                    Expired
+                                </span>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-lg" data-icon="history">history</span>
+<span class="font-medium">Disconnected</span>
+</div>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover:opacity-100">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4: Active -->
+<tr class="hover:bg-surface-container-lowest/40 transition-colors group">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary font-bold">
+                                        DB
+                                    </div>
+<div>
+<p class="font-bold text-on-surface">David Blackwell</p>
+<p class="text-xs text-on-surface-variant">Room 312 • Heritage Hall</p>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="text-sm">
+<p class="font-medium">Oct 14 — Oct 28</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-tighter">Guest just arrived</p>
+</div>
+</td>
+<td class="px-8 py-6">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-xs font-bold gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                                    Active
+                                </span>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2 text-sm text-primary">
+<span class="material-symbols-outlined text-lg" data-icon="cloud_done">cloud_done</span>
+<span class="font-medium">Synchronized</span>
+</div>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover:opacity-100">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Footer / Pagination -->
+<div class="px-8 py-6 bg-surface-container-lowest/30 flex justify-between items-center">
+<p class="text-sm text-on-surface-variant">Showing <span class="font-bold">1-10</span> of 1,284 guest records</p>
+<div class="flex gap-2">
+<button class="px-4 py-2 text-sm font-medium hover:bg-surface-container-high rounded-lg transition-colors">Previous</button>
+<button class="px-4 py-2 text-sm font-medium bg-primary-container text-white rounded-lg transition-transform active:scale-95">Next Page</button>
+</div>
+</div>
+</section>
+<!-- Informational Footer -->
+<footer class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 items-center border-t border-outline-variant/10 pt-8">
+<div class="flex items-center gap-6">
+<img alt="Data visualization" class="w-32 h-20 object-cover rounded-lg grayscale opacity-50" data-alt="A clean data visualization graph showing server uptime" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoORlvrt0yDmgOr3kpspUX2XXCi4pLf3YNah74njd1DHuZ1gGcJYRWgx_SpoJobDVU-TwLB0J0mV45Nps7vDUB2b6mwQBjQzKgwq0IdzA1HPgkdiLgT_6ZEN6qHZAG1Ohefi0rkO-nNehLS7HD71I28GJQPT1AB4UAvvj2OGV7kiHviNmt0-Csk1LBkiPgPhfMQ3Z9xKMNHjRtBX1OGUWZwg7Tn1v7Zrt-Kce5-W_XJPK9w0NJuuwIeVsLMxLSaMLfafxIxC3eNgY"/>
+<div>
+<h4 class="font-bold text-sm">Provider Health</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">All Seam integrations are operational. Average latency: 240ms. Last heartbeat: 2 mins ago.</p>
+</div>
+</div>
+<div class="flex justify-end gap-8 text-xs font-medium text-on-surface-variant">
+<a class="hover:text-primary transition-colors" href="#">Security Protocol</a>
+<a class="hover:text-primary transition-colors" href="#">API Logs</a>
+<a class="hover:text-primary transition-colors" href="#">Support Desk</a>
+</div>
+</footer>
+</main>
+</body></html>

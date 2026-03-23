@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Booking Management | University Hotel HMS</title>
+<script type='text/javascript' nonce='KPVe8mZGYF+fXhLQdqUEvw==' src='https://contribution.usercontent.google.com/EdLwVqLdjptcKMyHuRfq8E97RnCne2oewfZtdsDHd1xA3YVe6I5gCruU1dJuYb1XEfGf_mqdgw_AAxGSLKCmiV06VjJxUpwWnR6eYBc8dp5EEdG0vyPh8pJ4r32Z6kUnF_YEDlJGhoT_29vDMkhp_z-uBdhSgOeUm8mnpZo-ZJ8erDilMyCWAVFjY5mLhUPgXYA52-L95ulJyqYNE7gwQSYIlgYUa2pMEjdFuyEoojGkTOSBC6v43F85A1_PcQqYs3dhK8e9l3Eo1-WeL6Rp0bY3fZOFCNXpL1PTZvdbs6FNkKXmVMyCImw3KeZBmXj4EG_Q6JuAM7bxOAwalSSSacwFSwxnOhr4q_caoONg0RMuWCIlVcBHWRV7-1eRQPQWGOhCuM9aDV5jhrG5sSCEGMJ5LHde72xVCMU_LJUyrKyrolqunuccw4J2xfTERs8om7d_y9VLaHCmQxMm5Hk-UH5QapDjL9ZAFXSxVV-FHs6_n6qu84rLH7DcqH-PwK02rh6RAN33k2uhYD2H63sh3BQXIQrAWAqbKg_HKYP-XAwECq9I4In1SIXMgnlEz5qrYGffjlQGCKVKpsdKuJVIe4lefKALgnuHAB5msrUyw8sVRnHG1l-kDhibWVzNzjxgGbSkqFiVrm-EOXFcVEZ7PBDhZc-FtfO7PDPgosMxA_UPlpR0xrS6fD9G9K2jufbEr4-84nWNlVQiJeG4jaZFvqw5r8X9yQgDGWEFwTAOoJiuqsc1mlE5rcFBjpXNqVbPkAGRpbPyeGik_UU6ukfxgXcvCK-IjAPyhrKdjw'></script><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&amp;family=Manrope:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-error": "#ffffff",
+                        "surface-dim": "#dbdad5",
+                        "on-secondary-fixed-variant": "#6e3822",
+                        "surface-container": "#f0eee9",
+                        "inverse-primary": "#b7ccbc",
+                        "inverse-surface": "#30312e",
+                        "surface-bright": "#fbf9f4",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#f2f1ec",
+                        "secondary": "#8a4f37",
+                        "on-primary-container": "#f6fff6",
+                        "outline-variant": "#c3c8c2",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#fffbff",
+                        "on-background": "#1b1c19",
+                        "on-primary-fixed": "#0d1f15",
+                        "primary-container": "#66796c",
+                        "surface": "#fbf9f4",
+                        "on-surface": "#1b1c19",
+                        "surface-container-high": "#eae8e3",
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#b7ccbc",
+                        "on-tertiary-fixed-variant": "#5b4041",
+                        "surface-container-highest": "#e4e2dd",
+                        "on-tertiary-fixed": "#2b1617",
+                        "on-secondary-fixed": "#370e00",
+                        "on-secondary-container": "#7a412a",
+                        "on-secondary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary": "#725556",
+                        "tertiary-fixed": "#ffdada",
+                        "tertiary-container": "#8c6d6e",
+                        "error-container": "#ffdad6",
+                        "outline": "#737873",
+                        "primary": "#4d6054",
+                        "primary-fixed": "#d2e8d8",
+                        "secondary-fixed-dim": "#ffb599",
+                        "tertiary-fixed-dim": "#e3bebe",
+                        "surface-tint": "#506356",
+                        "surface-variant": "#e4e2dd",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed": "#ffdbce",
+                        "on-primary-fixed-variant": "#384b3f",
+                        "background": "#fbf9f4",
+                        "secondary-container": "#ffb193",
+                        "surface-container-low": "#f5f3ee",
+                        "on-surface-variant": "#434844"
+                    },
+                    fontFamily: {
+                        "headline": ["Noto Serif"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #fbf9f4;
+            color: #1b1c19;
+            font-family: 'Manrope', sans-serif;
+        }
+        .editorial-shadow {
+            box-shadow: 0 24px 48px -12px rgba(67, 72, 68, 0.06);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 bottom-0 flex flex-col py-6 w-[250px] h-screen border-none bg-[#f5f3ee] dark:bg-stone-900 z-50">
+<div class="px-8 mb-10">
+<h1 class="text-2xl font-bold text-[#1b1c19] dark:text-[#fbf9f4] italic font-headline">Uni Hotel</h1>
+<p class="text-xs font-label tracking-widest uppercase opacity-50 mt-1">Management System</p>
+</div>
+<nav class="flex-1 flex flex-col gap-2">
+<!-- Today (Inactive) -->
+<a class="flex items-center gap-3 px-4 py-3 text-[#1b1c19]/70 dark:text-[#fbf9f4]/70 hover:bg-[#7C9082]/10 rounded-full mx-2 transition-all font-[&#39;Noto_Serif&#39;] font-medium text-sm tracking-tight" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Today
+            </a>
+<!-- Service Desk (Active - Closest match for Admin/Bookings) -->
+<a class="flex items-center gap-3 px-4 py-3 bg-[#7C9082] text-white rounded-full mx-2 transition-all duration-300 font-[&#39;Noto_Serif&#39;] font-medium text-sm tracking-tight" href="#">
+<span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>
+                Service Desk
+            </a>
+<!-- Reception (Inactive) -->
+<a class="flex items-center gap-3 px-4 py-3 text-[#1b1c19]/70 dark:text-[#fbf9f4]/70 hover:bg-[#7C9082]/10 rounded-full mx-2 transition-all font-[&#39;Noto_Serif&#39;] font-medium text-sm tracking-tight" href="#">
+<span class="material-symbols-outlined" data-icon="desk">desk</span>
+                Reception
+            </a>
+<!-- Guest Portal (Inactive) -->
+<a class="flex items-center gap-3 px-4 py-3 text-[#1b1c19]/70 dark:text-[#fbf9f4]/70 hover:bg-[#7C9082]/10 rounded-full mx-2 transition-all font-[&#39;Noto_Serif&#39;] font-medium text-sm tracking-tight" href="#">
+<span class="material-symbols-outlined" data-icon="hail">hail</span>
+                Guest Portal
+            </a>
+</nav>
+<div class="px-6 mt-auto">
+<div class="p-4 bg-surface-container-high rounded-lg flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="Professional hotel manager portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-JVmB0OT7Wl2bvRr7EXADAIR-mYJZi4fNP-p9nAS_J_UZM8ZJhpsblj6zXDpRmRCpIHzZXt-dyKbUuq8qz7imPZlobCJ_5ZXrNA8hP7P6jMDXSn80xnvpMOIUwSU_8UKz_qRERTd9baTEKDD3y7cCLi4-6pFUBZBNGm8y5rWD9fHbAO1Bx2RHgW52LkOXlK3yZK7GzsVn-ET7NR6SOEdJzv3-dgbVSFxMaUqSoD7Wp4JyhjQYhqCIAVkP5SCR4oq0rJqLhdWFG9Q"/>
+<div>
+<p class="text-sm font-bold">University Hotel</p>
+<p class="text-[10px] opacity-60">ADMIN CONSOLE</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- TopNavBar Shell -->
+<header class="flex justify-between items-center w-full pl-[270px] pr-8 py-4 sticky top-0 z-40 bg-[#fbf9f4]/80 backdrop-blur-xl">
+<div class="flex items-center gap-4 bg-surface-container-low px-4 py-2 rounded-full w-96 focus-within:ring-2 focus-within:ring-[#7C9082]/20 transition-all">
+<span class="material-symbols-outlined text-outline" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full font-body" placeholder="Search bookings, guests, or rooms..." type="text"/>
+</div>
+<div class="flex items-center gap-6">
+<button class="relative hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-primary" data-icon="notifications">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-secondary rounded-full"></span>
+</button>
+<button class="hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-primary" data-icon="settings">settings</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant/30"></div>
+<img class="w-10 h-10 rounded-full border-2 border-white editorial-shadow" data-alt="User profile circular avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvjCZo8O05jh0_bglmQHHzUUTZg87YE8swT6fcz7act_YNZV1zzqQVpVMoUe7mChqsO1eYKBQMqE542y0nCtC69Hd27dvdq5cfItDy08UqjBX45mkTsWHOJf2Y0dRmfQxKwSbRcTLyMzx07zpIqjp54NwFlxIuLuTbwP_bBWpy64oQbIZM_jeHCzTxn9c6aCGD_5oQvSd8qeG4wvnQj0XuI1TzSSxvw8I_7KZA_dD-3wI70AvIoJbXa_MY4_1UC5YMiThJvrqZpq8"/>
+</div>
+</header>
+<main class="pl-[270px] pr-8 py-8 min-h-screen">
+<!-- Balance Summary Bento Section -->
+<section class="mb-12">
+<div class="flex justify-between items-end mb-6">
+<div>
+<h2 class="font-headline text-3xl font-bold tracking-tight text-on-surface">Booking Management</h2>
+<p class="font-body text-on-surface-variant opacity-70">Oversee stays, revenue, and guest relations.</p>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-white px-8 py-3 rounded-full font-label font-semibold text-sm shadow-lg hover:scale-[1.02] active:scale-95 transition-transform flex items-center gap-2">
+<span class="material-symbols-outlined text-lg" data-icon="add">add</span>
+                    New Reservation
+                </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<!-- Total Balance -->
+<div class="bg-surface-container-lowest p-6 rounded-lg editorial-shadow flex flex-col justify-between min-h-[160px]">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="account_balance_wallet">account_balance_wallet</span>
+<div>
+<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant opacity-60">Pending Balance</p>
+<p class="text-3xl font-headline font-bold text-primary mt-1">$14,280.00</p>
+</div>
+</div>
+<!-- Active Stays -->
+<div class="bg-surface-container-low p-6 rounded-lg flex flex-col justify-between min-h-[160px]">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="bed">bed</span>
+<div>
+<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant opacity-60">Active Stays</p>
+<p class="text-3xl font-headline font-bold text-on-surface mt-1">42</p>
+</div>
+</div>
+<!-- Today's Check-ins -->
+<div class="bg-surface-container-low p-6 rounded-lg flex flex-col justify-between min-h-[160px]">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="login">login</span>
+<div>
+<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant opacity-60">Expected Check-ins</p>
+<div class="flex items-baseline gap-2">
+<p class="text-3xl font-headline font-bold text-on-surface mt-1">12</p>
+<span class="text-xs font-bold text-secondary-container bg-secondary/10 px-2 py-0.5 rounded-full">3 urgent</span>
+</div>
+</div>
+</div>
+<!-- Guest Satisfaction -->
+<div class="bg-secondary-fixed p-6 rounded-lg flex flex-col justify-between min-h-[160px]">
+<span class="material-symbols-outlined text-on-secondary-fixed text-3xl" data-icon="auto_awesome">auto_awesome</span>
+<div>
+<p class="text-xs font-label uppercase tracking-widest text-on-secondary-fixed-variant">Guest Rating</p>
+<p class="text-3xl font-headline font-bold text-on-secondary-fixed mt-1">4.9/5.0</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Booking Table Section -->
+<section class="bg-surface-container-low rounded-lg p-1 overflow-hidden">
+<div class="bg-surface-container-lowest rounded-[1.8rem] overflow-hidden">
+<div class="px-8 py-6 border-b border-surface-container-high flex justify-between items-center">
+<h3 class="font-headline text-xl font-semibold">Live Reservations</h3>
+<div class="flex gap-2">
+<button class="px-4 py-2 rounded-full bg-surface-container text-xs font-bold hover:bg-surface-container-high transition-colors">All</button>
+<button class="px-4 py-2 rounded-full text-xs font-bold hover:bg-surface-container transition-colors">Active</button>
+<button class="px-4 py-2 rounded-full text-xs font-bold hover:bg-surface-container transition-colors">Reserved</button>
+</div>
+</div>
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/50">
+<th class="px-8 py-4 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant opacity-60">Booking ID</th>
+<th class="px-4 py-4 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant opacity-60">Guest Name</th>
+<th class="px-4 py-4 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant opacity-60">Room</th>
+<th class="px-4 py-4 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant opacity-60">Dates</th>
+<th class="px-4 py-4 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant opacity-60">Status</th>
+<th class="px-8 py-4 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant opacity-60 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container">
+<!-- Row 1: Active -->
+<tr class="group hover:bg-surface-container-low/30 transition-colors">
+<td class="px-8 py-6 font-mono text-sm font-semibold text-primary">#UH-9281</td>
+<td class="px-4 py-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed font-bold text-xs">EJ</div>
+<span class="font-body font-semibold">Eleanor Jenkins</span>
+</div>
+</td>
+<td class="px-4 py-6 font-body">Suite 402</td>
+<td class="px-4 py-6">
+<p class="text-xs font-body font-medium">Oct 12 — Oct 18</p>
+<p class="text-[10px] opacity-50">6 Nights</p>
+</td>
+<td class="px-4 py-6">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary">
+                                    Active
+                                </span>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2: Reserved -->
+<tr class="group hover:bg-surface-container-low/30 transition-colors">
+<td class="px-8 py-6 font-mono text-sm font-semibold text-primary">#UH-9304</td>
+<td class="px-4 py-6">
+<div class="flex items-center gap-3">
+<img class="w-8 h-8 rounded-full object-cover" data-alt="Male guest avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAK4q6nNxzW8Hnsrr9L4GA8ErF2GNTghLE-TcHcXbOd9hEG1LK0J80Rtcy1Wv5-xwLZ9NCzwtrnNrPahZiu_eXV4p0YCXva1SjeP_0mEG9GPRsPr6FEekmfwkfMPdFmpOHdAZEICWGEuplNGO2AdvzF-t0vvWLosP9TUZaIC2b8NKZs5bGYwU3k1Z0ulNz9vDGAuAAay2NyOmSZXB2Cr1tgdpzpfwZm8D7chBb8PEzQzAsINpqZNmU2xJ3BiHrcoPj5Ty8RL78MBIY"/>
+<span class="font-body font-semibold">Marcus Thorne</span>
+</div>
+</td>
+<td class="px-4 py-6 font-body">Deluxe 205</td>
+<td class="px-4 py-6">
+<p class="text-xs font-body font-medium">Oct 14 — Oct 16</p>
+<p class="text-[10px] opacity-50">2 Nights</p>
+</td>
+<td class="px-4 py-6">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-secondary-fixed text-on-secondary-container">
+                                    Reserved
+                                </span>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3: Checked Out -->
+<tr class="group hover:bg-surface-container-low/30 transition-colors">
+<td class="px-8 py-6 font-mono text-sm font-semibold text-primary">#UH-9270</td>
+<td class="px-4 py-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-fixed flex items-center justify-center text-on-tertiary-fixed font-bold text-xs">LW</div>
+<span class="font-body font-semibold">Lydia Wang</span>
+</div>
+</td>
+<td class="px-4 py-6 font-body">Standard 112</td>
+<td class="px-4 py-6">
+<p class="text-xs font-body font-medium">Oct 05 — Oct 11</p>
+<p class="text-[10px] opacity-50">Checked Out</p>
+</td>
+<td class="px-4 py-6">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-tertiary/10 text-tertiary">
+                                    Checked-Out
+                                </span>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4: Active -->
+<tr class="group hover:bg-surface-container-low/30 transition-colors">
+<td class="px-8 py-6 font-mono text-sm font-semibold text-primary">#UH-9299</td>
+<td class="px-4 py-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-outline-variant flex items-center justify-center text-white font-bold text-xs">RB</div>
+<span class="font-body font-semibold">Robert Blackwood</span>
+</div>
+</td>
+<td class="px-4 py-6 font-body">Suite 405</td>
+<td class="px-4 py-6">
+<p class="text-xs font-body font-medium">Oct 11 — Oct 20</p>
+<p class="text-[10px] opacity-50">9 Nights</p>
+</td>
+<td class="px-4 py-6">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary">
+                                    Active
+                                </span>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="px-8 py-6 flex items-center justify-between border-t border-surface-container-high bg-surface-container-low/20">
+<p class="text-xs font-body text-on-surface-variant">Showing 1 to 4 of 124 bookings</p>
+<div class="flex gap-4">
+<button class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant/30 hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center bg-primary text-white hover:opacity-90 transition-opacity font-bold text-xs">1</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container transition-colors font-bold text-xs">2</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container transition-colors font-bold text-xs">3</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant/30 hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Contextual Floating Action Button - Only for Home/Dashboards -->
+<button class="fixed bottom-10 right-10 w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-transform z-50">
+<span class="material-symbols-outlined text-3xl" data-icon="calendar_month">calendar_month</span>
+</button>
+</body></html>

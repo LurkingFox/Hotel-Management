@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script type='text/javascript' nonce='/vzxF2SSydNrJ14MWRj08A==' src='https://contribution.usercontent.google.com/soFuAW6z2iKlyATUvbIvQNohX2ZatH6q1UvWEtr9Im807kLdZjQqMBwcHsdMJR1FMH1RC6P9eeEeL7gAwBDIjCcxcoVdZuQefYE1B4OYz-j2p0cs_Eai4MP_zsATiIubZhRnGL235sa9sArNX50OcXZCj_Gw-VpSh6iigwJyGbqlWXhlb-VMB8cEI6EAiS_8YslD010H19yD8oB-DvCr2QZXaXwwJ66nDnyFWF445_qQesxbOORuMi7jSj-qGy7BmlUlhbsJxyJ3rjLi77LA6t8UMS62WeogJ9ntsy7dqLftIXFZM5bOkpKi-6Z-aMNFEKEARro3MYjgu4rj4SLlQtwuEm3ltBA6SsQsfSY382m-N-5X1y8ECPVmauHsAZDaS4dj3sau2m7pZxG1pR_tfNuTLByUZw0m36V8dCOyNYmEsh5OXuLV70ubmxDhISkV8JfX99jyk0-Nsp6mQ227WmvnEqenxuT3JZdCIjk7jufWC6JpRtXJqhe7Y6XNjrEFfRqeif-7tgA_8J5TnlJAl7oW84Q8CnK4P660T4u5ouLiq-sPZurw6P-YUIum1ztcESpa6IgJ4JuBReT1MFvJco5MWqwTRqCV8qr459uC1QMlHjNYsCeugWXo7L_LEqyAiJ6sIxEqDy9mGBI6rdEHHEhKsuZQyNVkptB70eo6kMmopBO8Nik93NnocTzk7ZNB5lg-DSsvVyIlz1U9bETPH6E0w0m3TLFzgWY5eUmFn-qxmCd2VPJ9U1uwd_075SLaFkQQRqmgZ3f9QXjc3KbdYkGLzKH8ZSfIXV6Yag'></script><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-error": "#ffffff",
+              "surface-dim": "#dbdad5",
+              "on-secondary-fixed-variant": "#6e3822",
+              "surface-container": "#f0eee9",
+              "inverse-primary": "#b7ccbc",
+              "inverse-surface": "#30312e",
+              "surface-bright": "#fbf9f4",
+              "on-tertiary": "#ffffff",
+              "inverse-on-surface": "#f2f1ec",
+              "secondary": "#8a4f37",
+              "on-primary-container": "#f6fff6",
+              "outline-variant": "#c3c8c2",
+              "error": "#ba1a1a",
+              "on-tertiary-container": "#fffbff",
+              "on-background": "#1b1c19",
+              "on-primary-fixed": "#0d1f15",
+              "primary-container": "#66796c",
+              "surface": "#fbf9f4",
+              "on-surface": "#1b1c19",
+              "surface-container-high": "#eae8e3",
+              "on-primary": "#ffffff",
+              "primary-fixed-dim": "#b7ccbc",
+              "on-tertiary-fixed-variant": "#5b4041",
+              "surface-container-highest": "#e4e2dd",
+              "on-tertiary-fixed": "#2b1617",
+              "on-secondary-fixed": "#370e00",
+              "on-secondary-container": "#7a412a",
+              "on-secondary": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "tertiary": "#725556",
+              "tertiary-fixed": "#ffdada",
+              "tertiary-container": "#8c6d6e",
+              "error-container": "#ffdad6",
+              "outline": "#737873",
+              "primary": "#4d6054",
+              "primary-fixed": "#d2e8d8",
+              "secondary-fixed-dim": "#ffb599",
+              "tertiary-fixed-dim": "#e3bebe",
+              "surface-tint": "#506356",
+              "surface-variant": "#e4e2dd",
+              "on-error-container": "#93000a",
+              "secondary-fixed": "#ffdbce",
+              "on-primary-fixed-variant": "#384b3f",
+              "background": "#fbf9f4",
+              "secondary-container": "#ffb193",
+              "surface-container-low": "#f5f3ee",
+              "on-surface-variant": "#434844"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #fbf9f4;
+            color: #1b1c19;
+        }
+        .editorial-text {
+            font-family: 'Noto Serif', serif;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 bottom-0 flex flex-col py-6 w-[250px] h-screen bg-[#f5f3ee] dark:bg-stone-900 z-50">
+<div class="px-8 mb-12">
+<h1 class="text-2xl font-bold text-[#1b1c19] dark:text-[#fbf9f4] italic font-headline">Uni Hotel</h1>
+<p class="text-[10px] uppercase tracking-widest opacity-50 font-label">Management System</p>
+</div>
+<nav class="flex-1 flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 text-[#1b1c19]/70 dark:text-[#fbf9f4]/70 hover:bg-[#7C9082]/10 rounded-full mx-2 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-[&#39;Noto_Serif&#39;] font-medium text-sm tracking-tight">Today</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#1b1c19]/70 dark:text-[#fbf9f4]/70 hover:bg-[#7C9082]/10 rounded-full mx-2 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>
+<span class="font-[&#39;Noto_Serif&#39;] font-medium text-sm tracking-tight">Service Desk</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#1b1c19]/70 dark:text-[#fbf9f4]/70 hover:bg-[#7C9082]/10 rounded-full mx-2 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="desk">desk</span>
+<span class="font-[&#39;Noto_Serif&#39;] font-medium text-sm tracking-tight">Reception</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-[#7C9082] text-white rounded-full mx-2 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="hail">hail</span>
+<span class="font-[&#39;Noto_Serif&#39;] font-medium text-sm tracking-tight">Guest Portal</span>
+</a>
+</nav>
+<div class="mt-auto px-6">
+<div class="p-4 bg-surface-container rounded-lg flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="University Hotel Logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5i-4n9J87aOSB_y2WsRVOInoVbU0qJ8eevx5TBD7HAUeycKvnWAOHU9VjcGP-IHhYQJwAdwpfqj2yiuDvR47JVCBo92UH9RTvuRot_ZEIlvfwqEWavTz7UxRZjm8oq4BhcYGb5nOyQjA7tAX5tUnjiLpRNMG2wYofE1IwKcslvDNOkgDiFgS3oXnn6k7WjZWeQovs4KuaOIqg0JaESK9j1ekfT3TgzdbNUymmELRf9kIMiCU4ekh9NMrM3HsGfVibZjEQFPHTmUg"/>
+</div>
+<div class="overflow-hidden">
+<p class="text-xs font-bold truncate">Admin Manager</p>
+<p class="text-[10px] opacity-60">Session: 08:42</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-[250px] min-h-screen">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center w-full pr-8 py-6 sticky top-0 z-40 bg-[#fbf9f4]/80 backdrop-blur-xl">
+<div class="pl-8 flex items-center gap-6 flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm" data-icon="search">search</span>
+<input class="w-full pl-12 pr-4 py-3 bg-surface-container-highest border-none rounded-full text-sm focus:ring-2 focus:ring-primary/20 placeholder:text-on-surface-variant/50" placeholder="Search guests by name or room..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-4 py-2 bg-surface-container-low rounded-full text-xs font-medium flex items-center gap-2 hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="filter_list">filter_list</span>
+                        KYC Status
+                    </button>
+<button class="px-4 py-2 bg-surface-container-low rounded-full text-xs font-medium flex items-center gap-2 hover:bg-surface-container-high transition-colors">
+                        Nationality
+                    </button>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:bg-surface-container rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:bg-surface-container rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</div>
+</header>
+<!-- Content Body -->
+<section class="px-8 pb-12">
+<!-- Header Section -->
+<div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<h2 class="text-5xl font-headline font-bold tracking-tight text-on-surface mb-2">Guest Records</h2>
+<p class="text-on-surface-variant font-body">Manage identification protocols and guest heritage profiles.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-8 py-4 bg-primary text-white rounded-full font-medium flex items-center gap-3 shadow-lg hover:shadow-xl transition-all active:scale-95">
+<span class="material-symbols-outlined" data-icon="person_add">person_add</span>
+                        Register New Guest
+                    </button>
+</div>
+</div>
+<!-- Stats Overview (Asymmetric Bento) -->
+<div class="grid grid-cols-12 gap-6 mb-12">
+<div class="col-span-12 md:col-span-4 bg-primary-container p-8 rounded-lg text-white relative overflow-hidden">
+<div class="relative z-10">
+<p class="text-xs uppercase tracking-[0.2em] opacity-80 mb-4 font-label">Verified Compliance</p>
+<p class="text-6xl font-headline font-light">94<span class="text-2xl font-body opacity-60 ml-1">%</span></p>
+<p class="mt-4 text-sm opacity-90 font-body">Current KYC verification rate across all active reservations.</p>
+</div>
+<span class="material-symbols-outlined absolute -right-4 -bottom-4 text-[120px] opacity-10 rotate-12" data-icon="verified_user">verified_user</span>
+</div>
+<div class="col-span-12 md:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-surface-container-low p-8 rounded-lg flex flex-col justify-between">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="pending_actions">pending_actions</span>
+<div>
+<p class="text-3xl font-headline">12</p>
+<p class="text-xs text-on-surface-variant font-medium">Pending Verification</p>
+</div>
+</div>
+<div class="bg-secondary-fixed p-8 rounded-lg flex flex-col justify-between">
+<span class="material-symbols-outlined text-secondary text-3xl" data-icon="warning">warning</span>
+<div>
+<p class="text-3xl font-headline">03</p>
+<p class="text-xs text-on-secondary-container font-medium">Flagged Documents</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-8 rounded-lg flex flex-col justify-between shadow-sm">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="group">group</span>
+<div>
+<p class="text-3xl font-headline">1,248</p>
+<p class="text-xs text-on-surface-variant font-medium">Total Lifetime Guests</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Guest List (Editorial Style) -->
+<div class="space-y-4">
+<div class="px-6 py-4 flex items-center text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60 border-b border-outline-variant/20">
+<div class="w-12">Avatar</div>
+<div class="flex-1">Guest Identity</div>
+<div class="w-48">Contact &amp; Origin</div>
+<div class="w-40">Document Status</div>
+<div class="w-32 text-right">Actions</div>
+</div>
+<!-- Guest Row 1 -->
+<div class="group bg-surface-container-low hover:bg-surface-container-lowest transition-all duration-300 p-6 rounded-lg flex items-center">
+<div class="w-12">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-highest">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="Portrait of Elena Rodriguez" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1LuEaqHoWKaw2-p7keBoMZbVuJ2mdUJCmGYXAshaOKiJo1ju_DyicXqRv4glsywpnSJpBxLFgoPHAn1_SryTggdLXuRL7WP7MzUCVvFWTsWA7zvU13jkyJRSKBRm2Lta01hhIksDNvSXjg2fcKos8RsZZ25DVa4VypjW2f_1eYCSCWVDoqqK284_9OIVA43pl8cZh2YaMVZ0Me_31Jcmi1agydLaVuV8HllVCMruXPXs_ZbT99v3kKVBG8pssZjL2lvnJcnZYjtE"/>
+</div>
+</div>
+<div class="flex-1 px-4">
+<h4 class="font-headline text-lg font-semibold">Elena Rodriguez</h4>
+<p class="text-xs text-on-surface-variant">Passport: ESP-882190</p>
+</div>
+<div class="w-48">
+<p class="text-sm font-medium">elena.ro@gmail.com</p>
+<p class="text-xs text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]" data-icon="public">public</span>
+                            Spain
+                        </p>
+</div>
+<div class="w-40">
+<span class="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider rounded-full">
+<span class="material-symbols-outlined text-sm" data-icon="verified" style="font-variation-settings: &#39;FILL&#39; 1;">verified</span>
+                            Verified
+                        </span>
+</div>
+<div class="w-32 text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_horiz">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- Guest Row 2 -->
+<div class="group bg-surface-container-low hover:bg-surface-container-lowest transition-all duration-300 p-6 rounded-lg flex items-center">
+<div class="w-12">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-highest">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="Portrait of Julian Marcus" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJwknSUKVJLZorZcqthiB6D1RPVS0mtyFvW6TtluiGNZELdiUhAcKcyGBadulg79bT020kepyumLe6ETVSk0OZM_5cCz1V03NhMOGNFCqaWO7w1nc7Xqd4TGdDR7djfQEFJprd5vFn-fNBdEyJShtScNid5pc28P11jqfWFIDQbfyTMZblIL8YrKP1PPnzqHBw8_nxiBd_sKU229ElZmqLeXCawO7dazxUBa31phCA8dorrcKqzScqZY9yEiYe-a2CqxloofgGr7c"/>
+</div>
+</div>
+<div class="flex-1 px-4">
+<h4 class="font-headline text-lg font-semibold">Julian Marcus</h4>
+<p class="text-xs text-on-surface-variant">ID: CAN-449102</p>
+</div>
+<div class="w-48">
+<p class="text-sm font-medium">j.marcus@proton.me</p>
+<p class="text-xs text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]" data-icon="public">public</span>
+                            Canada
+                        </p>
+</div>
+<div class="w-40">
+<span class="inline-flex items-center gap-1 px-3 py-1 bg-secondary-container/20 text-secondary text-[10px] font-bold uppercase tracking-wider rounded-full">
+<span class="material-symbols-outlined text-sm" data-icon="hourglass_empty">hourglass_empty</span>
+                            Pending
+                        </span>
+</div>
+<div class="w-32 text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_horiz">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- Guest Row 3 -->
+<div class="group bg-surface-container-low hover:bg-surface-container-lowest transition-all duration-300 p-6 rounded-lg flex items-center">
+<div class="w-12">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant/40" data-icon="person">person</span>
+</div>
+</div>
+<div class="flex-1 px-4">
+<h4 class="font-headline text-lg font-semibold">Li Wei Chen</h4>
+<p class="text-xs text-on-surface-variant">Passport: CHN-902213</p>
+</div>
+<div class="w-48">
+<p class="text-sm font-medium">wei.chen@outlook.cn</p>
+<p class="text-xs text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]" data-icon="public">public</span>
+                            China
+                        </p>
+</div>
+<div class="w-40">
+<span class="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider rounded-full">
+<span class="material-symbols-outlined text-sm" data-icon="verified" style="font-variation-settings: &#39;FILL&#39; 1;">verified</span>
+                            Verified
+                        </span>
+</div>
+<div class="w-32 text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_horiz">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- Guest Row 4 -->
+<div class="group bg-surface-container-low hover:bg-surface-container-lowest transition-all duration-300 p-6 rounded-lg flex items-center">
+<div class="w-12">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-highest">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="Portrait of Sarah Jenkins" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABRmXpLoIp77oeHWEEVnBf2_S4kMUFpnOlEX99ZJdaqaGQQiqGHkBt31oeX8o9PZQfEkKgA6poaLn41EdKCX0cBPdI-p45cX8yMeaoeEmhBg1ewUa4e-LozroUwtuofsXSoeuJOFykoM0om1WGxZG4xnXTFSdHqSwmCgg5iGv9FivQDY4QR4uv42mjFrVDBRkCmUZIRZW37wQDQnV9zo2qSIbbqZLOOUGRUKM6vfnPH2hSuVocO3gxE2JqoxEDVXqXr9ByS5xUFq4"/>
+</div>
+</div>
+<div class="flex-1 px-4">
+<h4 class="font-headline text-lg font-semibold">Sarah Jenkins</h4>
+<p class="text-xs text-on-surface-variant">ID: UK-001293</p>
+</div>
+<div class="w-48">
+<p class="text-sm font-medium">s.jenkins@corp.uk</p>
+<p class="text-xs text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]" data-icon="public">public</span>
+                            United Kingdom
+                        </p>
+</div>
+<div class="w-40">
+<span class="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider rounded-full">
+<span class="material-symbols-outlined text-sm" data-icon="verified" style="font-variation-settings: &#39;FILL&#39; 1;">verified</span>
+                            Verified
+                        </span>
+</div>
+<div class="w-32 text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_horiz">more_horiz</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Footer Pagination -->
+<div class="mt-8 flex items-center justify-between">
+<p class="text-xs text-on-surface-variant">Showing 1 to 4 of 1,248 entries</p>
+<div class="flex gap-2">
+<button class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center bg-primary text-white font-bold text-xs">1</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container transition-colors font-bold text-xs">2</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container transition-colors font-bold text-xs">3</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Quick Detail Floating Panel (Glassmorphism Example) -->
+<div class="fixed right-8 bottom-8 w-80 bg-surface/40 backdrop-blur-2xl p-6 rounded-lg border border-outline-variant/10 shadow-[0_24px_48px_rgba(0,0,0,0.06)]">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h5 class="text-xs font-bold uppercase tracking-widest text-primary mb-1">Live Alert</h5>
+<p class="text-sm font-medium">3 check-ins arriving in next 2 hours</p>
+</div>
+<span class="material-symbols-outlined text-secondary" data-icon="notifications_active" style="font-variation-settings: &#39;FILL&#39; 1;">notifications_active</span>
+</div>
+<div class="space-y-3">
+<div class="flex items-center gap-3 p-2 hover:bg-white/40 rounded-md transition-all cursor-pointer">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed text-secondary flex items-center justify-center text-[10px] font-bold">AK</div>
+<div>
+<p class="text-xs font-bold">Amara Khan</p>
+<p class="text-[10px] opacity-60">Pending ID Upload</p>
+</div>
+</div>
+<div class="flex items-center gap-3 p-2 hover:bg-white/40 rounded-md transition-all cursor-pointer">
+<div class="w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center text-[10px] font-bold">MS</div>
+<div>
+<p class="text-xs font-bold">Mark Schmidt</p>
+<p class="text-[10px] opacity-60">Verified &amp; Ready</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

@@ -28,6 +28,12 @@ export function AdminDashboardRealtime() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'booking_access_credentials' }, () => {
         startTransition(() => router.refresh())
       })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'service_requests' }, () => {
+        startTransition(() => router.refresh())
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'service_request_events' }, () => {
+        startTransition(() => router.refresh())
+      })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'room_access_devices' }, () => {
         startTransition(() => router.refresh())
       })

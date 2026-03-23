@@ -190,16 +190,12 @@ export function AdminAccessLogClient({ currentPage, events, filters, latestDenie
   }
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,_#11202f_0%,_#11202f_24%,_#f7f1e8_24%,_#f7f1e8_100%)] px-6 py-10 text-ink md:px-10">
+    <main className="min-h-screen bg-[linear-gradient(180deg,_#0f3d2e_0%,_#155d45_24%,_#f9fffc_24%,_#f9fffc_100%)] px-6 py-10 text-ink md:px-10" data-smoke-id="admin-access-log">
+      <span className="sr-only">smoke:admin-access-log</span>
       <div className="mx-auto max-w-7xl space-y-6">
-        <header className="flex flex-col gap-4 text-white lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm uppercase tracking-[0.28em] text-white/70">Admin Tower</p>
-            <h1 className="font-[family-name:var(--font-display)] text-5xl">Access log</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-white/72">
-              Access-log history is now server filtered. Date range, result, search, and pagination all fetch matching records from Supabase instead of only narrowing the latest preloaded slice.
-            </p>
-          </div>
+        <header className="text-white">
+          <h1 className="font-[family-name:var(--font-display)] text-3xl md:text-[2.2rem]">Access history</h1>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-white/72">Search and review historical entry events with server-backed filters and pagination.</p>
         </header>
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -232,7 +228,7 @@ export function AdminAccessLogClient({ currentPage, events, filters, latestDenie
                 {(['all', 'granted', 'denied', 'expired'] as const).map((filter) => (
                   <button
                     key={filter}
-                    className={`rounded-full px-5 py-3 text-sm font-semibold transition ${filters.result === filter ? 'bg-ink text-white' : 'bg-parchment text-ink hover:bg-[#eadfce]'}`}
+                    className={filters.result === filter ? 'ui-chip-active' : 'ui-chip'}
                     disabled={isPending}
                     onClick={() => navigate({ page: '1', result: filter === 'all' ? undefined : filter })}
                     type="button"
@@ -247,7 +243,7 @@ export function AdminAccessLogClient({ currentPage, events, filters, latestDenie
               <label className="block">
                 <span className="text-sm font-semibold text-ink/75">Search audit trail</span>
                 <input
-                  className="mt-2 w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 text-sm outline-none transition focus:border-terracotta"
+                  className="ui-input mt-2 w-full rounded-2xl px-4 py-3 text-sm"
                   disabled={isPending}
                   onChange={(event) => setSearchDraft(event.target.value)}
                   placeholder="Search room, credential identifier, guest, issuer, result, note"
@@ -256,16 +252,16 @@ export function AdminAccessLogClient({ currentPage, events, filters, latestDenie
               </label>
               <label className="block">
                 <span className="text-sm font-semibold text-ink/75">From</span>
-                <input className="mt-2 w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 text-sm outline-none transition focus:border-terracotta" disabled={isPending} onChange={(event) => setFromDateDraft(event.target.value)} type="date" value={fromDateDraft} />
+                <input className="ui-input mt-2 w-full rounded-2xl px-4 py-3 text-sm" disabled={isPending} onChange={(event) => setFromDateDraft(event.target.value)} type="date" value={fromDateDraft} />
               </label>
               <label className="block">
                 <span className="text-sm font-semibold text-ink/75">To</span>
-                <input className="mt-2 w-full rounded-2xl border border-ink/10 bg-[#fcfaf6] px-4 py-3 text-sm outline-none transition focus:border-terracotta" disabled={isPending} onChange={(event) => setToDateDraft(event.target.value)} type="date" value={toDateDraft} />
+                <input className="ui-input mt-2 w-full rounded-2xl px-4 py-3 text-sm" disabled={isPending} onChange={(event) => setToDateDraft(event.target.value)} type="date" value={toDateDraft} />
               </label>
-              <button className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#1e2735] disabled:opacity-60" disabled={isPending} type="submit">
+              <button className="ui-button-primary disabled:opacity-60" disabled={isPending} type="submit">
                 Apply
               </button>
-              <button className="rounded-full border border-ink/12 px-5 py-3 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-60" disabled={isPending} onClick={handleClearFilters} type="button">
+              <button className="ui-button-secondary disabled:opacity-60" disabled={isPending} onClick={handleClearFilters} type="button">
                 Clear
               </button>
             </form>
@@ -278,9 +274,7 @@ export function AdminAccessLogClient({ currentPage, events, filters, latestDenie
               ] as const).map((preset) => (
                 <button
                   key={preset.value}
-                  className={`rounded-full px-4 py-2 text-sm font-semibold transition disabled:opacity-60 ${
-                    activePreset === preset.value ? 'border border-ink bg-ink text-white' : 'border border-ink/12 text-ink hover:bg-parchment'
-                  }`}
+                  className={`${activePreset === preset.value ? 'ui-chip-active' : 'ui-chip'} disabled:opacity-60`}
                   disabled={isPending}
                   onClick={() => handlePreset(preset.value)}
                   type="button"
@@ -290,11 +284,11 @@ export function AdminAccessLogClient({ currentPage, events, filters, latestDenie
               ))}
             </div>
 
-            <div className="mt-4 flex flex-col gap-3 rounded-[1.5rem] bg-[#fcfaf6] px-4 py-4 text-sm text-ink/65 lg:flex-row lg:items-center lg:justify-between">
+            <div className="ui-panel-soft mt-4 flex flex-col gap-3 rounded-[1.5rem] px-4 py-4 text-sm text-ink/65 lg:flex-row lg:items-center lg:justify-between">
               <span>Showing {events.length} of {totalCount} matching events</span>
               <div className="flex flex-wrap items-center gap-3">
                 <span>{visibleRangeLabel}</span>
-                <button className="rounded-full border border-ink/12 px-4 py-2 font-semibold text-ink transition hover:bg-parchment" onClick={handleExport} type="button">
+                <button className="ui-button-secondary px-4 py-2" onClick={handleExport} type="button">
                   Export CSV
                 </button>
               </div>
@@ -302,7 +296,7 @@ export function AdminAccessLogClient({ currentPage, events, filters, latestDenie
 
             <div className="mt-6 grid gap-4">
               {events.map((event) => (
-                <article key={event.id} className="rounded-[1.5rem] border border-ink/10 bg-[#fcfaf6] p-5">
+                <article key={event.id} className="ui-panel-soft rounded-[1.5rem] p-5">
                   <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                     <div className="space-y-3">
                       <div className="flex flex-wrap items-center gap-3">
@@ -339,7 +333,7 @@ export function AdminAccessLogClient({ currentPage, events, filters, latestDenie
               ))}
 
               {events.length === 0 ? (
-                <div className="rounded-[1.75rem] border border-dashed border-ink/15 bg-[#fcfaf6] px-6 py-10 text-center text-sm text-ink/55">
+                <div className="ui-panel-muted rounded-[1.75rem] border-dashed px-6 py-10 text-center text-sm text-ink/55">
                   No access events match the current server filters.
                 </div>
               ) : null}
@@ -349,12 +343,12 @@ export function AdminAccessLogClient({ currentPage, events, filters, latestDenie
               <div className="mt-4 flex items-center justify-between gap-4">
                 <p className="text-sm text-ink/60">Page {currentPage} of {totalPages}</p>
                 <div className="flex flex-wrap items-center gap-2">
-                  <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={isPending || currentPage === 1} onClick={() => navigate({ page: '1' })} type="button">First</button>
-                  <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={isPending || currentPage === 1} onClick={() => navigate({ page: String(Math.max(1, currentPage - 1)) })} type="button">Previous</button>
+                  <button className="ui-button-secondary px-4 py-2 text-sm disabled:opacity-50" disabled={isPending || currentPage === 1} onClick={() => navigate({ page: '1' })} type="button">First</button>
+                  <button className="ui-button-secondary px-4 py-2 text-sm disabled:opacity-50" disabled={isPending || currentPage === 1} onClick={() => navigate({ page: String(Math.max(1, currentPage - 1)) })} type="button">Previous</button>
                   {visiblePages.map((pageNumber) => (
                     <button
                       key={pageNumber}
-                      className={`min-w-10 rounded-full px-4 py-2 text-sm font-semibold transition disabled:opacity-50 ${pageNumber === currentPage ? 'bg-ink text-white' : 'border border-ink/12 text-ink hover:bg-parchment'}`}
+                      className={`min-w-10 px-4 py-2 text-sm disabled:opacity-50 ${pageNumber === currentPage ? 'ui-chip-active' : 'ui-chip'}`}
                       disabled={isPending || pageNumber === currentPage}
                       onClick={() => navigate({ page: String(pageNumber) })}
                       type="button"
@@ -362,8 +356,8 @@ export function AdminAccessLogClient({ currentPage, events, filters, latestDenie
                       {pageNumber}
                     </button>
                   ))}
-                  <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={isPending || currentPage === totalPages} onClick={() => navigate({ page: String(Math.min(totalPages, currentPage + 1)) })} type="button">Next</button>
-                  <button className="rounded-full border border-ink/12 px-4 py-2 text-sm font-semibold text-ink transition hover:bg-parchment disabled:opacity-50" disabled={isPending || currentPage === totalPages} onClick={() => navigate({ page: String(totalPages) })} type="button">Last</button>
+                  <button className="ui-button-secondary px-4 py-2 text-sm disabled:opacity-50" disabled={isPending || currentPage === totalPages} onClick={() => navigate({ page: String(Math.min(totalPages, currentPage + 1)) })} type="button">Next</button>
+                  <button className="ui-button-secondary px-4 py-2 text-sm disabled:opacity-50" disabled={isPending || currentPage === totalPages} onClick={() => navigate({ page: String(totalPages) })} type="button">Last</button>
                 </div>
               </div>
             ) : null}
@@ -377,7 +371,7 @@ export function AdminAccessLogClient({ currentPage, events, filters, latestDenie
             </p>
             <div className="mt-6 space-y-3">
               {latestDenied.map((event) => (
-                <div key={event.id} className="rounded-2xl bg-[#fcfaf6] p-4">
+                <div key={event.id} className="ui-panel-soft rounded-2xl p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="font-semibold text-ink">{event.rooms ? `Room ${event.rooms.number}` : 'Unknown room'}</p>
@@ -390,7 +384,7 @@ export function AdminAccessLogClient({ currentPage, events, filters, latestDenie
               ))}
 
               {latestDenied.length === 0 ? (
-                <div className="rounded-2xl bg-[#fcfaf6] px-4 py-6 text-sm text-ink/55">No denied access attempts match the current server filters.</div>
+                <div className="ui-panel-soft rounded-2xl px-4 py-6 text-sm text-ink/55">No denied access attempts match the current server filters.</div>
               ) : null}
             </div>
           </article>

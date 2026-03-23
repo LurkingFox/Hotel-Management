@@ -17,6 +17,10 @@ type PaymentInput = {
 type CreateBookingBody = {
   roomId?: string
   guestName?: string
+  guestEmail?: string
+  guestNationality?: string
+  guestCity?: string
+  guestDateOfBirth?: string
   guestPhone?: string
   checkIn?: string
   checkOutExpected?: string
@@ -166,11 +170,120 @@ async function createNotification(
   }
 }
 
+function normalizeGuestName(value: string) {
+  return value.trim().replace(/\s+/g, ' ')
+}
+
+function normalizePhone(value?: string | null) {
+  const trimmed = value?.trim() ?? ''
+  return trimmed.length > 0 ? trimmed : null
+}
+
+async function upsertGuestProfile(
+  supabase: Awaited<ReturnType<typeof createAuthenticatedServerSupabaseClient>>['supabase'],
+  payload: {
+    city?: string
+    dateOfBirth?: string
+    email?: string
+    fullName: string
+    nationality?: string
+    phone?: string | null
+    stayDate?: string
+  }
+) {
+  const fullName = normalizeGuestName(payload.fullName)
+  const phone = normalizePhone(payload.phone)
+
+  let query = supabase.from('guest_profiles').select('*').eq('full_name', fullName)
+  query = phone ? query.eq('phone', phone) : query.is('phone', null)
+
+  const { data: existingProfiles, error: lookupError } = await query.order('updated_at', { ascending: false }).limit(1)
+
+  if (lookupError) {
+    throw new Error(lookupError.message)
+  }
+
+  const existing = existingProfiles?.[0] ?? null
+  const updatePayload: Database['public']['Tables']['guest_profiles']['Update'] = {
+    city: payload.city?.trim() || existing?.city || null,
+    date_of_birth: payload.dateOfBirth?.trim() || existing?.date_of_birth || null,
+    email: payload.email?.trim() || existing?.email || null,
+    full_name: fullName,
+    last_stayed_at:
+      payload.stayDate && (!existing?.last_stayed_at || Date.parse(payload.stayDate) > Date.parse(existing.last_stayed_at))
+        ? payload.stayDate
+        : existing?.last_stayed_at || payload.stayDate || null,
+    nationality: payload.nationality?.trim() || existing?.nationality || null,
+    phone
+  }
+
+  if (existing) {
+    const { data, error } = await supabase.from('guest_profiles').update(updatePayload).eq('id', existing.id).select('*').single()
+
+    if (error) {
+      throw new Error(error.message)
+    }
+
+    return data
+  }
+
+  const { data, error } = await supabase
+    .from('guest_profiles')
+    .insert({
+      city: updatePayload.city,
+      date_of_birth: updatePayload.date_of_birth,
+      email: updatePayload.email,
+      full_name: fullName,
+      last_stayed_at: updatePayload.last_stayed_at,
+      nationality: updatePayload.nationality,
+      phone
+    })
+    .select('*')
+    .single()
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return data
+}
+
 async function createExtensionAudit(
   supabase: Awaited<ReturnType<typeof createAuthenticatedServerSupabaseClient>>['supabase'],
   payload: Database['public']['Tables']['booking_extension_audits']['Insert']
 ) {
-  const { error } = await supabase.from('booking_extension_audits').insert(payload)
+  const { data, error } = await supabase.from('booking_extension_audits').insert(payload).select('*').single()
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return data
+}
+
+async function createManagerApproval(
+  supabase: Awaited<ReturnType<typeof createAuthenticatedServerSupabaseClient>>['supabase'],
+  payload: Database['public']['Tables']['manager_approvals']['Insert']
+) {
+  const { error } = await supabase.from('manager_approvals').insert(payload)
+
+  if (error) {
+    throw new Error(error.message)
+  }
+}
+
+async function updateManagerApprovalByTarget(
+  supabase: Awaited<ReturnType<typeof createAuthenticatedServerSupabaseClient>>['supabase'],
+  values: Database['public']['Tables']['manager_approvals']['Update'],
+  targetId: string,
+  targetTable: string
+) {
+  const { error } = await supabase
+    .from('manager_approvals')
+    .update(values)
+    .eq('target_id', targetId)
+    .eq('target_table', targetTable)
+    .eq('status', 'pending')
 
   if (error) {
     throw new Error(error.message)
@@ -225,12 +338,22 @@ export async function POST(request: NextRequest) {
 
     const nights = getNightCount(body.checkIn, body.checkOutExpected)
     const bookingStatus = body.status ?? 'reserved'
+    const guestProfile = await upsertGuestProfile(supabase, {
+      city: body.guestCity,
+      dateOfBirth: body.guestDateOfBirth,
+      email: body.guestEmail,
+      fullName: body.guestName,
+      nationality: body.guestNationality,
+      phone: body.guestPhone,
+      stayDate: body.checkOutExpected
+    })
 
     const { data: booking, error: bookingError } = await supabase
       .from('bookings')
       .insert({
         room_id: body.roomId,
         guest_name: body.guestName,
+        guest_profile_id: guestProfile.id,
         guest_phone: body.guestPhone ?? null,
         check_in: body.checkIn,
         check_out_expected: body.checkOutExpected,
@@ -444,6 +567,18 @@ export async function PATCH(request: NextRequest) {
         triggered_by: actor,
         booking_id: reviewedBooking.id
       })
+
+      await updateManagerApprovalByTarget(
+        supabase,
+        {
+          review_note: managerNote,
+          reviewed_at: reviewedAt,
+          reviewed_by: actor,
+          status: confirmationStatus === 'confirmed' ? 'approved' : 'rejected'
+        },
+        extensionAudit.id,
+        'booking_extension_audits'
+      )
 
       return NextResponse.json({ booking: reviewedBooking, message: reviewMessage, success: true } satisfies BookingMutationResponse)
     }
@@ -704,7 +839,7 @@ export async function PATCH(request: NextRequest) {
 
       const remainingBalance = recalculatedTotal - newPaidTotal
 
-      await createExtensionAudit(supabase, {
+      const extensionAudit = await createExtensionAudit(supabase, {
         authorization_mode: authorizationMode,
         authorized_by: authorizedBy,
         booking_id: booking.id,
@@ -724,6 +859,27 @@ export async function PATCH(request: NextRequest) {
         requested_by: actor,
         requester_role: actorRole ?? 'unknown'
       })
+
+      if (confirmationStatus === 'pending') {
+        await createManagerApproval(supabase, {
+          approval_type: 'booking_extension',
+          booking_id: booking.id,
+          detail: `${booking.guest_name} extended to ${body.newCheckOutExpected}. Review the receptionist justification and payment record.`,
+          metadata: {
+            added_amount_ghs: addedAmount,
+            extension_audit_id: extensionAudit.id,
+            new_check_out_expected: body.newCheckOutExpected,
+            payment_method: body.extensionPayment?.amountGhs ? body.extensionPayment.method : null,
+            payment_recorded_ghs: paymentRecorded,
+            previous_check_out_expected: booking.check_out_expected
+          },
+          requested_by: actor,
+          requested_by_role: actorRole ?? 'unknown',
+          target_id: extensionAudit.id,
+          target_table: 'booking_extension_audits',
+          title: `Stay extension review for ${booking.guest_name}`
+        })
+      }
 
       const extensionMessage = buildBookingExtensionMessage({
         actor,
