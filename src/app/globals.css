@@ -45,6 +45,10 @@
 
 html {
   background: var(--theme-parchment);
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -53,11 +57,27 @@ body {
 
 body {
   background: var(--theme-parchment);
+  width: 100%;
+  max-width: 100%;
+  min-height: 100dvh;
+  overflow-x: clip;
 }
 
 * {
+  box-sizing: border-box;
   scrollbar-color: rgba(15, 61, 46, 0.72) rgba(231, 246, 238, 0.95);
   scrollbar-width: auto;
+}
+
+body > * {
+  min-width: 0;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
 }
 
 *::-webkit-scrollbar {
@@ -96,6 +116,9 @@ a {
     background: #ffffff;
     color: var(--color-text-primary);
     outline: none;
+    max-width: 100%;
+    font-size: 1rem;
+    line-height: 1.5;
     padding: 0.75rem 1rem;
     transition: border-color 220ms ease, box-shadow 220ms ease, background-color 220ms ease;
     box-shadow: 0 0 0 0 rgba(123, 200, 164, 0);
@@ -239,5 +262,17 @@ a {
   .ui-link-card:hover {
     background: #e3f2e9;
     box-shadow: var(--shadow-card);
+  }
+}
+
+@media (max-width: 767px) {
+  .ui-input {
+    padding: 0.7rem 0.9rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .ui-input {
+    font-size: 0.875rem;
   }
 }

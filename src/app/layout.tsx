@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Cormorant_Garamond, Manrope } from 'next/font/google'
 
 import './globals.css'
@@ -18,6 +18,14 @@ const bodyFont = Manrope({
 export const metadata: Metadata = {
   title: 'University Hotel HMS',
   description: 'Hotel operations, bookings, payments, and guest access management for University Hotel.'
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover'
 }
 
 export default function RootLayout({
