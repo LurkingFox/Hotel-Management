@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Curator | Admin Approvals</title>
+<script type='text/javascript' nonce='6aTWznqwQzradKS9tToLbA==' src='https://contribution.usercontent.google.com/wznC92JkjjPiMazuMYgatjG_07HRtyPFLPctn7aFH0szkv75XdjJKV5nVmHYnq1kOZ8crdfX8bNHWFaGGHXOHiEY6sMbi04JEKFb4FSt-dX1ZknlueWqPm9CQHZhhS1KK9ThTW8saLdmeQyHhVeynSMFVZw5O3nY1ThVirzkHx0Hrj4H0i-nDY4E7aB_SJwYVproO9-GkJRy6ipAJMqAkgn0D3xbNu-ffwaHPMbdhYRM2TW_m3-zlZqjOGVLINzu4HxCvYWJmyz3mKigQJWmFZmtZC1WaA0AtrvLZPd9NxNXjXXaM4uJCQQQv2-mhaSudV_NksSB6SBdlJnU7LcRZG15HuzXozCCvUD4QhQpj_mA9-bJtwhQhZ9mQvIjB3mTJBmR1iwJsq0g3BKe_PyYXk0eZcsW2e93Mv3o1-S0n8gtsPGCMvcutMVqErERhRmtlVyGggyvXOG16PxZkZSal5DVBuZUaub0lywKTkf4DgBIptAfkMWMDpaSJqH5cqa-Q_sTO0lU-163keiJ-IUIgiKkg1rUk0udyIFiS9oyEZXdPtMExOmTaGbpwBUcjKym5plJEe52GthTBU-02xo4dd3cWJs8BXPyo-Cko6dBc4Jd43xkRehOrQD4JX1u7sQZ8vsABCDRRUyuzE1wtqnSx3B1G57rH5waQi00Gzgq57VvOZ0cvVJaFUiQLsq1KiohcsD4_IjHzqLPKjtgVP7eMXgDn765UmPU7QLfTIqme-_Uv5UppTzIhyBxoG35fohpJ2-NTC73E0ZYrBvV-AN0UEjBs5mrpDlPrsp3Rq9z'></script><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary-fixed-dim": "#e9c176",
+              "surface-tint": "#565e74",
+              "on-primary-container": "#7c839b",
+              "surface-dim": "#dcdad5",
+              "on-primary-fixed": "#131b2e",
+              "background": "#fcf9f4",
+              "on-tertiary-fixed": "#261900",
+              "tertiary": "#000000",
+              "surface-bright": "#fcf9f4",
+              "outline": "#76777d",
+              "surface-container-highest": "#e5e2dd",
+              "secondary-fixed": "#ffdbca",
+              "secondary-fixed-dim": "#ffb68e",
+              "error-container": "#ffdad6",
+              "on-tertiary": "#ffffff",
+              "error": "#ba1a1a",
+              "on-secondary-fixed": "#331200",
+              "primary-fixed-dim": "#bec6e0",
+              "on-primary": "#ffffff",
+              "secondary": "#9b4500",
+              "tertiary-fixed": "#ffdea5",
+              "on-surface": "#1c1c19",
+              "surface": "#fcf9f4",
+              "surface-variant": "#e5e2dd",
+              "on-secondary-fixed-variant": "#763300",
+              "primary": "#000000",
+              "tertiary-container": "#261900",
+              "on-surface-variant": "#45464d",
+              "on-secondary-container": "#682c00",
+              "inverse-primary": "#bec6e0",
+              "surface-container-low": "#f6f3ee",
+              "on-tertiary-fixed-variant": "#5d4201",
+              "surface-container-lowest": "#ffffff",
+              "outline-variant": "#c6c6cd",
+              "secondary-container": "#fd8a42",
+              "inverse-surface": "#31302d",
+              "on-tertiary-container": "#a17f3b",
+              "primary-container": "#131b2e",
+              "inverse-on-surface": "#f3f0eb",
+              "on-primary-fixed-variant": "#3f465c",
+              "primary-fixed": "#dae2fd",
+              "on-background": "#1c1c19",
+              "surface-container-high": "#ebe8e3",
+              "surface-container": "#f0ede8",
+              "on-error": "#ffffff",
+              "on-error-container": "#93000a",
+              "on-secondary": "#ffffff"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            font-size: 20px;
+        }
+        .seal-shadow {
+            box-shadow: 0 8px 32px rgba(28, 28, 25, 0.08);
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e5e2dd; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-secondary-fixed">
+<!-- Sidebar Navigation -->
+<aside class="h-screen w-64 fixed left-0 top-0 overflow-y-auto bg-[#f6f3ee] dark:bg-slate-900 flex flex-col h-full border-r-0 z-40">
+<div class="p-8 pb-4">
+<h1 class="font-[&#39;Noto_Serif&#39;] text-lg italic text-[#131b2e] dark:text-white">The Curator</h1>
+<p class="font-[&#39;Manrope&#39;] text-[10px] uppercase tracking-[0.2em] font-semibold text-slate-500 mt-1">Grand Hotel Est. 1924</p>
+</div>
+<nav class="flex-1 mt-6">
+<a class="text-slate-500 dark:text-slate-400 py-3 px-6 flex items-center gap-3 hover:bg-[#ebe8e3]/50 font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="today">today</span>
+<span>Today</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 py-3 px-6 flex items-center gap-3 hover:bg-[#ebe8e3]/50 font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 py-3 px-6 flex items-center gap-3 hover:bg-[#ebe8e3]/50 font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="concierge">concierge</span>
+<span>Service Desk</span>
+</a>
+<a class="bg-[#ebe8e3] dark:bg-slate-800 text-[#0f172a] border-l-4 border-[#9b4500] py-3 px-6 flex items-center gap-3 font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="approval">approval</span>
+<span>Approvals</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 py-3 px-6 flex items-center gap-3 hover:bg-[#ebe8e3]/50 font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span>Reports</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 py-3 px-6 flex items-center gap-3 hover:bg-[#ebe8e3]/50 font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span>
+<span>Bookings</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 py-3 px-6 flex items-center gap-3 hover:bg-[#ebe8e3]/50 font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span>Payments</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 py-3 px-6 flex items-center gap-3 hover:bg-[#ebe8e3]/50 font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="bed">bed</span>
+<span>Rooms</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 py-3 px-6 flex items-center gap-3 hover:bg-[#ebe8e3]/50 font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="badge">badge</span>
+<span>Staff</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 py-3 px-6 flex items-center gap-3 hover:bg-[#ebe8e3]/50 font-[&#39;Manrope&#39;] text-xs uppercase tracking-widest font-semibold transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="p-6 border-t-0">
+<button class="w-full py-4 px-4 bg-primary-container text-on-primary font-body text-sm font-semibold rounded-md shadow-lg flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-xs" data-icon="add">add</span>
+                New Booking
+            </button>
+<div class="mt-6">
+<a class="text-slate-500 dark:text-slate-400 py-2 flex items-center gap-3 hover:text-slate-900 font-[&#39;Manrope&#39;] text-[10px] uppercase tracking-widest font-bold" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="help_outline">help_outline</span>
+                    Help Center
+                </a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 min-h-screen">
+<!-- Top Navigation -->
+<header class="bg-[#fcf9f4] dark:bg-slate-950 flex justify-between items-center w-full px-12 py-6 sticky top-0 z-30">
+<div>
+<h2 class="font-headline text-3xl font-bold tracking-tighter text-primary-container">Approvals Desk</h2>
+<p class="text-outline font-label text-[10px] uppercase tracking-[0.3em] mt-1">Authority Queue &amp; Verification</p>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex gap-4">
+<button class="p-2 hover:bg-[#f6f3ee] rounded-full transition-colors text-primary-container">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+<button class="p-2 hover:bg-[#f6f3ee] rounded-full transition-colors text-primary-container relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-secondary rounded-full"></span>
+</button>
+<button class="p-2 hover:bg-[#f6f3ee] rounded-full transition-colors text-primary-container">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+</button>
+</div>
+<div class="h-8 w-[1px] bg-surface-container-highest"></div>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="text-xs font-bold text-primary-container">M. Sterling</p>
+<p class="text-[10px] text-outline uppercase tracking-wider">Executive Concierge</p>
+</div>
+<img alt="Manager Profile" class="w-10 h-10 rounded-full object-cover border-2 border-surface-container" data-alt="Professional portrait of a male hotel manager" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOb519-17OiOjYnwHvCYems1RP2VmF7lKLdpoPKyc8oCYvdONV2isigWqd_OtBTCUpVpI6yzXrACpN2_1XOOP46pZcR5RoTwkRP_CmgejL53xvLe4uD2hRTALH-f9XoxHVOgVb25H6mDDmF3-Ysik4pYZRtMop9Rzgl6IvBXjJfyLT5VplUv5A3oU5MhCls_4ecPdQFvvXJga4vnMmfQieEiG9KuiTdFog7Z8NhOuLVGAD1ZPq3jyWLixbIX8_5L1O341EsPAqiU1p"/>
+</div>
+</div>
+</header>
+<!-- Workspace Layout -->
+<div class="px-12 py-8 grid grid-cols-12 gap-8">
+<!-- Left Column: Pending Extensions & Document Verifications -->
+<div class="col-span-12 lg:col-span-7 space-y-12">
+<!-- Section: Pending Extensions -->
+<section>
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-headline text-xl text-primary-container">Pending Extensions</h3>
+<span class="bg-surface-container px-3 py-1 rounded-full text-[10px] font-bold text-outline tracking-widest uppercase">4 ACTIVE REQUESTS</span>
+</div>
+<div class="space-y-4">
+<!-- Request Card 1 -->
+<div class="bg-surface-container-lowest p-6 rounded-lg seal-shadow flex flex-col md:flex-row gap-6 items-start">
+<div class="w-16 h-16 bg-surface-container rounded-md flex flex-col items-center justify-center border border-outline-variant/20">
+<span class="text-[10px] font-bold text-outline uppercase tracking-tighter">Room</span>
+<span class="text-xl font-bold text-primary-container">302</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<div>
+<h4 class="font-bold text-primary-container text-lg">Julian Voss-Andreae</h4>
+<p class="text-sm text-outline font-medium">Standard Suite • 2 Nights Requested</p>
+</div>
+<div class="bg-tertiary-fixed px-3 py-1 rounded text-[9px] font-bold text-on-tertiary-fixed-variant uppercase tracking-widest">VIP Guest</div>
+</div>
+<div class="mt-4 flex items-center gap-6 text-xs text-on-surface-variant font-medium">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="event_note">event_note</span>
+<span>Current: Oct 12 - 14</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="arrow_forward">arrow_forward</span>
+<span>Extended: Oct 16</span>
+</div>
+</div>
+<div class="mt-6 flex gap-3">
+<button class="bg-primary-container text-on-primary px-6 py-2 rounded text-xs font-bold hover:opacity-90 transition-all">Approve</button>
+<button class="bg-surface-container-highest text-on-surface px-6 py-2 rounded text-xs font-bold hover:bg-surface-container-high transition-all">Inquire</button>
+<button class="text-error px-4 py-2 rounded text-xs font-bold hover:bg-error-container/20 transition-all underline-offset-4 hover:underline">Decline</button>
+</div>
+</div>
+</div>
+<!-- Request Card 2 -->
+<div class="bg-surface-container-lowest p-6 rounded-lg seal-shadow flex flex-col md:flex-row gap-6 items-start">
+<div class="w-16 h-16 bg-surface-container rounded-md flex flex-col items-center justify-center border border-outline-variant/20">
+<span class="text-[10px] font-bold text-outline uppercase tracking-tighter">Room</span>
+<span class="text-xl font-bold text-primary-container">510</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<div>
+<h4 class="font-bold text-primary-container text-lg">Elena Ricci</h4>
+<p class="text-sm text-outline font-medium">Executive Loft • 1 Night Requested</p>
+</div>
+</div>
+<div class="mt-4 flex items-center gap-6 text-xs text-on-surface-variant font-medium">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="event_note">event_note</span>
+<span>Current: Oct 12 - 13</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="arrow_forward">arrow_forward</span>
+<span>Extended: Oct 14</span>
+</div>
+</div>
+<div class="mt-6 flex gap-3">
+<button class="bg-primary-container text-on-primary px-6 py-2 rounded text-xs font-bold hover:opacity-90 transition-all">Approve</button>
+<button class="bg-surface-container-highest text-on-surface px-6 py-2 rounded text-xs font-bold hover:bg-surface-container-high transition-all">Inquire</button>
+<button class="text-error px-4 py-2 rounded text-xs font-bold hover:bg-error-container/20 transition-all underline-offset-4 hover:underline">Decline</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: KYC / Document Verification -->
+<section>
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-headline text-xl text-primary-container">Document Verification</h3>
+<span class="bg-surface-container px-3 py-1 rounded-full text-[10px] font-bold text-outline tracking-widest uppercase">3 WAITING</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Verification Item 1 -->
+<div class="bg-surface-container-low p-6 rounded-lg border border-transparent hover:border-secondary transition-all group">
+<div class="flex justify-between items-start mb-4">
+<div class="w-10 h-10 bg-primary-container rounded flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" data-icon="badge">badge</span>
+</div>
+<div class="bg-[#ffdea5] text-[#5d4201] text-[8px] font-black uppercase px-2 py-1 rounded tracking-widest">Urgent</div>
+</div>
+<h4 class="font-bold text-primary-container">Passport ID #9928</h4>
+<p class="text-xs text-outline mb-4">Guest: Takahashi (Suite 501)</p>
+<div class="aspect-[4/3] bg-surface-container-lowest rounded overflow-hidden mb-4 border border-outline-variant/30 flex items-center justify-center">
+<img alt="Passport document thumbnail" class="w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-500" data-alt="Monochrome image of an identification document" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5bhs0sEPBMVFwQzsV70HS8FLQSADT0KAIbZTjad0y0popWnSJrbaN7BrsjtKJfrpvK02XzcfVhrrkr8RFu58wZgzpC0HrdjjW5soX82jnLS6ubT7QydnW3PEgXEG6W6h9dsZJX4OuJhArRPkBwtdAiWhydSVLB1IC5chCjA8AD3T77CJlL5F8fTF9nV-kYhQJxyFCoAS0C05LRG_SayEigiZKUgNW80T_fsnHcMFv5hPAo5YZCPZaNg80AGKPxczflNeXddTWDQrs"/>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 bg-primary-container text-on-primary py-2 text-[10px] font-bold uppercase tracking-wider rounded">Verify</button>
+<button class="p-2 border border-outline-variant rounded group-hover:border-secondary transition-colors">
+<span class="material-symbols-outlined text-outline group-hover:text-secondary" data-icon="fullscreen">fullscreen</span>
+</button>
+</div>
+</div>
+<!-- Verification Item 2 -->
+<div class="bg-surface-container-low p-6 rounded-lg border border-transparent hover:border-secondary transition-all group">
+<div class="flex justify-between items-start mb-4">
+<div class="w-10 h-10 bg-primary-container rounded flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" data-icon="corporate_fare">corporate_fare</span>
+</div>
+</div>
+<h4 class="font-bold text-primary-container">Corporate Credentials</h4>
+<p class="text-xs text-outline mb-4">Group: Amex Global (12 Rooms)</p>
+<div class="aspect-[4/3] bg-surface-container-lowest rounded overflow-hidden mb-4 border border-outline-variant/30 flex items-center justify-center">
+<div class="text-center p-4">
+<span class="material-symbols-outlined text-4xl text-outline-variant" data-icon="description">description</span>
+<p class="text-[9px] uppercase tracking-widest text-outline mt-2">Tax_Exemption_Form.pdf</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 bg-primary-container text-on-primary py-2 text-[10px] font-bold uppercase tracking-wider rounded">Verify</button>
+<button class="p-2 border border-outline-variant rounded group-hover:border-secondary transition-colors">
+<span class="material-symbols-outlined text-outline group-hover:text-secondary" data-icon="download">download</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Expense Receipts -->
+<div class="col-span-12 lg:col-span-5">
+<section class="sticky top-32">
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-headline text-xl text-primary-container">Expense Receipts</h3>
+<span class="text-[10px] font-bold text-secondary tracking-widest uppercase">Staff Reimbursements</span>
+</div>
+<div class="bg-surface-container-low rounded-lg p-1">
+<div class="bg-surface-container-lowest rounded-md divide-y divide-surface-container overflow-hidden">
+<!-- Expense Item 1 -->
+<div class="p-6 hover:bg-surface-container/30 transition-colors">
+<div class="flex justify-between items-start">
+<div class="flex gap-4">
+<div class="w-12 h-12 rounded bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-primary-container" data-icon="local_florist">local_florist</span>
+</div>
+<div>
+<p class="text-[10px] font-bold text-outline uppercase tracking-widest">Lobby Decor</p>
+<h4 class="font-bold text-primary-container">Orchid Arrangements</h4>
+<p class="text-xs text-outline-variant mt-1">Submitted by: Sarah H. • Oct 11</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-lg font-bold text-primary-container">$450.00</p>
+<button class="text-[10px] font-black text-secondary uppercase tracking-tighter flex items-center gap-1 mt-1 justify-end">
+                                            View Receipt <span class="material-symbols-outlined text-xs" data-icon="open_in_new">open_in_new</span>
+</button>
+</div>
+</div>
+<div class="mt-6 flex justify-end gap-3">
+<button class="px-4 py-1.5 border border-outline-variant text-[10px] font-bold uppercase rounded hover:bg-surface-container transition-all">Decline</button>
+<button class="px-6 py-1.5 bg-primary-container text-on-primary text-[10px] font-bold uppercase rounded shadow-sm">Approve Expense</button>
+</div>
+</div>
+<!-- Expense Item 2 -->
+<div class="p-6 hover:bg-surface-container/30 transition-colors">
+<div class="flex justify-between items-start">
+<div class="flex gap-4">
+<div class="w-12 h-12 rounded bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-primary-container" data-icon="restaurant">restaurant</span>
+</div>
+<div>
+<p class="text-[10px] font-bold text-outline uppercase tracking-widest">Guest Recovery</p>
+<h4 class="font-bold text-primary-container">Complimentary Wine</h4>
+<p class="text-xs text-outline-variant mt-1">Submitted by: David L. • Oct 12</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-lg font-bold text-primary-container">$85.00</p>
+<button class="text-[10px] font-black text-secondary uppercase tracking-tighter flex items-center gap-1 mt-1 justify-end">
+                                            View Receipt <span class="material-symbols-outlined text-xs" data-icon="open_in_new">open_in_new</span>
+</button>
+</div>
+</div>
+<div class="mt-6 flex justify-end gap-3">
+<button class="px-4 py-1.5 border border-outline-variant text-[10px] font-bold uppercase rounded hover:bg-surface-container transition-all">Decline</button>
+<button class="px-6 py-1.5 bg-primary-container text-on-primary text-[10px] font-bold uppercase rounded shadow-sm">Approve Expense</button>
+</div>
+</div>
+<!-- Expense Item 3 -->
+<div class="p-6 hover:bg-surface-container/30 transition-colors">
+<div class="flex justify-between items-start">
+<div class="flex gap-4">
+<div class="w-12 h-12 rounded bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-primary-container" data-icon="construction">construction</span>
+</div>
+<div>
+<p class="text-[10px] font-bold text-outline uppercase tracking-widest">Maintenance</p>
+<h4 class="font-bold text-primary-container">HVAC Filters (Bulk)</h4>
+<p class="text-xs text-outline-variant mt-1">Submitted by: Mike R. • Oct 12</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-lg font-bold text-primary-container">$1,240.50</p>
+<button class="text-[10px] font-black text-secondary uppercase tracking-tighter flex items-center gap-1 mt-1 justify-end">
+                                            View Receipt <span class="material-symbols-outlined text-xs" data-icon="open_in_new">open_in_new</span>
+</button>
+</div>
+</div>
+<div class="mt-6 flex justify-end gap-3">
+<button class="px-4 py-1.5 border border-outline-variant text-[10px] font-bold uppercase rounded hover:bg-surface-container transition-all">Decline</button>
+<button class="px-6 py-1.5 bg-primary-container text-on-primary text-[10px] font-bold uppercase rounded shadow-sm">Approve Expense</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Floating Help Anchor -->
+<div class="fixed bottom-8 right-8 z-50">
+<button class="w-14 h-14 rounded-full bg-primary-container text-on-primary seal-shadow flex items-center justify-center hover:scale-105 transition-transform">
+<span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>
+</button>
+</div>
+</body></html>

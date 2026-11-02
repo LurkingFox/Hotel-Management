@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Digital Guest Slip - University Hotel HMS</title>
+<script type='text/javascript' nonce='5YK7Jmu32I7mRno6hAER5g==' src='https://contribution.usercontent.google.com/JwGTq5fGOu4hxqHoIowTbJgvPCaJZd8P6pkIrMLoHGf2drKCSU5MqFvxg8NlzYtZh0jClUDoSmKR594R4XVrJPuJ0hcp0eLks5RE8d6L34KC4lLDm5_HgAMXyPCOUGk_YTI8cB-eN2AZZH92fpn3gEb6lfehVMo-rL17_Wn2Bf8Erp3K6KJ9yOkPEVQFJD8ZOwUITir5vEol9hpMxG4kGkmJpJnbdaPO7z0BYxNT-lIbM5DDMc1eOSqMhCe_xvM5lorbnxD97rpurwnZVYGTn4_cxhAV_SXYJUzgfzLLqFtvDAAsvBYzPqCFlObN1eqrs-8xGS73RSp38fxX3Q6EQWxE7q4CPOiwuTDUuvhDOHI15ZBd6hHyIYISfunCyBwzBtLQd5Ih5dW0pUPNgocFYKShtMCiESnGsFGy8bJ0PrOLC4eG3DbBk9czE9apIerAEY1x6_aeh9LUoOxPRXp3o84gWbjQJj3p2fsN2aoQZTWzolRlIUXyIxxUnuUFqqbFBMtXQRBNq6PwUBMyUmmY5qKTibNwhXY1ww908WgnAbLxBJ1EOthfT_eONGoIP7qqtSJeWvnsFKhMOk2_0pj9y4MhtlZiKVyN2asK0rh0i9oRQ7gtztKpte3Bgt3IyQN-cMmSlXE3j06X0WOZVUlvpzA8uyORBX5-5XsXetRTc0omSNaxIPy6UrN28tmDTq2hYarjJ3AaboyV9lHgtMw_Zqwd1Ooyf41a_LDnq54eC0Vx6hSRhhXDJdqsTy1xtheelNNUHYyw-ySau7XiD7_MqrdaFsR69GHBZmnbOQ'></script><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Modern Organic Typography: Playfair Display for serif elegance, Inter for clean modern text -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#7B8E7E", // Sage Green
+          "sage-light": "#F2F4F2",
+          "background-light": "#F9FAF9",
+          "background-dark": "#1A1D1A",
+        },
+        fontFamily: {
+          "display": ["Playfair Display", "serif"],
+          "sans": ["Inter", "sans-serif"]
+        },
+        borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+      },
+    },
+  }
+</script>
+<style>
+  @keyframes slideUpFade {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-slide-up-fade {
+    animation: slideUpFade 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  
+  .receipt-edge {
+    position: relative;
+  }
+  .receipt-edge::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    background: linear-gradient(-45deg, transparent 5px, white 5px), linear-gradient(45deg, transparent 5px, white 5px);
+    background-size: 10px 10px;
+    background-repeat: repeat-x;
+  }
+  .dark .receipt-edge::after {
+    background: linear-gradient(-45deg, transparent 5px, #0f172a 5px), linear-gradient(45deg, transparent 5px, #0f172a 5px);
+    background-size: 10px 10px;
+  }
+
+  @media print {
+    body { background: none; }
+    .no-print { display: none !important; }
+    .slip-container { box-shadow: none !important; border: 1px solid #e5e7eb; }
+  }
+</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-sans text-slate-800 dark:text-slate-200 min-h-screen flex items-center justify-center p-6">
+<!-- Minimal Header / Back Navigation -->
+<div class="fixed top-0 left-0 w-full p-6 no-print z-10">
+<button class="flex items-center gap-2 text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+<span class="text-xs font-semibold uppercase tracking-widest">Back</span>
+</button>
+</div>
+<main class="w-full max-w-[420px] animate-slide-up-fade">
+<!-- Slip Container -->
+<div class="slip-container receipt-edge bg-white dark:bg-slate-900 rounded-t-xl shadow-2xl shadow-slate-200/50 dark:shadow-black/20 overflow-visible flex flex-col relative border border-slate-100 dark:border-slate-800">
+<!-- Header -->
+<div class="p-8 text-center border-b border-slate-50 dark:border-slate-800">
+<div class="mx-auto w-14 h-14 bg-sage-light dark:bg-primary/10 rounded-full flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary text-2xl" data-icon="hotel" data-weight="fill" style="font-variation-settings: &#39;FILL&#39; 1;">hotel</span>
+</div>
+<h1 class="text-3xl font-display font-bold mb-2 tracking-tight">University Hotel</h1>
+<p class="text-xs text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] font-medium">Guest Folio &amp; Receipt</p>
+</div>
+<!-- Itinerary Meta -->
+<div class="px-8 py-6 flex justify-between items-baseline border-b border-dashed border-slate-200 dark:border-slate-700">
+<div>
+<p class="font-display text-lg italic text-slate-700 dark:text-slate-300">Eleanor Shellstrop</p>
+<p class="text-xs text-slate-400 dark:text-slate-500 mt-1">Oct 12 — Oct 14, 2023</p>
+</div>
+<div class="text-right">
+<p class="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Room</p>
+<p class="font-display font-bold text-2xl text-primary leading-none">342</p>
+</div>
+</div>
+<!-- Charges Breakdown -->
+<div class="px-8 py-8 flex flex-col gap-5">
+<div class="flex justify-between items-end group">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-light">Room Rate <span class="text-[10px] ml-1 opacity-60">(2 nights)</span></p>
+<div class="flex-1 border-b border-slate-100 dark:border-slate-800 mx-3 mb-1"></div>
+<p class="font-medium text-sm">$450.00</p>
+</div>
+<div class="flex justify-between items-end group">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-light">Room Service</p>
+<div class="flex-1 border-b border-slate-100 dark:border-slate-800 mx-3 mb-1"></div>
+<p class="font-medium text-sm">$45.00</p>
+</div>
+<div class="flex justify-between items-end group">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-light">Mini-bar</p>
+<div class="flex-1 border-b border-slate-100 dark:border-slate-800 mx-3 mb-1"></div>
+<p class="font-medium text-sm">$15.00</p>
+</div>
+<div class="flex justify-between items-end group">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-light">Taxes &amp; Fees</p>
+<div class="flex-1 border-b border-slate-100 dark:border-slate-800 mx-3 mb-1"></div>
+<p class="font-medium text-sm">$51.00</p>
+</div>
+</div>
+<!-- Total Banner (Sage Green) -->
+<div class="px-8 pb-10">
+<div class="bg-primary text-white rounded-xl p-5 flex justify-between items-center shadow-lg shadow-primary/20">
+<div>
+<p class="text-[10px] uppercase tracking-widest opacity-80 mb-0.5">Total Amount Paid</p>
+<p class="font-display text-base italic">Settled via Visa ****4242</p>
+</div>
+<p class="text-2xl font-bold tracking-tight">$561.00</p>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="mt-12 flex flex-col items-center gap-4 no-print px-4">
+<button class="flex items-center justify-center gap-3 w-full max-w-[280px] h-12 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-semibold hover:bg-slate-800 dark:hover:bg-slate-100 transition-all transform hover:-translate-y-0.5 shadow-md">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span>Download Receipt</span>
+</button>
+<p class="text-[11px] text-slate-400 uppercase tracking-widest font-medium">Safe travels, Eleanor.</p>
+</div>
+</main>
+</body></html>

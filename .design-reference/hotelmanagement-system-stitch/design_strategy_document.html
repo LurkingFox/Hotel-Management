@@ -1,0 +1,58 @@
+# Design Strategy: Premium Hotel Operations Platform Overhaul
+
+## 1. Vision & Art Direction
+Transform a functional Next.js/Tailwind internal tool into a high-end, executive hospitality command center. The aesthetic balances the **operational efficiency** of an air traffic control tower with the **refined elegance** of a boutique hotel brand.
+
+**Core Tenets:**
+- **Confident & Refined:** Bold typography and clear hierarchy.
+- **Atmospheric but Sharp:** Warm tones (sandstone, parchment) paired with deep, professional anchors (midnight navy).
+- **Practical Luxury:** Every element feels high-quality but serves a clear operational purpose. No "fluff."
+
+---
+
+## 2. Visual & Semantic Tokens (Tailwind Strategy)
+
+### Color Palette (CSS Variables)
+- `--color-brand-anchor`: `#0F172A` (Midnight Navy / Deep Ink)
+- `--color-brand-neutral-warm`: `#F5F2ED` (Parchment / Bone)
+- `--color-brand-neutral-mid`: `#E5E0D8` (Sandstone)
+- `--color-brand-accent`: `#B45309` (Refined Terracotta / Copper)
+- `--color-brand-accent-glow`: `rgba(180, 83, 9, 0.1)`
+- `--status-urgent`: `#BE123C` (Deep Rose / Crimson)
+- `--status-warning`: `#D97706` (Amber)
+- `--status-success`: `#059669` (Emerald)
+
+### Typography Scale
+- **Display (Headings):** Serif or High-Contrast Sans (e.g., Playfair Display or Inter Tight) for a "Hospitality" feel.
+- **Operational (Data/UI):** Highly legible, rhythmic Sans-Serif (e.g., Inter or Geist) for dense tables and forms.
+- **Hierarchy:** Strong contrast between labels (all-caps, tracked out) and data (bold, clear).
+
+---
+
+## 3. Reusable Component Primitives
+- **The "Page Shell":** Persistent navigation, contextual header with "Hero Band" for critical page status.
+- **The "Command Card":** High-density summary card for managers.
+- **The "Queue Card":** Actionable lane-based cards for service desks.
+- **The "Operational Table":** Custom Tailwind table with refined borders and clear row highlighting.
+- **The "Status Badge":** Muted background with high-contrast text and a small "dot" indicator.
+
+---
+
+## 4. Page-by-Page Redesign Goals
+
+| Page | UX & Design Priority |
+| :--- | :--- |
+| **Today Command Center** | Manager-level "at a glance" view. Heavy on "Command Cards" and exception handling. |
+| **Service Desk** | Kanban/Lane efficiency. Visualizing SLA pressure with subtle color/motion cues. |
+| **Approvals** | High-signal review. Distinction between different request types (KYC vs. Receipts). |
+| **Reports** | Split view. "Outlook" for analysis (charts); "Export Studio" for document generation. |
+| **Dashboard** | A clean "Launch Surface." Focus on quick navigation and core operational confidence. |
+| **Reception Desk** | High-speed scanability. Focused on guest arrival/departure and room status. |
+
+---
+
+## 5. Motion & Interaction
+- **Staggered Reveals:** Use `framer-motion` or Tailwind transitions for soft entry of cards.
+- **Tactile Feedback:** Subtle scale-down or shadow-deepening on card hover.
+- **Urgency Pulses:** Very subtle opacity pulse for "Overdue" SLA items.
+- **Reduced Motion:** All transitions respect `prefers-reduced-motion`.

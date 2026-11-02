@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Executive Dashboard - University Hotel</title>
+<script type='text/javascript' nonce='9Wr4AhK5foiGbR7ikPuZGQ==' src='https://contribution.usercontent.google.com/QbOy-jPT4JVKhYd-uAQMcypjZR19uCE3bgFNfkj0R7q_8YxlilEtNDwtBNEpfRfPZ2e6QzQzOSIXa-kx8T_8hknBpb_-NoApN3i3lyTvney8zwizllxvBGaYZ0jJcooA6s0LGZOXnGwtHRzbRUcfuXZNrran3OmGtISCFpYZI7fqUc4lpziNeC9FOF5MgKqiIM83xdF25DWmfgFNNe0W5aiHT4S9jchsd65BiEtKGStmcopDYckIeclbBnztEH51RIIfJG9hMxtlHKaS2bf15ox_3QB2hCrLaZpl2YVT3GfZtr-VKq0RPcusfJ_rLcqRFOL49byV8mlrkQvN-h6v2OSnmbv6Ska9FPD32_a3DuxsejWmfzrG5Sf-8EG6TyLZc9BD7QbqYKlSh66M360Xaj8mJyGG6rwKobBrFp7M46K8rB6x5vDh5IgU4RuKEsXfhtjKlS3FOQi40OqlcVuo1HRvg1X-Vj2OCACtwmV3RFCkYvFB4VXh9WRszu0LpvJKGxK_FOP8BAWn_jyPUll_0MNAiLjh-QKJwsQ9Rf_J2kcEP8l-P7MZeEigyS524K4aAfw3HDph_ZBIOhgSmyz6YzxgxYe_safw2wxXdMSfrykUelVaILdhwWAsHigB1AdjaeBIs71XQpN9DanNOZVPRntaTSErAT5esL3RattBo8x_eqJNjYQyxng-W8vgcVDiu9TpUEmqZHexGBMTGnxSbtXGyXXTo4db1SwOZrJQ3HoabVHGHE1Z6I7UO2jh46vr3tbX5cd9pHT9npU9jdwxlkygusohgTvDwkMC3w'></script><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,700&amp;family=DM+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#7C9082",
+                        "background": "#F7F5F0",
+                        "surface": "#FFFFFF",
+                        "text-main": "#2C302E",
+                        "muted": "#A39E93",
+                        "accent": "#D48C70",
+                    },
+                    fontFamily: {
+                        "heading": ["Noto Serif", "serif"],
+                        "body": ["DM Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "md": "16px",
+                        "lg": "24px",
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        'soft': '0 8px 30px rgba(163, 158, 147, 0.15)',
+                        'soft-hover': '0 12px 40px rgba(163, 158, 147, 0.2)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: #F7F5F0;
+            color: #2C302E;
+        }
+        h1, h2, h3, h4, .font-heading {
+            font-family: 'Noto Serif', serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .metric-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(163, 158, 147, 0.2);
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #A39E93;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex antialiased">
+<!-- Shared Sidebar Component: SideNavBar -->
+<aside class="fixed left-0 top-0 bottom-0 w-[250px] bg-[#f5f3ee] dark:bg-stone-900 flex flex-col py-6 z-50">
+<div class="px-8 mb-8 flex flex-col gap-1">
+<h1 class="text-2xl font-bold text-[#1b1c19] dark:text-[#fbf9f4] italic font-heading">Uni Hotel</h1>
+<p class="text-xs font-medium text-[#7C9082] tracking-widest uppercase">Management System</p>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 px-6 py-3 bg-[#7C9082] text-white rounded-full mx-4 transition-all duration-300 font-heading font-medium text-sm tracking-tight" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+            Today
+        </a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#1b1c19]/70 dark:text-[#fbf9f4]/70 hover:bg-[#7C9082]/10 rounded-full mx-4 transition-all font-heading font-medium text-sm tracking-tight" href="#">
+<span class="material-symbols-outlined text-[20px]">support_agent</span>
+            Service Desk
+        </a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#1b1c19]/70 dark:text-[#fbf9f4]/70 hover:bg-[#7C9082]/10 rounded-full mx-4 transition-all font-heading font-medium text-sm tracking-tight" href="#">
+<span class="material-symbols-outlined text-[20px]">desk</span>
+            Reception
+        </a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#1b1c19]/70 dark:text-[#fbf9f4]/70 hover:bg-[#7C9082]/10 rounded-full mx-4 transition-all font-heading font-medium text-sm tracking-tight" href="#">
+<span class="material-symbols-outlined text-[20px]">hail</span>
+            Guest Portal
+        </a>
+</nav>
+<div class="px-6 mt-auto">
+<div class="flex items-center gap-3 p-3 bg-white/50 rounded-full">
+<div class="w-10 h-10 rounded-full bg-[#7C9082] flex items-center justify-center text-white font-bold text-sm">JD</div>
+<div class="flex flex-col">
+<span class="text-sm font-bold text-[#1b1c19]">Jane Doe</span>
+<span class="text-[11px] text-[#A39E93] font-medium uppercase tracking-wider">Executive Manager</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col">
+<!-- Shared Top Navigation Component: TopNavBar -->
+<header class="sticky top-0 z-40 flex justify-between items-center w-full pl-[270px] pr-8 py-4 bg-[#fbf9f4]/80 backdrop-blur-xl shadow-[0_4px_24px_rgba(124,144,130,0.06)]">
+<div class="flex items-center gap-4 flex-1 max-w-xl">
+<div class="relative w-full group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#A39E93]">search</span>
+<input class="w-full bg-white border-none rounded-full pl-12 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-[#7C9082]/20 transition-all placeholder:text-[#A39E93]" placeholder="Search guests, rooms, or tasks..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-[#7C9082] hover:bg-[#7C9082]/10 transition-opacity">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-[#7C9082] hover:bg-[#7C9082]/10 transition-opacity">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-px h-6 bg-[#A39E93]/20 mx-2"></div>
+<p class="font-heading text-sm font-semibold text-[#1b1c19]">University Hotel HMS</p>
+</div>
+</header>
+<main class="flex-1 pl-[270px] pr-8 py-8 lg:py-10">
+<div class="max-w-6xl mx-auto space-y-10">
+<!-- Header Section -->
+<section class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+<div class="space-y-1">
+<div class="flex items-center gap-3">
+<h2 class="text-3xl font-bold text-[#2C302E] tracking-tight font-heading">Monday, October 12</h2>
+<div class="flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-[#EDEBE4] shadow-sm">
+<span class="w-2 h-2 rounded-full bg-[#D48C70] animate-pulse"></span>
+<span class="text-[10px] font-bold text-[#A39E93] uppercase tracking-[0.2em]">Live Pulse</span>
+</div>
+</div>
+<p class="text-[#A39E93] text-sm">Welcome back, Jane. Here is your overview for today.</p>
+</div>
+<div class="flex gap-2">
+<button class="px-5 py-2.5 bg-white border border-[#EDEBE4] text-[#7C9082] font-medium rounded-full text-sm hover:bg-[#F7F5F0] transition-colors shadow-sm">Generate Report</button>
+<button class="px-5 py-2.5 bg-[#7C9082] text-white font-medium rounded-full text-sm hover:opacity-90 transition-all shadow-sm">Add New Task</button>
+</div>
+</section>
+<!-- Metrics Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Occupancy Card -->
+<div class="metric-card bg-surface rounded-md p-6 shadow-soft border border-[#F7F5F0] flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<p class="text-[11px] font-bold text-muted uppercase tracking-widest">Occupancy Rate</p>
+<span class="material-symbols-outlined text-primary/40 text-[20px]">bed</span>
+</div>
+<div class="flex items-baseline gap-2 mt-2">
+<p class="text-4xl font-bold text-primary font-heading">82%</p>
+<span class="text-xs font-bold text-primary flex items-center bg-primary/10 px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-[14px] mr-0.5">trending_up</span>
+                            +4%
+                        </span>
+</div>
+<div class="w-full bg-[#F7F5F0] rounded-full h-1.5 mt-6">
+<div class="bg-primary h-1.5 rounded-full" style="width: 82%"></div>
+</div>
+</div>
+<!-- Revenue Card -->
+<div class="metric-card bg-surface rounded-md p-6 shadow-soft border border-[#F7F5F0] flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<p class="text-[11px] font-bold text-muted uppercase tracking-widest">Daily Revenue</p>
+<span class="material-symbols-outlined text-primary/40 text-[20px]">payments</span>
+</div>
+<div class="flex items-baseline gap-2 mt-2">
+<p class="text-4xl font-bold text-primary font-heading">$12,450</p>
+<span class="text-xs font-medium text-muted">vs yesterday</span>
+</div>
+<div class="mt-6 flex items-center gap-2">
+<span class="text-[11px] font-medium text-muted bg-[#F7F5F0] px-2 py-1 rounded-md">84 Trans.</span>
+<span class="text-[11px] font-medium text-muted bg-[#F7F5F0] px-2 py-1 rounded-md">Avg $148</span>
+</div>
+</div>
+<!-- Pending Card -->
+<div class="metric-card bg-surface rounded-md p-6 shadow-soft border border-[#F7F5F0] flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<p class="text-[11px] font-bold text-muted uppercase tracking-widest">Pending Action</p>
+<span class="material-symbols-outlined text-accent/40 text-[20px]">assignment</span>
+</div>
+<div class="flex items-baseline gap-2 mt-2">
+<p class="text-4xl font-bold text-accent font-heading">14</p>
+<p class="text-xs font-semibold text-accent uppercase tracking-tighter">Needs attention</p>
+</div>
+<div class="flex gap-2 mt-6">
+<span class="px-3 py-1 bg-accent/10 text-accent text-[11px] rounded-full font-bold">6 Check-ins</span>
+<span class="px-3 py-1 bg-accent/10 text-accent text-[11px] rounded-full font-bold">8 Service</span>
+</div>
+</div>
+</section>
+<!-- Bottom Section -->
+<section class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+<!-- Occupancy Chart -->
+<div class="lg:col-span-3 bg-surface rounded-md shadow-soft border border-[#F7F5F0] p-6 flex flex-col min-h-[420px]">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h3 class="text-lg font-bold text-[#2C302E] font-heading">Occupancy Trends</h3>
+<p class="text-xs text-muted">Weekly performance comparison</p>
+</div>
+<select class="bg-[#F7F5F0] border-none text-[13px] font-bold text-[#7C9082] rounded-full py-2 pl-4 pr-10 focus:ring-2 focus:ring-primary/20 cursor-pointer">
+<option>This Week</option>
+<option>Previous Week</option>
+</select>
+</div>
+<div class="flex-1 w-full flex items-end gap-3 pb-4 px-2">
+<!-- Simplified Organic Chart bars -->
+<div class="flex-1 bg-primary/10 rounded-t-full h-[40%] hover:bg-primary/20 transition-all relative group cursor-pointer">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#2C302E] text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">Mon: 42%</div>
+</div>
+<div class="flex-1 bg-primary/20 rounded-t-full h-[60%] hover:bg-primary/30 transition-all"></div>
+<div class="flex-1 bg-primary/30 rounded-t-full h-[75%] hover:bg-primary/40 transition-all"></div>
+<div class="flex-1 bg-primary/50 rounded-t-full h-[88%] hover:bg-primary/60 transition-all"></div>
+<div class="flex-1 bg-primary rounded-t-full h-[95%] shadow-lg shadow-primary/20"></div>
+<div class="flex-1 bg-primary/20 rounded-t-full h-[45%] border-t-2 border-dashed border-primary/40"></div>
+<div class="flex-1 bg-primary/10 rounded-t-full h-[30%] border-t-2 border-dashed border-primary/20"></div>
+</div>
+<div class="flex justify-between mt-4 px-2 text-[10px] font-bold text-muted uppercase tracking-widest">
+<span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+</div>
+</div>
+<!-- Recent Activity -->
+<div class="lg:col-span-2 bg-surface rounded-md shadow-soft border border-[#F7F5F0] flex flex-col h-[420px]">
+<div class="p-6 border-b border-[#F7F5F0] flex items-center justify-between">
+<h3 class="text-lg font-bold text-[#2C302E] font-heading">Live Feed</h3>
+<button class="text-xs font-bold text-primary uppercase tracking-widest hover:opacity-70">View History</button>
+</div>
+<div class="flex-1 overflow-y-auto">
+<div class="divide-y divide-[#F7F5F0]">
+<!-- Activity Item 1 -->
+<div class="flex gap-4 p-5 hover:bg-[#F7F5F0]/50 transition-colors cursor-pointer group">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-primary text-[20px]">login</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-0.5">
+<p class="text-sm font-bold text-[#2C302E] truncate">Room 204 Checked In</p>
+<span class="text-[10px] font-medium text-muted">10m ago</span>
+</div>
+<p class="text-xs text-muted">Michael Smith • Guest VIP</p>
+</div>
+</div>
+<!-- Activity Item 2 -->
+<div class="flex gap-4 p-5 hover:bg-[#F7F5F0]/50 transition-colors cursor-pointer group">
+<div class="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-accent text-[20px]">cleaning_services</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-0.5">
+<p class="text-sm font-bold text-[#2C302E] truncate">Housekeeping Task</p>
+<span class="text-[10px] font-medium text-muted">25m ago</span>
+</div>
+<p class="text-xs text-muted">Room 102 - Urgent extra towels</p>
+</div>
+</div>
+<!-- Activity Item 3 -->
+<div class="flex gap-4 p-5 hover:bg-[#F7F5F0]/50 transition-colors cursor-pointer group">
+<div class="w-10 h-10 rounded-full bg-[#EDEBE4] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-muted text-[20px]">credit_card</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-0.5">
+<p class="text-sm font-bold text-[#2C302E] truncate">Payment Processed</p>
+<span class="text-[10px] font-medium text-muted">1h ago</span>
+</div>
+<p class="text-xs text-muted">Invoice #4920 - $450.00</p>
+</div>
+</div>
+<!-- Activity Item 4 -->
+<div class="flex gap-4 p-5 hover:bg-[#F7F5F0]/50 transition-colors cursor-pointer group">
+<div class="w-10 h-10 rounded-full bg-[#EDEBE4] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-muted text-[20px]">logout</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-0.5">
+<p class="text-sm font-bold text-[#2C302E] truncate">Room 305 Checked Out</p>
+<span class="text-[10px] font-medium text-muted">2h ago</span>
+</div>
+<p class="text-xs text-muted">Clean request automatically triggered</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+</body></html>

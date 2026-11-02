@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Access Log - University Hotel HMS</title>
+<script type='text/javascript' nonce='KmKWheNlMnOkFwn8AoDK6A==' src='https://contribution.usercontent.google.com/z4jQdPz1nCDkckhmwEieFK_wlOZgpAf4yOL9NePGqat7l7KKDHIacjEONjid4fLsOBkXyCGZKIl5Ir8YhHY0Osgw4LEMo_6LToJI781NhffRR6WmOjZ5M68Vn28FNu__sKX22VNxtGqYcqmV5HB20I8lU4ys1_ChulOXFpG2ZmwswNwGB_ywD50N1Ov47D_CupywqEpblKd-QbdYV234t1VL77nRzlLdo3RhKeNuAVpZFS0CfaXtFLNuziJ-lLF0Q3CXhJJCaHobmxVkhmEbIrYftgZLFaiSxVNdplPpGg7pHthSC2cZRBCD6ozQlJa1pwD4u7zKU-Yjh6GmiZni2OGQS2ReMYVxGa0jGsyZv7affOPKtQPN3VW0ViHhNE0RmlOFtAW_xs65lZuZY7FNZfObuqprWcIE1WB8v7o59H7yP8AdUiHMWwR57mz32zJbXFaneXJZuqMfOrWv9WGFuwqkDl-H5MHKJNpjMRMLgoDHg4eKgfIWcSW31U2DvIH9iFG6xBm1uJc5hN22vV2t83NscNOt5RICxhHPDxh3Ft6DeF3bLNoeG0K0gOIbvGT_AfEpUsBMkeYuuu5nbXKeknyBAIB2ucO_rI_nkChTDk7NNIv-48Z0sHbi2cvo0IUfgjw_bONZWM4xPm0mgBtla4n_1iLyjlNrO2qzotwR3svhvQgGazhtwrle0VB6pWTczpLCgSsP3DTT0Bix6G79kAqS3lqL1QgwVssuB87AD4KrhDGMJ5b-mg65UPLC4Z6AiPb-bgggz--99VqMFoC9VMMNHtmYy3uJPv5J4Q'></script><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-variant": "#e4e2dd",
+              "error": "#ba1a1a",
+              "surface": "#fbf9f4",
+              "surface-container-lowest": "#ffffff",
+              "surface-bright": "#fbf9f4",
+              "primary": "#4d6054",
+              "on-surface": "#1b1c19",
+              "inverse-surface": "#30312e",
+              "on-secondary-container": "#7a412a",
+              "on-error": "#ffffff",
+              "tertiary-container": "#8c6d6e",
+              "secondary": "#8a4f37",
+              "inverse-on-surface": "#f2f1ec",
+              "on-surface-variant": "#434844",
+              "error-container": "#ffdad6",
+              "surface-container-low": "#f5f3ee",
+              "surface-container-high": "#eae8e3",
+              "on-tertiary-fixed": "#2b1617",
+              "primary-fixed-dim": "#b7ccbc",
+              "secondary-fixed-dim": "#ffb599",
+              "surface-container": "#f0eee9",
+              "on-primary-container": "#f6fff6",
+              "on-tertiary": "#ffffff",
+              "primary-fixed": "#d2e8d8",
+              "on-primary-fixed-variant": "#384b3f",
+              "surface-dim": "#dbdad5",
+              "on-secondary-fixed": "#370e00",
+              "outline": "#737873",
+              "tertiary": "#725556",
+              "on-tertiary-container": "#fffbff",
+              "on-secondary": "#ffffff",
+              "primary-container": "#66796c",
+              "secondary-fixed": "#ffdbce",
+              "secondary-container": "#ffb193",
+              "surface-tint": "#506356",
+              "inverse-primary": "#b7ccbc",
+              "background": "#fbf9f4",
+              "on-tertiary-fixed-variant": "#5b4041",
+              "tertiary-fixed-dim": "#e3bebe",
+              "on-primary": "#ffffff",
+              "surface-container-highest": "#e4e2dd",
+              "on-secondary-fixed-variant": "#6e3822",
+              "on-error-container": "#93000a",
+              "on-background": "#1b1c19",
+              "outline-variant": "#c3c8c2",
+              "tertiary-fixed": "#ffdada",
+              "on-primary-fixed": "#0d1f15"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body {
+        font-family: 'Manrope', sans-serif;
+        background-color: #fbf9f4;
+        color: #1b1c19;
+      }
+      h1, h2, h3 {
+        font-family: 'Noto Serif', serif;
+      }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- SideNavBar (Shared Component) -->
+<aside class="fixed left-0 top-0 bottom-0 flex flex-col py-6 w-[250px] h-screen border-none bg-[#f5f3ee] dark:bg-stone-900 z-50">
+<div class="px-6 mb-10">
+<h1 class="text-2xl font-bold text-[#1b1c19] dark:text-[#fbf9f4] italic">Uni Hotel</h1>
+<p class="font-[&#39;Noto_Serif&#39;] font-medium text-xs tracking-tight text-[#7C9082]">Management System</p>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- Active State Logic: Mapping Service Desk as context for Admin/Audit -->
+<a class="flex items-center gap-3 px-4 py-3 text-[#1b1c19]/70 dark:text-[#fbf9f4]/70 hover:bg-[#7C9082]/10 rounded-full mx-2 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-[&#39;Noto_Serif&#39;] font-medium text-sm tracking-tight">Today</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-[#7C9082] text-white rounded-full mx-2 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>
+<span class="font-[&#39;Noto_Serif&#39;] font-medium text-sm tracking-tight">Service Desk</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#1b1c19]/70 dark:text-[#fbf9f4]/70 hover:bg-[#7C9082]/10 rounded-full mx-2 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="desk">desk</span>
+<span class="font-[&#39;Noto_Serif&#39;] font-medium text-sm tracking-tight">Reception</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#1b1c19]/70 dark:text-[#fbf9f4]/70 hover:bg-[#7C9082]/10 rounded-full mx-2 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="hail">hail</span>
+<span class="font-[&#39;Noto_Serif&#39;] font-medium text-sm tracking-tight">Guest Portal</span>
+</a>
+</nav>
+<div class="px-6 pt-6 mt-auto border-t border-outline-variant/10">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden">
+<img alt="University Hotel Logo" class="w-full h-full object-cover" data-alt="Corporate headshot of a hotel manager" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuZ10pig3Mb1INZeLddoO9ujAdfMEbQt13RY7pJeR4rCTAeZoRAN0jDG2dHEoRX3AD4CDtZQJ5AmdinZ5gGaozdBJob8p4vD3xO8hGs1aC60QLvScQTl8862o4D4z1Po7lr0v_4T6mIRJVlkpPsBWjlsSu70OrvtOZqr7wpoOpfXZhvKn6ai7Ie-i20OytMpKUXo3PZNzzngt3dchj9JHbhxNFC9f8VKrORj3-lZwZ_ao7-c2g5UMMSs_dhJpT7ymhg85b2dZ_URg"/>
+</div>
+<div>
+<p class="text-sm font-bold">Admin Portal</p>
+<p class="text-xs text-on-surface-variant">Security Audit</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- TopNavBar (Shared Component) -->
+<header class="flex justify-between items-center w-full pl-[270px] pr-8 py-4 sticky top-0 z-40 bg-[#fbf9f4]/80 dark:bg-stone-950/80 backdrop-blur-xl shadow-[0_4px_24px_rgba(124,144,130,0.06)]">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/50" data-icon="search">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full text-sm focus:ring-2 focus:ring-[#7C9082]/20 transition-all" placeholder="Search logs by room, guest or ID..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex gap-4">
+<button class="material-symbols-outlined text-[#7C9082] hover:opacity-80 transition-opacity" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined text-[#7C9082] hover:opacity-80 transition-opacity" data-icon="settings">settings</button>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-fixed overflow-hidden ring-2 ring-surface">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="Close up of a professional male user" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBITxIgT7U7pSEn6Xu9lOd4iWSDM8F9PXBUDDPart07tH62NYX3QMHQuwH9TCFrrBOPRUkOcL4L-k9SOENsnc53NuUEcHIgACsTgvMM_IyCdtJjU8bSLGvlKthFMD-la97FwFkbXVFPvBq3oBu2k5_lXFOrRFGgIca2wj_Y7usGRNM3-XrAyqNPm6TzBRQF4QX9XkYYYN82TW-H-bVCPVr4udCyYFWDF7qllTrvLuqPghfsVtoU5xsQOeaxvPVsh1LYfsGakU3XRbM"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-[250px] p-8 min-h-screen">
+<!-- Editorial Header Section -->
+<section class="mb-10 flex justify-between items-end">
+<div>
+<nav class="flex gap-2 text-xs font-medium text-on-surface-variant mb-2 uppercase tracking-widest">
+<span>Admin</span>
+<span>/</span>
+<span class="text-primary font-bold">Access Audit</span>
+</nav>
+<h2 class="text-4xl font-headline font-bold text-on-surface">Access Ledger</h2>
+<p class="text-on-surface-variant mt-2 font-body max-w-lg">Historical record of all physical and digital credential attempts across the University Hotel estate.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-6 py-3 rounded-full bg-surface-container-high text-on-surface font-semibold text-sm hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="filter_list">filter_list</span>
+                    Filter Records
+                </button>
+<button class="flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-white font-semibold text-sm hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-sm" data-icon="download">download</span>
+                    Export CSV
+                </button>
+</div>
+</section>
+<!-- Access Summary Cards (Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+<div class="bg-surface-container-low p-6 rounded-lg flex flex-col justify-between">
+<span class="material-symbols-outlined text-primary mb-4" data-icon="door_front">door_front</span>
+<div>
+<p class="text-3xl font-headline font-bold">1,284</p>
+<p class="text-sm text-on-surface-variant">Total Entries (24h)</p>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-lg flex flex-col justify-between">
+<span class="material-symbols-outlined text-error mb-4" data-icon="gpp_maybe">gpp_maybe</span>
+<div>
+<p class="text-3xl font-headline font-bold">12</p>
+<p class="text-sm text-on-surface-variant">Denied Access Attempts</p>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-lg flex flex-col justify-between">
+<span class="material-symbols-outlined text-secondary mb-4" data-icon="vpn_key">vpn_key</span>
+<div>
+<p class="text-3xl font-headline font-bold">84%</p>
+<p class="text-sm text-on-surface-variant">Digital Key Usage</p>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-lg flex flex-col justify-between">
+<span class="material-symbols-outlined text-[#7C9082] mb-4" data-icon="history">history</span>
+<div>
+<p class="text-3xl font-headline font-bold">0.8s</p>
+<p class="text-sm text-on-surface-variant">Avg. Auth Latency</p>
+</div>
+</div>
+</div>
+<!-- Ledger Table Section -->
+<div class="bg-surface-container-lowest rounded-lg overflow-hidden">
+<div class="p-6 border-b border-surface-container">
+<h3 class="text-xl font-headline font-bold">Audit Records</h3>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant uppercase text-[10px] tracking-[0.2em] font-bold">
+<th class="px-8 py-4">Timestamp</th>
+<th class="px-6 py-4">Room / Area</th>
+<th class="px-6 py-4">Credential Type</th>
+<th class="px-6 py-4">Guest / Staff</th>
+<th class="px-6 py-4">Status Result</th>
+<th class="px-8 py-4 text-right">Reference</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-8 py-5 font-medium text-sm">
+<span class="block text-on-surface">Oct 24, 2023</span>
+<span class="text-xs text-on-surface-variant">14:22:10</span>
+</td>
+<td class="px-6 py-5">
+<span class="text-sm font-bold text-on-surface">Suite 402</span>
+<span class="block text-xs text-on-surface-variant">North Wing</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-lg text-on-surface-variant" data-icon="contactless">contactless</span>
+<span class="text-sm">Mobile Key NFC</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 rounded-full bg-surface-container-high overflow-hidden">
+<img alt="Guest" class="w-full h-full object-cover" data-alt="Portrait of a young male guest" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRoYda-4Ey23AmOJ8nUpWFc5T1g4fWJ2HKPPIpEaBYDrfQeyLyjbsuJMN7wH-OSdLo2NFQs_PuVkhMw4x9YaeMIZOObq-kCodhEwjpTzOfB4wDYwSJuJaldjRFzPS8ZrStEbnVjzAfiesJc6ICv-FN_yffe5ZZGGzyPWUHGotu8B85o8mWe_jX-WkR4h-K9AonDQAIvd3DPa_w-6_I_arKZO3NrMf_89Irdq8xAlxZBHz7_YlH_aqeBq8KN2DUg0FwYEM-NTX9dKQ"/>
+</div>
+<span class="text-sm">Julian Montgomery</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary">
+                                    Granted
+                                </span>
+</td>
+<td class="px-8 py-5 text-right text-xs font-mono text-on-surface-variant">#TX-9021</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-8 py-5 font-medium text-sm">
+<span class="block text-on-surface">Oct 24, 2023</span>
+<span class="text-xs text-on-surface-variant">14:18:45</span>
+</td>
+<td class="px-6 py-5">
+<span class="text-sm font-bold text-on-surface">Main Gym</span>
+<span class="block text-xs text-on-surface-variant">Level 1</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-lg text-on-surface-variant" data-icon="credit_card">credit_card</span>
+<span class="text-sm">RFID Card</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 rounded-full bg-surface-container-high overflow-hidden">
+<img alt="Guest" class="w-full h-full object-cover" data-alt="Portrait of a female hotel guest" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVpBPJK5GHvw_mHrzgfNz9vwt0phdXUgcrxWJhKQgPhH9r4MLe4NWJ74q3HbVFInwEvYbB2YXNxKIZyl9dGPALezLvuQjm9eN4cu1jwcWub9OrIfax99BVvL5hAiIetM4tYOX38GSkLVWHleHbGz9yXgwRKmFn6XKA7EozSwsLlj4L3G1So-lSx5YFRaYNKu9z0jiheAt8xVzO3OkQy_3MJ6Bnsali8D8MqebvB9KcxBafQ4Vabhto4qH9_LOBL5me-XT6crR4YME"/>
+</div>
+<span class="text-sm">Sarah Jenkins</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-error-container text-error">
+                                    Denied
+                                </span>
+</td>
+<td class="px-8 py-5 text-right text-xs font-mono text-on-surface-variant">#TX-9020</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-8 py-5 font-medium text-sm">
+<span class="block text-on-surface">Oct 24, 2023</span>
+<span class="text-xs text-on-surface-variant">14:05:12</span>
+</td>
+<td class="px-6 py-5">
+<span class="text-sm font-bold text-on-surface">Room 214</span>
+<span class="block text-xs text-on-surface-variant">South Wing</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-lg text-on-surface-variant" data-icon="badge">badge</span>
+<span class="text-sm">Staff Badge</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 rounded-full bg-surface-container-high overflow-hidden">
+<img alt="Staff" class="w-full h-full object-cover" data-alt="Close up of hotel housekeeping staff" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkk70gktUwPIr5RrjJKlxFps3YEDyGuhL5M4P9hPyXpzzFvfq-wxNn_QkdphC097mqYXR_sgmG7RsQghi4_-Guo9gYARXiRTPfaZbeNi3QJS7AskE1UUXw2esquiapWHFqXpEw16pvORHiXLwRv7r6L9A7Sa9UXkTX2UoNu5kBmY4wgGwGiAwfB8wKljVKJAcgKLSvz2PTC6b6Fk1aC3MdjcpIlBai00FTRq-G96wjkfySMqis0GlTBo9-peCk6t6S4PgA1PLD_k4"/>
+</div>
+<span class="text-sm">Elena Rodriguez (Hskp)</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary">
+                                    Granted
+                                </span>
+</td>
+<td class="px-8 py-5 text-right text-xs font-mono text-on-surface-variant">#TX-9019</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-8 py-5 font-medium text-sm">
+<span class="block text-on-surface">Oct 24, 2023</span>
+<span class="text-xs text-on-surface-variant">13:50:22</span>
+</td>
+<td class="px-6 py-5">
+<span class="text-sm font-bold text-on-surface">Executive Lounge</span>
+<span class="block text-xs text-on-surface-variant">Rooftop</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-lg text-on-surface-variant" data-icon="contactless">contactless</span>
+<span class="text-sm">Mobile Key NFC</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 rounded-full bg-surface-container-high overflow-hidden">
+<img alt="Guest" class="w-full h-full object-cover" data-alt="Portrait of an elderly male guest" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPBKi8xkqTdSRKmRUT1dPLKw-bWqS4-IbYPyN6Q5mzY1cPG9mCO24lQuLxGhnNWD5WLafBJXF8YPJQFHfG1gzYwyph0ty4k5zmNpZXR430dv1k9JF3YtWuVLQg9mDLemIT3HQTArsy1WZu6vr0NeirEWuDpYypP_yNlxwbTOz6aH7_XMilicVyfiWHiSxvIHFh-u9O-89BwC5gVwkjFA5LEnrYlG93KZVMt6lXB0HmNV0qWJnGET4_sGqXT2WbvLuJf3nUawHhkkk"/>
+</div>
+<span class="text-sm">Robert Chen</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-tertiary-container/20 text-tertiary">
+                                    Expired
+                                </span>
+</td>
+<td class="px-8 py-5 text-right text-xs font-mono text-on-surface-variant">#TX-9018</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Pagination -->
+<div class="p-6 flex justify-between items-center bg-surface-container-low/30">
+<p class="text-xs text-on-surface-variant">Showing 4 of 2,450 entries</p>
+<div class="flex gap-2">
+<button class="p-2 rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="px-4 py-2 text-sm font-bold bg-primary text-white rounded-full">1</button>
+<button class="px-4 py-2 text-sm font-bold text-on-surface-variant hover:text-on-surface">2</button>
+<button class="px-4 py-2 text-sm font-bold text-on-surface-variant hover:text-on-surface">3</button>
+<button class="p-2 rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Asymmetric Detail Panel (Audit Insights) -->
+<section class="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div class="lg:col-span-2 bg-[#7C9082] text-white p-10 rounded-lg relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="text-2xl font-headline italic mb-4">Integrity Report</h3>
+<p class="font-body opacity-90 max-w-md mb-8">System diagnostic indicates 100% of locks are currently synchronized with the cloud ledger. No unauthorized tamper attempts detected in the current session.</p>
+<div class="flex gap-10">
+<div>
+<p class="text-4xl font-headline font-bold">0</p>
+<p class="text-xs uppercase tracking-widest opacity-70 mt-1">Faulty Terminals</p>
+</div>
+<div>
+<p class="text-4xl font-headline font-bold">2.4k</p>
+<p class="text-xs uppercase tracking-widest opacity-70 mt-1">Uptime Hours</p>
+</div>
+</div>
+</div>
+<div class="absolute right-0 top-0 h-full w-1/3 opacity-10 flex items-center justify-center">
+<span class="material-symbols-outlined text-[200px]" data-icon="verified_user" style="font-variation-settings: &#39;FILL&#39; 1;">verified_user</span>
+</div>
+</div>
+<div class="bg-surface-container-high p-8 rounded-lg">
+<h4 class="text-lg font-headline font-bold mb-6">Recent Denials</h4>
+<div class="space-y-6">
+<div class="flex items-start gap-4">
+<div class="p-2 bg-error-container text-error rounded-full">
+<span class="material-symbols-outlined" data-icon="lock_open">lock_open</span>
+</div>
+<div>
+<p class="text-sm font-bold">Invalid Room Key</p>
+<p class="text-xs text-on-surface-variant">Room 102 • Attempted 3m ago</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="p-2 bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full">
+<span class="material-symbols-outlined" data-icon="timer">timer</span>
+</div>
+<div>
+<p class="text-sm font-bold">Checkout Elapsed</p>
+<p class="text-xs text-on-surface-variant">Main Lobby • Attempted 14m ago</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="p-2 bg-error-container text-error rounded-full">
+<span class="material-symbols-outlined" data-icon="warning">warning</span>
+</div>
+<div>
+<p class="text-sm font-bold">Unauthorized Level</p>
+<p class="text-xs text-on-surface-variant">Maintenance • Attempted 28m ago</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-8 py-3 text-sm font-bold text-primary border border-primary/20 rounded-full hover:bg-primary/5 transition-colors">
+                    Security Dashboard
+                </button>
+</div>
+</section>
+</main>
+</body></html>
